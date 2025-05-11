@@ -1,0 +1,141 @@
+// Estilos del cursor personalizado
+.custom-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  will-change: transform, left, top;
+  // No transition en el contenedor principal para que el movimiento sea controlado por JS
+  
+  .cursor-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    background-color: transparent;
+    will-change: width, height, transform, border-color;
+    transition: width 0.15s ease-out, 
+                height 0.15s ease-out, 
+                border-color 0.15s ease-out,
+                background-color 0.15s ease-out;
+    overflow: hidden;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 154, 158, 0.2);
+      mix-blend-mode: difference;
+      backdrop-filter: hue-rotate(60deg) saturate(2);
+      border-radius: 50%;
+      will-change: background-color, mix-blend-mode, backdrop-filter;
+      transition: background-color 0.15s ease-out, 
+                  mix-blend-mode 0.15s ease-out,
+                  backdrop-filter 0.15s ease-out;
+    }
+  }
+  
+  // Cuando el cursor está sobre elementos interactivos
+  &.pointer {
+    .cursor-dot {
+      width: 70px;
+      height: 70px;
+      border-color: rgba(255, 154, 158, 0.8);
+      
+      &::after {
+        background-color: rgba(255, 154, 158, 0.3);
+        mix-blend-mode: color-dodge;
+        backdrop-filter: hue-rotate(180deg) saturate(2.5);
+      }
+    }
+  }
+  
+  // Cuando el usuario hace clic
+  &.clicking {
+    .cursor-dot {
+      transform: translate(-50%, -50%) scale(0.9);
+      border-color: rgba(255, 154, 158, 1);
+      
+      &::after {
+        background-color: rgba(255, 154, 158, 0.4);
+        mix-blend-mode: overlay;
+        backdrop-filter: hue-rotate(270deg) saturate(3);
+      }
+    }
+  }
+  
+  // Cuando el cursor sale de la ventana
+  &.hidden {
+    .cursor-dot {
+      opacity: 0;
+    }
+  }
+}
+
+// Ocultar TODOS los cursores nativos
+html, 
+body, 
+a, 
+button, 
+input, 
+textarea, 
+select, 
+[role="button"], 
+[tabindex]:not([tabindex="-1"]), 
+label, 
+.button, 
+.clickable, 
+.link {
+  cursor: none !important;
+}
+
+// Aplicar esto a todos los elementos y sus estados
+* {
+  cursor: none !important;
+  
+  &:hover, 
+  &:active, 
+  &:focus {
+    cursor: none !important;
+  }
+}
+
+// Restaurar cursores nativos solo en móviles
+@media (max-width: 768px) {
+  .custom-cursor {
+    display: none;
+  }
+  
+  html, 
+  body, 
+  *, 
+  a, 
+  button, 
+  input, 
+  textarea, 
+  select {
+    cursor: auto !important;
+    
+    &:hover {
+      cursor: pointer !important;
+    }
+  }
+  
+  a:hover, 
+  button:hover, 
+  [role="button"]:hover, 
+  .button:hover, 
+  .clickable:hover, 
+  .link:hover {
+    cursor: pointer !important;
+  }
+} 

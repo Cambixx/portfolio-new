@@ -1,0 +1,84 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "title": "Portfolio 2024",
+      "description": "Portfolio personal con animaciones suaves y scroll horizontal. Implementación de efectos visuales avanzados y transiciones fluidas.",
+      "image": "/imgs/projects/greenpeace.png",
+      "technologies": ["React", "TypeScript", "GSAP", "Lenis"],
+      "link": "https://portfolio.com"
+    },
+    {
+      "id": 2,
+      "title": "E-commerce Dashboard",
+      "description": "Panel de administración para tienda online con análisis en tiempo real. Sistema completo de gestión de inventario y métricas de ventas.",
+      "image": "/projects/dashboard.jpg",
+      "technologies": ["Next.js", "Tailwind", "Prisma", "PostgreSQL"],
+      "link": "https://dashboard.com"
+    },
+    {
+      "id": 3,
+      "title": "AI Chat Assistant",
+      "description": "Chatbot inteligente con procesamiento de lenguaje natural. Integración con múltiples fuentes de datos y aprendizaje continuo.",
+      "image": "/projects/chatbot.jpg",
+      "technologies": ["Python", "TensorFlow", "FastAPI", "React"],
+      "link": "https://aichat.com"
+    },
+    {
+      "id": 4,
+      "title": "Social Media Analytics",
+      "description": "Plataforma de análisis de redes sociales con visualización de datos en tiempo real y predicciones de tendencias.",
+      "image": "/projects/social.jpg",
+      "technologies": ["Vue.js", "D3.js", "Node.js", "MongoDB"],
+      "link": "https://analytics.com"
+    },
+    {
+      "id": 5,
+      "title": "Fitness Tracking App",
+      "description": "Aplicación móvil para seguimiento de rutinas de ejercicio y nutrición con sincronización en la nube.",
+      "image": "/projects/fitness.jpg",
+      "technologies": ["React Native", "Redux", "Firebase", "TypeScript"],
+      "link": "https://fitness.com"
+    },
+    {
+      "id": 6,
+      "title": "Real Estate Platform",
+      "description": "Plataforma inmobiliaria con búsqueda avanzada y visualización 3D de propiedades.",
+      "image": "/projects/realestate.jpg",
+      "technologies": ["Angular", "Three.js", "Express", "MySQL"],
+      "link": "https://realestate.com"
+    },
+    {
+        "id": 7,
+        "title": "Real Estate Platform",
+        "description": "Plataforma inmobiliaria con búsqueda avanzada y visualización 3D de propiedades.",
+        "image": "/projects/realestate.jpg",
+        "technologies": ["Angular", "Three.js", "Express", "MySQL"],
+        "link": "https://realestate.com"
+      },
+      {
+        "id": 8,
+        "title": "Real Estate Platform",
+        "description": "Plataforma inmobiliaria con búsqueda avanzada y visualización 3D de propiedades.",
+        "image": "/projects/realestate.jpg",
+        "technologies": ["Angular", "Three.js", "Express", "MySQL"],
+        "link": "https://realestate.com"
+      },
+      {
+        "id": 9,
+        "title": "Real Estate Platform",
+        "description": "Plataforma inmobiliaria con búsqueda avanzada y visualización 3D de propiedades.",
+        "image": "/projects/realestate.jpg",
+        "technologies": ["Angular", "Three.js", "Express", "MySQL"],
+        "link": "https://realestate.com"
+      },
+      {
+        "id": 10,
+        "title": "Real Estate Platform",
+        "description": "Plataforma inmobiliaria con búsqueda avanzada y visualización 3D de propiedades.",
+        "image": "/projects/realestate.jpg",
+        "technologies": ["Angular", "Three.js", "Express", "MySQL"],
+        "link": "https://realestate.com"
+      }
+  ]
+} 

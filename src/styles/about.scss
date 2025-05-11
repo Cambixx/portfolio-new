@@ -1,0 +1,168 @@
+.about-section {
+  min-height: 300vh; // Altura mínima para tener espacio para scroll
+  width: 100%;
+  background-color: var(--background-color);
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 4rem; // Padding base para todas las pantallas
+  
+  @media (max-width: 768px) {
+    min-height: auto; // Ajustamos la altura para móvil
+    padding-bottom: 8rem; // Aumentamos significativamente el espacio en móvil
+  }
+  
+  .about-layout {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: minmax(300px, 30%) 1fr;
+    gap: 4rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 0 1.5rem;
+    }
+  }
+
+  .title-wrapper {
+    position: relative;
+    padding-top: 6rem;
+
+    @media (max-width: 768px) {
+      padding-top: 3rem;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .title-container {
+    position: relative;
+    height: fit-content;
+    padding-left: 2rem;
+    
+    @media (max-width: 768px) {
+      padding-left: 1rem;
+    }
+    
+    &.title-pinned {
+      @media (min-width: 769px) {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        width: auto;
+        
+        .vertical-line {
+          height: 120%;
+        }
+      }
+    }
+    
+    .title {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      margin: 0;
+      line-height: 0.9;
+      position: relative;
+      display: inline-block;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      
+      @media (max-width: 768px) {
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+      }
+      
+      span {
+        display: inline-block;
+        margin-left: 0.5rem;
+      }
+    }
+    
+    .vertical-line {
+      position: absolute;
+      top: -10%;
+      left: 0;
+      width: 1px;
+      height: 120%;
+      background: linear-gradient(to bottom, rgba(255,154,158,0.1), rgba(255,154,158,0.8), rgba(255,154,158,0.1));
+
+      @media (max-width: 768px) {
+        height: 100%;
+      }
+    }
+  }
+  
+  .content-wrapper {
+    padding-top: 6rem;
+
+    @media (max-width: 768px) {
+      padding-top: 0;
+    }
+  }
+
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+    
+    @media (max-width: 768px) {
+      gap: 3rem;
+    }
+    
+    .text-block {
+      opacity: 0;
+      transform: translateY(100px);
+      margin-bottom: 2rem;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 1rem;
+        transform: translateY(50px);
+      }
+      
+      h3 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: #FFF;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-block;
+
+        @media (max-width: 768px) {
+          font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+          margin-bottom: 0.75rem;
+        }
+      }
+      
+      p {
+        font-size: clamp(1rem, 1.2vw, 1.2rem);
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 600px;
+
+        @media (max-width: 768px) {
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+  
+  // Animación de la línea vertical
+  @keyframes lineGrow {
+    from {
+      height: 0;
+    }
+    to {
+      height: 100%;
+    }
+  }
+} 

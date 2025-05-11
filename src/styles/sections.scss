@@ -1,0 +1,149 @@
+// Estilos comunes para todas las secciones
+section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+// Hero Section
+.hero {
+  background-color: var(--background-color);
+  display: flex;
+  align-items: center;
+  
+  .hero-content {
+    max-width: 800px;
+  }
+  
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    
+    .greeting {
+      display: block;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 400;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s ease forwards;
+    }
+    
+    .name {
+      display: block;
+      background: linear-gradient(to right, var(--text-color), var(--primary-color));
+      -webkit-background-clip: text;
+      color: transparent;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards 0.3s;
+    }
+  }
+  
+  .title {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards 0.6s;
+  }
+  
+  .description {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s ease forwards 0.9s;
+  }
+}
+
+// About Section
+.about {
+  background-color: var(--background-color);
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+  }
+  
+  p {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    max-width: 600px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+  }
+}
+
+// Projects Section
+.projects {
+  background-color: var(--background-color);
+  
+  h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+  }
+  
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+}
+
+// Contact Section
+.contact {
+  background-color: var(--background-color);
+  text-align: center;
+  
+  h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+  }
+  
+  p {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    margin-bottom: 2rem;
+    color: rgba(255,255,255,0.8);
+  }
+}
+
+// Animaciones
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 
