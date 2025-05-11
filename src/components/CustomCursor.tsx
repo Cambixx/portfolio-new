@@ -43,7 +43,10 @@ const CustomCursor = () => {
     const handleMouseUp = () => setIsClicking(false);
     
     const handlePointerElements = () => {
-      const elements = document.querySelectorAll('a, button, [role="button"], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      // Añadir .project-card a los selectores para que también activen el estado de puntero
+      const elements = document.querySelectorAll(
+        'a, button, [role="button"], input, select, textarea, [tabindex]:not([tabindex="-1"]), .project-card'
+      );
       
       elements.forEach(el => {
         el.addEventListener('mouseenter', () => setIsPointer(true));
