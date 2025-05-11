@@ -54,7 +54,7 @@ const AboutSection = () => {
     }
 
     // Animación de los bloques de texto apareciendo en secuencia
-    textBlocks.forEach((block, index) => {
+    textBlocks.forEach((block, _index) => {
       gsap.fromTo(block, 
         { 
           y: 50, // Reducido para móvil
