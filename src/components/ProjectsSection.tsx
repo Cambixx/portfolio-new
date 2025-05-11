@@ -18,7 +18,6 @@ const ProjectsSection = () => {
     if (window.innerWidth < 768) return; // Solo aplica GSAP en desktop
     if (!sectionRef.current || !containerRef.current || !projectsRef.current || !lastCardRef.current) return;
 
-    const section = sectionRef.current;
     const container = containerRef.current;
     const projectsWrapper = projectsRef.current;
     const lastCard = lastCardRef.current;

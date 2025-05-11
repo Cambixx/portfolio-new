@@ -106,13 +106,13 @@ const AboutSection = () => {
 
         <div ref={contentContainerRef} className="content-wrapper">
           <div className="text-container">
-            {textBlocks.map((block, index) => (
+            {textBlocks.map((block, _index) => (
               <div 
-                key={index} 
+                key={_index} 
                 className="text-block"
-                ref={(el) => setTextBlockRef(el, index)}
+                ref={(el) => setTextBlockRef(el, _index)}
               >
-                <h3 ref={index === textBlocks.length - 1 ? lastBlockTitleRef : null}>
+                <h3 ref={_index === textBlocks.length - 1 ? lastBlockTitleRef : null}>
                   {block.title}
                 </h3>
                 <p>{block.description}</p>
