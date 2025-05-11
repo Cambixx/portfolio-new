@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, useScroll, useTransform } from 'framer-motion';
 import '../styles/about.scss';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +22,6 @@ const AboutSection = () => {
 
     const titleContainer = titleContainerRef.current;
     const title = titleRef.current;
-    const contentContainer = contentContainerRef.current;
     const lastBlockTitle = lastBlockTitleRef.current;
     const textBlocks = textBlocksRef.current.filter(Boolean);
 
