@@ -1,14 +1,14 @@
 .hero {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-color: #000;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  opacity: 0; /* Inicialmente invisible para la animación */
+  overflow: visible;
+  opacity: 0;
   
   .hero-container {
     width: 100%;
@@ -18,12 +18,14 @@
     z-index: 2;
     height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
-  
+
   .hero-content {
-    margin-bottom: 15vh;
+    flex: 0 0 40%;
+    margin-bottom: 0;
 
     .title-container {
       overflow: hidden;
@@ -50,47 +52,40 @@
         line-height: 0.9;
         background: linear-gradient(to right, #FF9A9E, #FFECD2);
         -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
         color: transparent;
-        text-transform: uppercase;
-        transform-origin: left;
         position: relative;
         display: inline-block;
-
-        @media (max-width: 768px) {
-          line-height: normal;
-        }
         
         .name-underline {
           position: absolute;
-          bottom: -0.2rem;
+          bottom: -0.5rem;
           left: 0;
-          width: 40%;
-          height: 0.4rem;
+          width: 100%;
+          height: 4px;
           background: linear-gradient(to right, #FF9A9E, #FFECD2);
-          display: block;
           transform-origin: left;
         }
       }
     }
+  }
+
+  .hero-right {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: -1;
     
-    .hero-subtitle {
-      margin-top: 2rem;
-      
-      .title {
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: rgba(255, 255, 255, 0.9);
-      }
-      
-      .description {
-        font-size: clamp(1rem, 1.5vw, 1.2rem);
-        max-width: 500px;
-        color: rgba(255, 255, 255, 0.7);
-        line-height: 1.6;
-      }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      position: absolute !important;
+      top: 0;
+      left: 0;
     }
   }
   
@@ -132,18 +127,17 @@
   }
 }
 
-// Animaciones
 @keyframes scrollDown {
   0% {
     opacity: 1;
     top: 0.5rem;
   }
   50% {
-    opacity: 0.5;
-    top: 1.5rem;
-  }
-  100% {
     opacity: 0;
     top: 2rem;
   }
-} 
+  100% {
+    opacity: 1;
+    top: 0.5rem;
+  }
+}

@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { Model3D } from './Model3D';
 import '../styles/hero.scss';
 
 const Hero = () => {
@@ -72,6 +75,19 @@ const Hero = () => {
 
   return (
     <section className="hero" ref={heroRef}>
+      <div className="hero-right">
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <ambientLight intensity={0.8} />
+          <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
+          <pointLight position={[-10, -10, -10]} intensity={0.5} />
+          <directionalLight position={[0, 5, 5]} intensity={1} castShadow />
+          <Model3D />
+          <OrbitControls enableZoom={false} />
+        </Canvas>
+      </div>
       <div className="hero-container">
         <div className="hero-content">
           <div className="title-container">
@@ -105,18 +121,18 @@ const Hero = () => {
           </div>
         </div>
 
-        <motion.div 
-          className="scroll-indicator"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          <span>Scroll</span>
-          <div className="arrow"></div>
-        </motion.div>
-      </div>
-    </section>
+          <motion.div 
+            className="scroll-indicator"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <span>Scroll</span>
+            <div className="arrow"></div>
+          </motion.div>
+        </div>
+      </section>
   );
 };
 
-export default Hero; 
+export default Hero;

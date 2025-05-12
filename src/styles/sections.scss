@@ -8,7 +8,7 @@ section {
 
 // Hero Section
 .hero {
-  background-color: var(--background-color);
+  background-color: transparent;
   display: flex;
   align-items: center;
   
@@ -65,7 +65,7 @@ section {
 
 // About Section
 .about {
-  background-color: var(--background-color);
+  background-color: transparent;
   
   .container {
     display: flex;
@@ -93,7 +93,7 @@ section {
 
 // Projects Section
 .projects {
-  background-color: var(--background-color);
+  background-color: transparent;
   
   h2 {
     font-size: clamp(2rem, 5vw, 4rem);
@@ -115,7 +115,7 @@ section {
 
 // Contact Section
 .contact {
-  background-color: var(--background-color);
+  background-color: transparent;
   text-align: center;
   
   h2 {
@@ -139,11 +139,11 @@ section {
 // Animaciones
 @keyframes fadeInUp {
   from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
     opacity: 1;
     transform: translateY(0);
   }
-} 
+  to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}

@@ -82,10 +82,8 @@ const ProjectsSection = () => {
                   cursor: 'pointer',
                   backgroundImage: `url(${project.image})`
                 }}
-                whileHover={{ y: -10 }}
                 transition={{ 
-                  layout: { type: "tween", duration: 0.2, ease: "easeInOut" },
-                  y: { type: "tween", duration: 0.2, ease: "easeInOut" }
+                  layout: { type: "tween", duration: 0.2, ease: "easeInOut" }
                 }}
               >
                 <motion.div 
