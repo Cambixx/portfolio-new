@@ -3,6 +3,9 @@ import { useGLTF, useAnimations, Float, Environment, Lightformer } from '@react-
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 import { AudioController } from './AudioController';
 
 interface Model3DProps {
@@ -68,7 +71,7 @@ export function Model3D({ audioEnabled = false }: Model3DProps) {
       
       // Ajuste adicional para dispositivos móviles (medio giro más = PI/2)
       const isMobile = window.innerWidth < 768;
-      const mobileRotationAdjust = isMobile ? Math.PI / 2 : 0;
+      const mobileRotationAdjust = isMobile ? -Math.PI / 2 : 0;
       
       // Calcula la rotación total
       targetRotation.current = baseRotation + mobileRotationAdjust;

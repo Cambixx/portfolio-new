@@ -82,6 +82,10 @@ const ProjectsSection = () => {
                   cursor: 'pointer',
                   backgroundImage: `url(${project.image})`
                 }}
+                initial={{ opacity: 0 }}
+                animate={{ 
+                  opacity: 1
+                }}
                 transition={{ 
                   layout: { type: "tween", duration: 0.2, ease: "easeInOut" }
                 }}
@@ -189,4 +193,4 @@ const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
   );
 };
 
-export default ProjectsSection; 
+export default ProjectsSection;
