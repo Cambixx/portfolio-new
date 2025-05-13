@@ -1,12 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, useProgress } from '@react-three/drei';
 import { Model3D } from './Model3D';
+import { ModelLoader } from './ModelLoader';
 import '../styles/hero.scss';
 
 const Hero = () => {
+  const { loaded } = useProgress();
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    if (loaded) {
+      const timer = setTimeout(() => setShowLoader(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loaded]);
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLSpanElement>(null);
@@ -75,6 +85,7 @@ const Hero = () => {
 
   return (
     <section className="hero" ref={heroRef}>
+      <ModelLoader show={showLoader} />
       <div className="hero-right">
         <Canvas
           camera={{ position: [0, 0, 5], fov: 45 }}
