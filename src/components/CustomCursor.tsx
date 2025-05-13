@@ -19,24 +19,20 @@ const CustomCursor = () => {
 
     // Animación fluida del cursor
     const animateCursor = () => {
-      // Calcular la distancia entre el cursor y el mouse
+      // Factor de suavizado - valores más bajos = más suavizado
+      const smoothing = 0.15;
+      
+      // Calcular la nueva posición con interpolación suave
       const dx = mousePosition.current.x - cursorPosition.current.x;
       const dy = mousePosition.current.y - cursorPosition.current.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
       
-      // Factor de suavizado dinámico basado en la distancia
-      // Más rápido cuando está lejos, más suave cuando está cerca
-      const baseSmoothing = 0.08; // Valor base más bajo para mayor responsividad
-      const speedMultiplier = Math.min(distance / 100, 2); // Limitar el multiplicador
-      const smoothing = baseSmoothing * speedMultiplier;
-      
-      // Aplicar el movimiento con el factor de suavizado dinámico
       cursorPosition.current.x += dx * smoothing;
       cursorPosition.current.y += dy * smoothing;
       
-      // Aplicar la nueva posición con transform para mejor rendimiento
+      // Aplicar la nueva posición
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${cursorPosition.current.x}px, ${cursorPosition.current.y}px, 0)`;
+        cursorRef.current.style.left = `${cursorPosition.current.x}px`;
+        cursorRef.current.style.top = `${cursorPosition.current.y}px`;
       }
       
       // Continuar la animación
@@ -117,4 +113,4 @@ const CustomCursor = () => {
   );
 };
 
-export default CustomCursor;
+export default CustomCursor; 
