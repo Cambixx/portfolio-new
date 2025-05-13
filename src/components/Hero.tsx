@@ -5,11 +5,13 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useProgress } from '@react-three/drei';
 import { Model3D } from './Model3D';
 import { ModelLoader } from './ModelLoader';
+import { AudioButton } from './AudioButton';
 import '../styles/hero.scss';
 
 const Hero = () => {
   const { loaded } = useProgress();
   const [showLoader, setShowLoader] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(false);
 
   useEffect(() => {
     if (loaded) {
@@ -95,7 +97,7 @@ const Hero = () => {
           <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           <directionalLight position={[0, 5, 5]} intensity={1} castShadow />
-          <Model3D />
+          <Model3D audioEnabled={audioEnabled} />
           <OrbitControls enableZoom={false} />
         </Canvas>
       </div>
@@ -141,6 +143,8 @@ const Hero = () => {
             <span>Scroll</span>
             <div className="arrow"></div>
           </motion.div>
+          
+          <AudioButton onToggle={setAudioEnabled} />
         </div>
       </section>
   );

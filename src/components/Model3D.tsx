@@ -3,8 +3,13 @@ import { useGLTF, useAnimations, Float, Environment, Lightformer } from '@react-
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { AudioController } from './AudioController';
 
-export function Model3D() {
+interface Model3DProps {
+  audioEnabled?: boolean;
+}
+
+export function Model3D({ audioEnabled = false }: Model3DProps) {
   const modelRef = useRef<THREE.Group>(null);
   const { nodes, animations } = useGLTF('/models/carlos-3.glb');
   const { actions } = useAnimations(animations, modelRef);
@@ -56,7 +61,7 @@ export function Model3D() {
         action.time = duration; // Establecer el tiempo al último fotograma
       }
     });
-
+    
     const handleScroll = () => {
       // Factor de rotación base
       const baseRotation = window.scrollY * 0.002;
@@ -83,6 +88,7 @@ export function Model3D() {
     };
 
     window.addEventListener('scroll', handleScroll);
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
       Object.values(actions).forEach((action) => action?.stop());
@@ -100,6 +106,7 @@ export function Model3D() {
 
   return (
     <>
+      {audioEnabled && <AudioController />}
       <Environment resolution={512}>
         {/* Techo */}
         <Lightformer intensity={2.5} rotation-x={Math.PI / 2} position={[0, 3, -4]} scale={[10, 1, 1]} />
