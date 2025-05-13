@@ -5,9 +5,10 @@
   z-index: 9999;
   width: 60px;
   height: 60px;
-  transform: translate(-50%, -50%);
-  will-change: transform, left, top;
-  // No transition en el contenedor principal para que el movimiento sea controlado por JS
+  left: 0;
+  top: 0;
+  will-change: transform;
+  // Usar transform para todas las transformaciones mejora el rendimiento
   
   .cursor-dot {
     position: absolute;
@@ -139,4 +140,4 @@ label,
   .link:hover {
     cursor: pointer !important;
   }
-} 
+}
