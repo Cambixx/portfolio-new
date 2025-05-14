@@ -42,13 +42,7 @@ const ProjectsSection = () => {
         pinSpacing: true,
         fastScrollEnd: true,
         preventOverlaps: true,
-        invalidateOnRefresh: true,
-        markers: {
-          startColor: "purple",
-          endColor: "lime",
-          fontSize: "16px",
-          indent: 20
-        }
+        invalidateOnRefresh: true
       }
     });
 

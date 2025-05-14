@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useState } from 'react';
 import '../styles/audio-visualizer.scss';
 
 interface AudioVisualizerProps {
@@ -11,29 +12,53 @@ interface AudioVisualizerProps {
 // Configuración del visualizador
 const VISUALIZER_CONFIG = {
   // Configuración de las barras
-  BAR_COUNT: 70, // Número de barras a mostrar
+  DESKTOP_BAR_COUNT: 70, // Número de barras para escritorio
+  MOBILE_BAR_COUNT: 40, // Número de barras para móvil
   MIN_BAR_HEIGHT: 1, // Altura mínima de cada barra
   BAR_GAP: 0.5, // Espacio entre barras
   MIN_BAR_WIDTH: 4, // Ancho mínimo de cada barra
+  DESKTOP_MAX_BAR_WIDTH: 200, // Ancho máximo de las barras en escritorio
+  MOBILE_MAX_BAR_WIDTH: 70, // Ancho máximo de las barras en móvil
   BAR_WIDTH_SCALE: 0.9, // Factor de escala para el ancho máximo de las barras (0-1)
   
   // Configuración de la distribución del espectro
   FREQUENCY_DISTRIBUTION: {
-    POWER: 1.2, // Exponente para la distribución logarítmica
-    RANGE: 0.6, // Rango del espectro de frecuencias a utilizar (0-1)
-    OFFSET: 3, // Desplazamiento del índice de frecuencia
+    DESKTOP: {
+      POWER: 1.2, // Exponente para la distribución logarítmica
+      RANGE: 0.6, // Rango del espectro de frecuencias a utilizar (0-1)
+      OFFSET: 3, // Desplazamiento del índice de frecuencia
+    },
+    MOBILE: {
+      POWER: 0.5, // Mayor exponente para una distribución más pronunciada en móvil
+      RANGE: 0.5, // Rango más reducido para enfocarse en frecuencias más relevantes
+      OFFSET: 2, // Menor desplazamiento para ajustarse al ancho reducido
+    }
   },
   
   // Configuración del gradiente
   GRADIENT: {
     START_COLOR: 'rgba(121, 40, 202, 0)', // Color inicial (Púrpura)
-    END_COLOR: 'rgba(255, 154, 158, 0.6)', // Color final (Rosa)
+    END_COLOR: 'rgba(255, 154, 158, 0.5)', // Color final (Rosa)
   },
 };
 
 export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyser }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
+  const [barCount, setBarCount] = useState(VISUALIZER_CONFIG.DESKTOP_BAR_COUNT);
+
+  // Efecto para manejar el cambio de barras según el tamaño de la pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      setBarCount(isMobile ? VISUALIZER_CONFIG.MOBILE_BAR_COUNT : VISUALIZER_CONFIG.DESKTOP_BAR_COUNT);
+    };
+
+    handleResize(); // Establecer valor inicial
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // No necesitamos configurar el analizador aquí, ya lo recibimos como prop
   useEffect(() => {
@@ -87,23 +112,32 @@ export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyse
     // Configuración para dibujar las barras horizontales
     const barHeight = Math.max(
       VISUALIZER_CONFIG.MIN_BAR_HEIGHT,
-      (canvas.height / VISUALIZER_CONFIG.BAR_COUNT) - VISUALIZER_CONFIG.BAR_GAP
+      (canvas.height / barCount) - VISUALIZER_CONFIG.BAR_GAP
     );
     
     // Dibujar cada barra horizontal
-    for (let i = 0; i < VISUALIZER_CONFIG.BAR_COUNT; i++) {
+    for (let i = 0; i < barCount; i++) {
       // Distribución logarítmica para representar mejor el espectro de audio
+      const isMobile = window.innerWidth <= 768;
+      const freqConfig = isMobile ? VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.MOBILE : VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.DESKTOP;
       const index = Math.floor(
-        Math.pow(i / VISUALIZER_CONFIG.BAR_COUNT, VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.POWER) *
-        (bufferLength * VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.RANGE) +
-        VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.OFFSET
+        Math.pow(i / barCount, freqConfig.POWER) *
+        (bufferLength * freqConfig.RANGE) +
+        freqConfig.OFFSET
       );
       const value = dataArray[index];
       
       // Ancho de la barra proporcional a la intensidad de la frecuencia
+      const maxBarWidth = window.innerWidth <= 768 
+        ? VISUALIZER_CONFIG.MOBILE_MAX_BAR_WIDTH 
+        : VISUALIZER_CONFIG.DESKTOP_MAX_BAR_WIDTH;
+      
       const barWidth = Math.max(
         VISUALIZER_CONFIG.MIN_BAR_WIDTH,
-        (value / 255) * canvas.width * VISUALIZER_CONFIG.BAR_WIDTH_SCALE
+        Math.min(
+          maxBarWidth,
+          (value / 255) * canvas.width * VISUALIZER_CONFIG.BAR_WIDTH_SCALE
+        )
       );
       
       // Posición y de la barra
