@@ -13,7 +13,7 @@ interface AudioVisualizerProps {
 const VISUALIZER_CONFIG = {
   // Configuración de las barras
   DESKTOP_BAR_COUNT: 70, // Número de barras para escritorio
-  MOBILE_BAR_COUNT: 40, // Número de barras para móvil
+  MOBILE_BAR_COUNT: 30, // Número de barras para móvil
   MIN_BAR_HEIGHT: 1, // Altura mínima de cada barra
   BAR_GAP: 0.5, // Espacio entre barras
   MIN_BAR_WIDTH: 4, // Ancho mínimo de cada barra
