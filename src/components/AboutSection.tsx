@@ -33,8 +33,9 @@ const AboutSection = () => {
         trigger: titleContainer,
         start: 'top 20%',
         endTrigger: lastBlockTitle,
-        end: 'top top',
+        end: 'top 40%',
         pin: title,
+        markers: true,
         pinSpacing: false,
         onEnter: () => {
           title.classList.add('title-pinned');

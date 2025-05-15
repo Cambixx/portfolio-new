@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { motion } from 'framer-motion';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useProgress } from '@react-three/drei';
 import { Model3D } from './Model3D';
 import { ModelLoader } from './ModelLoader';
 import { AudioButton } from './AudioButton';
 import '../styles/hero.scss';
+
+// Registramos ScrollTrigger para poder usarlo
+gsap.registerPlugin(ScrollTrigger);
 
 const Hero = () => {
   const { loaded } = useProgress();
@@ -19,75 +22,146 @@ const Hero = () => {
       return () => clearTimeout(timer);
     }
   }, [loaded]);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const nameRef = useRef<HTMLSpanElement>(null);
-  const subtitleRef = useRef<HTMLDivElement>(null);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
+  const firstNameRef = useRef<HTMLDivElement>(null);
+  const lastNameRef = useRef<HTMLDivElement>(null);
+  const nameContainerRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+
+  // Animación principal
   useEffect(() => {
     const hero = heroRef.current;
-    const title = titleRef.current;
-    const name = nameRef.current;
-    const subtitle = subtitleRef.current;
+    const firstNameLine = firstNameRef.current;
+    const lastNameLine = lastNameRef.current;
+    const container = nameContainerRef.current;
+    const scrollIndicator = scrollIndicatorRef.current;
+    
+    if (!hero || !firstNameLine || !lastNameLine || !container || !scrollIndicator) return;
 
-    if (!title || !subtitle || !hero || !name) return;
-
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-    // Animación inicial con un enfoque simplificado
-    tl.set(hero, { opacity: 1 })
-      .from(title.querySelector('.greeting'), { 
-        y: 30, 
-        opacity: 0, 
-        duration: 0.8
-      })
-      .from(name, { 
-        y: 60, 
-        opacity: 0, 
-        duration: 1,
-        delay: -0.4
-      })
-      .from(subtitle, { 
-        y: 30, 
-        opacity: 0, 
-        duration: 0.8,
-        delay: -0.2
-      })
-      .from('.scroll-indicator', {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        delay: -0.3
-      });
-
-    // Animación de la línea debajo del nombre
-    gsap.fromTo(
-      '.name-underline',
-      { scaleX: 0, transformOrigin: 'left' },
-      { scaleX: 1, duration: 1.2, delay: 1, ease: 'power3.inOut' }
-    );
-
-  }, []);
-
-  // Variantes para framer-motion
-  const textVariants = {
-    hidden: { 
-      opacity: 0,
-      y: 20
-    },
-    visible: { 
+    // Asegurarse de que el hero sea visible
+    gsap.set(hero, { opacity: 1 });
+    gsap.set(scrollIndicator, { opacity: 0 });
+    
+    // Obtener todas las letras por línea
+    const firstNameLetters = gsap.utils.toArray('.first-name .letter');
+    const lastNameLetters = gsap.utils.toArray('.last-name .letter');
+    
+    // Timeline para la animación
+    const tl = gsap.timeline();
+    
+    // Configurar posición inicial (letras abajo)
+    gsap.set([firstNameLetters, lastNameLetters], {
+      y: 100,
+      opacity: 0
+    });
+    
+    // Animación de entrada desde abajo hacia arriba para el primer nombre
+    tl.to(firstNameLetters, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.03,
+      ease: "power3.out"
+    });
+    
+    // Animación de entrada desde abajo hacia arriba para el apellido
+    tl.to(lastNameLetters, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.03,
+      ease: "power3.out"
+    }, "-=0.5");
+    
+    // Efecto de brillo suave
+    tl.to([firstNameLetters, lastNameLetters], {
+      textShadow: "0 0 10px rgba(255,154,158,0.3)",
+      duration: 1.2,
+      ease: "power2.inOut"
+    }, "-=0.5");
+    
+    // Mostrar el indicador de scroll al final
+    tl.to(scrollIndicator, {
       opacity: 1,
       y: 0,
-      transition: { 
-        duration: 0.8,
-        ease: "easeOut" 
+      duration: 0.8,
+      ease: "power2.out"
+    });
+    
+  }, []);
+
+  // Efecto para el scroll
+  useEffect(() => {
+    const hero = heroRef.current;
+    const container = nameContainerRef.current;
+    const scrollIndicator = scrollIndicatorRef.current;
+    const firstNameLetters = gsap.utils.toArray('.first-name .letter');
+    const lastNameLetters = gsap.utils.toArray('.last-name .letter');
+    
+    if (!hero || !container || !scrollIndicator) return;
+    
+    // Crear animación de scroll
+    ScrollTrigger.create({
+      trigger: hero,
+      start: "top top",
+      end: "center top",
+      scrub: true,
+      onUpdate: (self) => {
+        const progress = self.progress;
+        
+        // Hacer que las letras se desvanezcan de arriba hacia abajo
+        gsap.to(firstNameLetters, {
+          y: 50 * progress, // Movimiento hacia abajo
+          opacity: Math.max(0, 1 - progress * 2),
+          stagger: {
+            each: 0.02,
+            from: "start"
+          },
+          duration: 0.1
+        });
+        
+        gsap.to(lastNameLetters, {
+          y: 70 * progress, // Movimiento hacia abajo pero más pronunciado
+          opacity: Math.max(0, 1 - progress * 2),
+          stagger: {
+            each: 0.02,
+            from: "start"
+          },
+          duration: 0.1
+        });
+        
+        // Animar el indicador de scroll
+        gsap.to(scrollIndicator, {
+          opacity: Math.max(0, 1 - progress * 3),
+          y: 20 * progress, // También hacia abajo
+          duration: 0.1
+        });
       }
-    }
+    });
+    
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
+
+  // Función para crear los spans de las letras
+  const createLetterSpans = (text: string) => {
+    return text.split('').map((char, index) => (
+      <span 
+        key={index} 
+        className="letter"
+      >
+        {char === ' ' ? '\u00A0' : char}
+      </span>
+    ));
   };
 
   return (
     <section className="hero" ref={heroRef}>
       <ModelLoader show={showLoader} />
+      
       <div className="hero-right">
         <Canvas
           camera={{ position: [0, 0, 5], fov: 45 }}
@@ -101,52 +175,23 @@ const Hero = () => {
           <OrbitControls enableZoom={false} />
         </Canvas>
       </div>
-      <div className="hero-container">
-        <div className="hero-content">
-          <div className="title-container">
-            <div className="hero-title" ref={titleRef}>
-              <span className="greeting">Hola, soy</span>
-              <span className="name" ref={nameRef}>
-                Carlos Rábago
-                <span className="name-underline"></span>
-              </span>
-            </div>
-          </div>
-
-          <div className="hero-subtitle" ref={subtitleRef}>
-            <motion.h2 
-              className="title"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              Desarrollador Web
-            </motion.h2>
-            <motion.p 
-              className="description"
-              variants={textVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.2 }}
-            >
-              Creando experiencias digitales únicas
-            </motion.p>
+      
+      <div className="simple-content">
+        <div className="name-container" ref={nameContainerRef}>
+          <div className="hero-name" ref={nameRef}>
+            <div className="first-name" ref={firstNameRef}>{createLetterSpans("CARLOS")}</div>
+            <div className="last-name" ref={lastNameRef}>{createLetterSpans("RÁBAGO")}</div>
           </div>
         </div>
-
-          <motion.div 
-            className="scroll-indicator"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-          >
-            <span>Scroll</span>
-            <div className="arrow"></div>
-          </motion.div>
-          
-          <AudioButton onToggle={setAudioEnabled} />
+        
+        <div className="scroll-indicator" ref={scrollIndicatorRef}>
+          <span>Scroll</span>
+          <div className="arrow"></div>
         </div>
-      </section>
+      </div>
+      
+      <AudioButton onToggle={setAudioEnabled} />
+    </section>
   );
 };
 

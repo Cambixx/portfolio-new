@@ -19,20 +19,24 @@ const CustomCursor = () => {
 
     // Animación fluida del cursor
     const animateCursor = () => {
-      // Factor de suavizado - valores más bajos = más suavizado
-      const smoothing = 0.15;
+      // Factor de suavizado aumentado para menor retraso (antes era 0.15)
+      const smoothing = 0.35;
       
       // Calcular la nueva posición con interpolación suave
       const dx = mousePosition.current.x - cursorPosition.current.x;
       const dy = mousePosition.current.y - cursorPosition.current.y;
       
-      cursorPosition.current.x += dx * smoothing;
-      cursorPosition.current.y += dy * smoothing;
+      // Si el movimiento es muy pequeño, hacerlo instantáneo
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        cursorPosition.current = {...mousePosition.current};
+      } else {
+        cursorPosition.current.x += dx * smoothing;
+        cursorPosition.current.y += dy * smoothing;
+      }
       
-      // Aplicar la nueva posición
+      // Aplicar la nueva posición usando transform para mejor rendimiento
       if (cursorRef.current) {
-        cursorRef.current.style.left = `${cursorPosition.current.x}px`;
-        cursorRef.current.style.top = `${cursorPosition.current.y}px`;
+        cursorRef.current.style.transform = `translate3d(${cursorPosition.current.x}px, ${cursorPosition.current.y}px, 0) translate(-50%, -50%)`;
       }
       
       // Continuar la animación
@@ -55,13 +59,15 @@ const CustomCursor = () => {
     };
     
     const handleMouseLeave = () => setIsHidden(true);
-    const handleMouseEnter = () => {
+    const handleMouseEnter = (e: MouseEvent) => {
       setIsHidden(false);
-      // Forzar actualización de posición al volver a entrar en la ventana
+      // Actualizar tanto la posición del mouse como la posición actual del cursor
+      mousePosition.current = { x: e.clientX, y: e.clientY };
+      cursorPosition.current = { x: e.clientX, y: e.clientY };
+      
+      // Actualizar la posición inmediatamente
       if (cursorRef.current) {
-        cursorPosition.current = mousePosition.current;
-        cursorRef.current.style.left = `${cursorPosition.current.x}px`;
-        cursorRef.current.style.top = `${cursorPosition.current.y}px`;
+        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
       }
     };
     
@@ -69,8 +75,8 @@ const CustomCursor = () => {
     window.addEventListener('mousemove', updateMousePosition);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
-    document.body.addEventListener('mouseleave', handleMouseLeave);
-    document.body.addEventListener('mouseenter', handleMouseEnter);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseenter', handleMouseEnter);
     
     // Detectar elementos con puntero
     handlePointerElements();
@@ -87,8 +93,8 @@ const CustomCursor = () => {
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      document.body.removeEventListener('mouseleave', handleMouseLeave);
-      document.body.removeEventListener('mouseenter', handleMouseEnter);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
       
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
