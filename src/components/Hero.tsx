@@ -11,6 +11,15 @@ import '../styles/hero.scss';
 // Registramos ScrollTrigger para poder usarlo
 gsap.registerPlugin(ScrollTrigger);
 
+// Configuración de la animación del nombre
+const NAME_ANIMATION_CONFIG = {
+  FINAL_SCALE: 120, // Escala final del texto (1 es el tamaño original)
+  SCROLL_DURATION: "+=150%", // Duración del scroll para la animación completa
+  FADE_OUT_THRESHOLD: 1, // Punto donde comienza el fade out (0-1)
+  FADE_OUT_INTENSITY: 5, // Intensidad del fade out
+  SCRUB_SMOOTHNESS: 1, // Suavidad de la animación (mayor = más suave)
+};
+
 const Hero = () => {
   const { loaded } = useProgress();
   const [showLoader, setShowLoader] = useState(true);
@@ -25,8 +34,8 @@ const Hero = () => {
 
   const heroRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
-  const firstNameRef = useRef<HTMLDivElement>(null);
-  const lastNameRef = useRef<HTMLDivElement>(null);
+  const firstNameRef = useRef<SVGTextElement>(null);
+  const lastNameRef = useRef<SVGTextElement>(null);
   const nameContainerRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
@@ -43,50 +52,37 @@ const Hero = () => {
     // Asegurarse de que el hero sea visible
     gsap.set(hero, { opacity: 1 });
     gsap.set(scrollIndicator, { opacity: 0 });
-
-    // Obtener todas las letras por línea
-    const firstNameLetters = gsap.utils.toArray('.first-name .letter');
-    const lastNameLetters = gsap.utils.toArray('.last-name .letter');
     
     // Timeline para la animación
     const tl = gsap.timeline();
     
-    // Configurar posición inicial (letras abajo)
-    gsap.set([firstNameLetters, lastNameLetters], {
+    // Configurar posición inicial
+    gsap.set([firstNameLine, lastNameLine], {
       y: 100,
       opacity: 0
     });
     
-    // Animación de entrada desde abajo hacia arriba para el primer nombre
-    tl.to(firstNameLetters, {
+    // Animación de entrada para el primer nombre
+    tl.to(firstNameLine, {
       y: 0,
       opacity: 1,
-        duration: 0.8,
-      stagger: 0.03,
+      duration: 0.8,
       ease: "power3.out"
     });
     
-    // Animación de entrada desde abajo hacia arriba para el apellido
-    tl.to(lastNameLetters, {
+    // Animación de entrada para el apellido
+    tl.to(lastNameLine, {
       y: 0,
       opacity: 1,
-        duration: 0.8,
-      stagger: 0.03,
+      duration: 0.8,
       ease: "power3.out"
-    }, "-=0.5");
-
-    // Efecto de brillo suave
-    tl.to([firstNameLetters, lastNameLetters], {
-      textShadow: "0 0 10px rgba(255,154,158,0.3)",
-      duration: 1.2,
-      ease: "power2.inOut"
     }, "-=0.5");
 
     // Mostrar el indicador de scroll al final
     tl.to(scrollIndicator, {
       opacity: 1,
       y: 0,
-        duration: 0.8,
+      duration: 0.8,
       ease: "power2.out"
     });
     
@@ -96,46 +92,35 @@ const Hero = () => {
   useEffect(() => {
     const hero = heroRef.current;
     const container = nameContainerRef.current;
+    const nameContainer = nameRef.current;
     const scrollIndicator = scrollIndicatorRef.current;
-    const firstNameLetters = gsap.utils.toArray('.first-name .letter');
-    const lastNameLetters = gsap.utils.toArray('.last-name .letter');
     
-    if (!hero || !container || !scrollIndicator) return;
+    if (!hero || !container || !nameContainer || !scrollIndicator) return;
     
-    // Crear animación de scroll
     ScrollTrigger.create({
       trigger: hero,
       start: "top top",
-      end: "center top",
-      scrub: true,
+      end: NAME_ANIMATION_CONFIG.SCROLL_DURATION,
+      pin: container,
+      pinSpacing: true,
+      scrub: NAME_ANIMATION_CONFIG.SCRUB_SMOOTHNESS,
       onUpdate: (self) => {
         const progress = self.progress;
         
-        // Hacer que las letras se desvanezcan de arriba hacia abajo
-        gsap.to(firstNameLetters, {
-          y: 50 * progress, // Movimiento hacia abajo
-          opacity: Math.max(0, 1 - progress * 2),
-          stagger: {
-            each: 0.02,
-            from: "start"
-          },
+        const scale = 1 + (progress * (NAME_ANIMATION_CONFIG.FINAL_SCALE - 1));
+        const opacity = progress > NAME_ANIMATION_CONFIG.FADE_OUT_THRESHOLD 
+          ? Math.max(0, NAME_ANIMATION_CONFIG.FADE_OUT_INTENSITY * (1 - progress)) 
+          : 1;
+        
+        gsap.to(nameContainer, {
+          scale: scale,
+          opacity: opacity,
           duration: 0.1
         });
         
-        gsap.to(lastNameLetters, {
-          y: 70 * progress, // Movimiento hacia abajo pero más pronunciado
-          opacity: Math.max(0, 1 - progress * 2),
-          stagger: {
-            each: 0.02,
-            from: "start"
-          },
-          duration: 0.1
-        });
-        
-        // Animar el indicador de scroll
         gsap.to(scrollIndicator, {
           opacity: Math.max(0, 1 - progress * 3),
-          y: 20 * progress, // También hacia abajo
+          y: 20 * progress,
           duration: 0.1
         });
       }
@@ -145,18 +130,6 @@ const Hero = () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
   }, []);
-
-  // Función para crear los spans de las letras
-  const createLetterSpans = (text: string) => {
-    return text.split('').map((char, index) => (
-      <span 
-        key={index} 
-        className="letter"
-      >
-        {char === ' ' ? '\u00A0' : char}
-      </span>
-    ));
-  };
 
   return (
     <section className="hero" ref={heroRef}>
@@ -174,24 +147,50 @@ const Hero = () => {
           <Model3D audioEnabled={audioEnabled} />
           <OrbitControls enableZoom={false} />
         </Canvas>
-          </div>
+      </div>
 
       <div className="simple-content">
         <div className="name-container" ref={nameContainerRef}>
           <div className="hero-name" ref={nameRef}>
-            <div className="first-name" ref={firstNameRef}>{createLetterSpans("CARLOS")}</div>
-            <div className="last-name" ref={lastNameRef}>{createLetterSpans("RÁBAGO")}</div>
+            <svg width="100%" height="200" className="name-svg">
+              <defs>
+                <linearGradient id="nameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#FF9A9E" />
+                  <stop offset="100%" stopColor="#FFECD2" />
+                </linearGradient>
+              </defs>
+              <text
+                ref={firstNameRef}
+                x="50%"
+                y="40%"
+                textAnchor="middle"
+                className="first-name"
+                fill="url(#nameGradient)"
+              >
+                CARLOS
+              </text>
+              <text
+                ref={lastNameRef}
+                x="50%"
+                y="80%"
+                textAnchor="middle"
+                className="last-name"
+                fill="url(#nameGradient)"
+              >
+                RÁBAGO
+              </text>
+            </svg>
           </div>
         </div>
 
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
-            <span>Scroll</span>
-            <div className="arrow"></div>
+          <span>Scroll</span>
+          <div className="arrow"></div>
         </div>
       </div>
       
       <AudioButton onToggle={setAudioEnabled} />
-      </section>
+    </section>
   );
 };
 
