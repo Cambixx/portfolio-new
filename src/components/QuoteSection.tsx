@@ -140,7 +140,6 @@ const QuoteSection = () => {
 
     // Eliminamos el efecto de escala en móviles
     const scaleFactor = isMobile ? { from: 1, to: 1 } : { from: 0.9, to: 1 };
-    const yOffset = isMobile ? 30 : 80;
 
     // Animación de entrada
     ScrollTrigger.create({
