@@ -18,12 +18,19 @@ const NAME_ANIMATION_CONFIG = {
   FADE_OUT_START: 0.7, // Punto donde comienza el fade out (0-1)
   FADE_OUT_END: 0.9, // Punto donde termina el fade out (0-1)
   SCRUB_SMOOTHNESS: 1, // Suavidad de la animación (mayor = más suave)
+  MOBILE: {
+    FINAL_SCALE: 40, // Escala reducida para móviles
+    SCROLL_DURATION: "+=100%", // Duración reducida para móviles
+    FADE_OUT_START: 0.6,
+    FADE_OUT_END: 0.8,
+  }
 };
 
 const Hero = () => {
   const { loaded } = useProgress();
   const [showLoader, setShowLoader] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     if (loaded) {
@@ -32,6 +39,16 @@ const Hero = () => {
     }
   }, [loaded]);
 
+  // Detector de cambio de tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const heroRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
   const firstNameRef = useRef<SVGTextElement>(null);
@@ -39,7 +56,7 @@ const Hero = () => {
   const nameContainerRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
-  // Animación principal
+  // Animación inicial optimizada
   useEffect(() => {
     const hero = heroRef.current;
     const firstNameLine = firstNameRef.current;
@@ -49,46 +66,38 @@ const Hero = () => {
 
     if (!hero || !firstNameLine || !lastNameLine || !container || !scrollIndicator) return;
 
-    // Asegurarse de que el hero sea visible
     gsap.set(hero, { opacity: 1 });
     gsap.set(scrollIndicator, { opacity: 0 });
     
-    // Timeline para la animación
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({
+      defaults: {
+        duration: isMobile ? 0.6 : 0.8,
+        ease: "power2.out"
+      }
+    });
     
-    // Configurar posición inicial
     gsap.set([firstNameLine, lastNameLine], {
-      y: 100,
+      y: isMobile ? 50 : 100,
       opacity: 0
     });
     
-    // Animación de entrada para el primer nombre
     tl.to(firstNameLine, {
       y: 0,
       opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    });
-    
-    // Animación de entrada para el apellido
-    tl.to(lastNameLine, {
+    })
+    .to(lastNameLine, {
       y: 0,
       opacity: 1,
-      duration: 0.8,
-      ease: "power3.out"
-    }, "-=0.5");
-
-    // Mostrar el indicador de scroll al final
-    tl.to(scrollIndicator, {
+    }, "-=0.4")
+    .to(scrollIndicator, {
       opacity: 1,
       y: 0,
-      duration: 0.8,
-      ease: "power2.out"
-    });
+      duration: 0.6
+    }, "-=0.2");
     
-  }, []);
+  }, [isMobile]);
 
-  // Efecto para el scroll
+  // Efecto de scroll optimizado
   useEffect(() => {
     const hero = heroRef.current;
     const container = nameContainerRef.current;
@@ -97,30 +106,31 @@ const Hero = () => {
     
     if (!hero || !container || !nameContainer || !scrollIndicator) return;
     
+    const config = isMobile ? NAME_ANIMATION_CONFIG.MOBILE : NAME_ANIMATION_CONFIG;
+    
     ScrollTrigger.create({
       trigger: hero,
       start: "top top",
-      end: NAME_ANIMATION_CONFIG.SCROLL_DURATION,
+      end: config.SCROLL_DURATION,
       pin: container,
       pinSpacing: true,
       scrub: NAME_ANIMATION_CONFIG.SCRUB_SMOOTHNESS,
       onUpdate: (self) => {
         const progress = self.progress;
         
-        // Calcular la escala
-        const scale = 1 + (progress * (NAME_ANIMATION_CONFIG.FINAL_SCALE - 1));
+        const scale = 1 + (progress * (config.FINAL_SCALE - 1));
         
-        // Calcular la opacidad usando una transición más suave
         let opacity = 1;
-        if (progress > NAME_ANIMATION_CONFIG.FADE_OUT_START) {
-          opacity = Math.max(0, 1 - (progress - NAME_ANIMATION_CONFIG.FADE_OUT_START) / 
-            (NAME_ANIMATION_CONFIG.FADE_OUT_END - NAME_ANIMATION_CONFIG.FADE_OUT_START));
+        if (progress > config.FADE_OUT_START) {
+          opacity = Math.max(0, 1 - (progress - config.FADE_OUT_START) / 
+            (config.FADE_OUT_END - config.FADE_OUT_START));
         }
         
         gsap.to(nameContainer, {
           scale: scale,
           opacity: opacity,
-          duration: 0.1
+          duration: 0.1,
+          ease: "none"
         });
         
         gsap.to(scrollIndicator, {
@@ -134,7 +144,7 @@ const Hero = () => {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section className="hero" ref={heroRef}>
@@ -142,7 +152,7 @@ const Hero = () => {
       
       <div className="hero-right">
         <Canvas
-          camera={{ position: [0, 0, 5], fov: 45 }}
+          camera={{ position: [0, 0, 5], fov: isMobile ? 60 : 45 }}
           style={{ width: '100%', height: '100%' }}
         >
           <ambientLight intensity={0.8} />
@@ -150,14 +160,19 @@ const Hero = () => {
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           <directionalLight position={[0, 5, 5]} intensity={1} castShadow />
           <Model3D audioEnabled={audioEnabled} />
-          <OrbitControls enableZoom={false} />
+          <OrbitControls 
+            enableZoom={false}
+            enablePan={false}
+            maxPolarAngle={Math.PI / 1.8}
+            minPolarAngle={Math.PI / 2.5}
+          />
         </Canvas>
       </div>
 
       <div className="simple-content">
         <div className="name-container" ref={nameContainerRef}>
           <div className="hero-name" ref={nameRef}>
-            <svg width="100%" height="200" className="name-svg">
+            <svg width="100%" height={isMobile ? "120" : "200"} className="name-svg">
               <defs>
                 <linearGradient id="nameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#FF9A9E" />
@@ -167,7 +182,7 @@ const Hero = () => {
               <text
                 ref={firstNameRef}
                 x="50%"
-                y="40%"
+                y={isMobile ? "45%" : "40%"}
                 textAnchor="middle"
                 className="first-name"
                 fill="url(#nameGradient)"
@@ -177,7 +192,7 @@ const Hero = () => {
               <text
                 ref={lastNameRef}
                 x="50%"
-                y="80%"
+                y={isMobile ? "85%" : "80%"}
                 textAnchor="middle"
                 className="last-name"
                 fill="url(#nameGradient)"
