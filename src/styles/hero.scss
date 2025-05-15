@@ -55,7 +55,7 @@
     @media (max-width: 768px) {
       padding: 0 1.5rem;
       justify-content: flex-start;
-      padding-top: 25vh;
+      padding-top: 15vh;
     }
     
     .name-container {
@@ -72,6 +72,7 @@
       @media (max-width: 768px) {
         width: 90%;
         margin: 0 auto;
+        transform: translateY(-8rem);
       }
       
       .hero-name {
@@ -119,7 +120,7 @@
       align-items: center;
       
       @media (max-width: 768px) {
-        margin-top: 2rem;
+        margin-top: 3rem;
         transform: scale(0.8);
       }
     
