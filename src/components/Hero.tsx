@@ -13,10 +13,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Configuración de la animación del nombre
 const NAME_ANIMATION_CONFIG = {
-  FINAL_SCALE: 120, // Escala final del texto (1 es el tamaño original)
+  FINAL_SCALE: 90, // Escala final del texto (1 es el tamaño original)
   SCROLL_DURATION: "+=150%", // Duración del scroll para la animación completa
-  FADE_OUT_THRESHOLD: 1, // Punto donde comienza el fade out (0-1)
-  FADE_OUT_INTENSITY: 5, // Intensidad del fade out
+  FADE_OUT_START: 0.7, // Punto donde comienza el fade out (0-1)
+  FADE_OUT_END: 0.9, // Punto donde termina el fade out (0-1)
   SCRUB_SMOOTHNESS: 1, // Suavidad de la animación (mayor = más suave)
 };
 
@@ -107,10 +107,15 @@ const Hero = () => {
       onUpdate: (self) => {
         const progress = self.progress;
         
+        // Calcular la escala
         const scale = 1 + (progress * (NAME_ANIMATION_CONFIG.FINAL_SCALE - 1));
-        const opacity = progress > NAME_ANIMATION_CONFIG.FADE_OUT_THRESHOLD 
-          ? Math.max(0, NAME_ANIMATION_CONFIG.FADE_OUT_INTENSITY * (1 - progress)) 
-          : 1;
+        
+        // Calcular la opacidad usando una transición más suave
+        let opacity = 1;
+        if (progress > NAME_ANIMATION_CONFIG.FADE_OUT_START) {
+          opacity = Math.max(0, 1 - (progress - NAME_ANIMATION_CONFIG.FADE_OUT_START) / 
+            (NAME_ANIMATION_CONFIG.FADE_OUT_END - NAME_ANIMATION_CONFIG.FADE_OUT_START));
+        }
         
         gsap.to(nameContainer, {
           scale: scale,
