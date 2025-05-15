@@ -130,29 +130,31 @@ const QuoteSection = () => {
 
     if (!section || !card || !text || !author) return;
 
+    // Optimizar para móviles
+    const isMobile = window.innerWidth <= 768;
+
     // Configuramos posición inicial (fuera de la vista)
-    gsap.set(card, { y: 60, opacity: 0, scale: 0.95 });
+    gsap.set(card, { y: 60, opacity: 0, scale: isMobile ? 1 : 0.95 });
     gsap.set(text, { opacity: 0 });
     gsap.set(author, { opacity: 0, x: -15 });
 
-    // Optimizar para móviles
-    const isMobile = window.innerWidth <= 768;
-    const scaleFactor = isMobile ? { from: 0.97, to: 1 } : { from: 0.9, to: 1 };
-    const yOffset = isMobile ? 50 : 80;
+    // Eliminamos el efecto de escala en móviles
+    const scaleFactor = isMobile ? { from: 1, to: 1 } : { from: 0.9, to: 1 };
+    const yOffset = isMobile ? 30 : 80;
 
-    // Animación de entrada con pinning para mantener la sección visible
+    // Animación de entrada
     ScrollTrigger.create({
       trigger: section,
       start: "top bottom-=100",
       end: "top top",
-      scrub: isMobile ? 0.4 : 0.6, // Más rápido en móviles
+      scrub: isMobile ? 0.2 : 0.6, // Más rápido en móviles
       onEnter: () => {
         // Animar la entrada de la tarjeta con valores optimizados
         gsap.to(card, {
           y: 0,
           opacity: 1,
           scale: scaleFactor.to,
-          duration: isMobile ? 0.5 : 0.8,
+          duration: isMobile ? 0.4 : 0.8,
           ease: "power1.out"
         });
         
@@ -175,34 +177,44 @@ const QuoteSection = () => {
       }
     });
 
-    // Animación de salida al seguir scrolleando - extendemos el tiempo de visibilidad
-    ScrollTrigger.create({
+    // Configuración diferente del pin según el dispositivo
+    const pinConfig = {
       trigger: section,
       start: "top top",
-      end: "bottom+=40% top", // Extendemos el final para que permanezca más tiempo visible
-      scrub: isMobile ? 0.3 : true, // Valor fijo para móviles para mayor suavidad
-      pin: true, // Mantener la sección fija mientras se hace scroll
+      end: "bottom+=40% top",
+      scrub: isMobile ? 0.2 : true,
+      pin: true,
       pinSpacing: true,
-      onUpdate: (self) => {
+      // Mejorar el comportamiento del pin en móviles
+      anticipatePin: isMobile ? 1 : 0,
+      onUpdate: (self: ScrollTrigger) => {
         // Retrasamos el inicio de la animación de salida
-        // Cambiamos de 0.1 a 0.3, lo que significa que estará 30% del scroll completo antes de comenzar a desvanecerse
         if (self.progress > 0.3) {
           // Normalizamos el progreso para que vaya de 0 a 1 en el 70% restante del scroll
           const fadeOutProgress = (self.progress - 0.3) / 0.7;
           
-          // Valores reducidos para animación más suave en móviles
-          const scaleReduction = isMobile ? 0.03 : 0.1;
-          const yMultiplier = isMobile ? 30 : 50;
-          
-          gsap.to(card, {
-            y: fadeOutProgress * yMultiplier,
-            opacity: Math.max(0, 1 - fadeOutProgress * 1.2),
-            scale: Math.max(scaleFactor.from, scaleFactor.to - fadeOutProgress * scaleReduction),
-            duration: 0.05 // Duración más corta para mayor reactividad
-          });
+          // En móvil, solo hacemos fade y un poco de movimiento vertical, sin escala
+          if (isMobile) {
+            gsap.to(card, {
+              y: fadeOutProgress * 20,
+              opacity: Math.max(0, 1 - fadeOutProgress * 1.2),
+              duration: 0.05
+            });
+          } else {
+            // En desktop mantenemos el comportamiento original
+            gsap.to(card, {
+              y: fadeOutProgress * 50,
+              opacity: Math.max(0, 1 - fadeOutProgress * 1.2),
+              scale: Math.max(scaleFactor.from, scaleFactor.to - fadeOutProgress * 0.1),
+              duration: 0.05
+            });
+          }
         }
       }
-    });
+    };
+
+    // Crear ScrollTrigger con la configuración adaptada
+    ScrollTrigger.create(pinConfig);
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
