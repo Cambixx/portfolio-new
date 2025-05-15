@@ -35,13 +35,13 @@ const QuoteSection = () => {
           onComplete: () => setIsAnimating(false)
         })
           .fromTo([quoteTextRef.current, quoteAuthorRef.current], 
-            { y: 30, opacity: 0, scale: 0.95 }, 
+            { y: 20, opacity: 0, scale: 0.98 }, 
             { 
               y: 0, 
               opacity: 1, 
               scale: 1,
-              duration: 0.8, 
-              stagger: 0.15, 
+              duration: 0.6, 
+              stagger: 0.1, 
               ease: "power2.out" 
             }
           );
@@ -49,12 +49,12 @@ const QuoteSection = () => {
     });
     
     tl.to([quoteTextRef.current, quoteAuthorRef.current], {
-      y: -30,
+      y: -20,
       opacity: 0,
-      scale: 0.98,
-      duration: 0.7,
-      stagger: 0.1,
-      ease: "power2.in"
+      scale: 0.99,
+      duration: 0.5,
+      stagger: 0.08,
+      ease: "power1.in"
     });
   }, [isAnimating]);
 
@@ -131,63 +131,74 @@ const QuoteSection = () => {
     if (!section || !card || !text || !author) return;
 
     // Configuramos posición inicial (fuera de la vista)
-    gsap.set(card, { y: 80, opacity: 0, scale: 0.9 });
+    gsap.set(card, { y: 60, opacity: 0, scale: 0.95 });
     gsap.set(text, { opacity: 0 });
-    gsap.set(author, { opacity: 0, x: -20 });
+    gsap.set(author, { opacity: 0, x: -15 });
+
+    // Optimizar para móviles
+    const isMobile = window.innerWidth <= 768;
+    const scaleFactor = isMobile ? { from: 0.97, to: 1 } : { from: 0.9, to: 1 };
+    const yOffset = isMobile ? 50 : 80;
 
     // Animación de entrada con pinning para mantener la sección visible
     ScrollTrigger.create({
       trigger: section,
       start: "top bottom-=100",
       end: "top top",
-      scrub: 0.6,
+      scrub: isMobile ? 0.4 : 0.6, // Más rápido en móviles
       onEnter: () => {
-        // Animar la entrada de la tarjeta
+        // Animar la entrada de la tarjeta con valores optimizados
         gsap.to(card, {
           y: 0,
           opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          ease: "power2.out"
+          scale: scaleFactor.to,
+          duration: isMobile ? 0.5 : 0.8,
+          ease: "power1.out"
         });
         
         // Animar el texto con retraso
         gsap.to(text, {
           opacity: 1,
-          duration: 0.6,
-          delay: 0.3,
-          ease: "power2.out"
+          duration: 0.5,
+          delay: 0.2,
+          ease: "power1.out"
         });
         
         // Animar el autor
         gsap.to(author, {
           opacity: 1,
           x: 0,
-          duration: 0.6,
-          delay: 0.5,
-          ease: "power2.out"
+          duration: 0.5,
+          delay: 0.3,
+          ease: "power1.out"
         });
       }
     });
 
-    // Animación de salida al seguir scrolleando
+    // Animación de salida al seguir scrolleando - extendemos el tiempo de visibilidad
     ScrollTrigger.create({
       trigger: section,
       start: "top top",
-      end: "bottom top",
-      scrub: true,
+      end: "bottom+=40% top", // Extendemos el final para que permanezca más tiempo visible
+      scrub: isMobile ? 0.3 : true, // Valor fijo para móviles para mayor suavidad
       pin: true, // Mantener la sección fija mientras se hace scroll
       pinSpacing: true,
       onUpdate: (self) => {
-        // Suavizar la salida de la tarjeta solo cuando comienza a salir
-        if (self.progress > 0.1) {
-          const fadeOutProgress = (self.progress - 0.1) / 0.9; // Normalizar de 0.1-1.0 a 0-1
+        // Retrasamos el inicio de la animación de salida
+        // Cambiamos de 0.1 a 0.3, lo que significa que estará 30% del scroll completo antes de comenzar a desvanecerse
+        if (self.progress > 0.3) {
+          // Normalizamos el progreso para que vaya de 0 a 1 en el 70% restante del scroll
+          const fadeOutProgress = (self.progress - 0.3) / 0.7;
+          
+          // Valores reducidos para animación más suave en móviles
+          const scaleReduction = isMobile ? 0.03 : 0.1;
+          const yMultiplier = isMobile ? 30 : 50;
           
           gsap.to(card, {
-            y: fadeOutProgress * 50,
+            y: fadeOutProgress * yMultiplier,
             opacity: Math.max(0, 1 - fadeOutProgress * 1.2),
-            scale: Math.max(0.9, 1 - fadeOutProgress * 0.1),
-            duration: 0.1
+            scale: Math.max(scaleFactor.from, scaleFactor.to - fadeOutProgress * scaleReduction),
+            duration: 0.05 // Duración más corta para mayor reactividad
           });
         }
       }
