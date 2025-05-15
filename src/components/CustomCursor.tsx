@@ -30,8 +30,8 @@ const CustomCursor = () => {
       if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
         cursorPosition.current = {...mousePosition.current};
       } else {
-        cursorPosition.current.x += dx * smoothing;
-        cursorPosition.current.y += dy * smoothing;
+      cursorPosition.current.x += dx * smoothing;
+      cursorPosition.current.y += dy * smoothing;
       }
       
       // Aplicar la nueva posición usando transform para mejor rendimiento

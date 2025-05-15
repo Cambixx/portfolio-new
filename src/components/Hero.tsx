@@ -37,13 +37,13 @@ const Hero = () => {
     const lastNameLine = lastNameRef.current;
     const container = nameContainerRef.current;
     const scrollIndicator = scrollIndicatorRef.current;
-    
+
     if (!hero || !firstNameLine || !lastNameLine || !container || !scrollIndicator) return;
 
     // Asegurarse de que el hero sea visible
     gsap.set(hero, { opacity: 1 });
     gsap.set(scrollIndicator, { opacity: 0 });
-    
+
     // Obtener todas las letras por línea
     const firstNameLetters = gsap.utils.toArray('.first-name .letter');
     const lastNameLetters = gsap.utils.toArray('.last-name .letter');
@@ -61,7 +61,7 @@ const Hero = () => {
     tl.to(firstNameLetters, {
       y: 0,
       opacity: 1,
-      duration: 0.8,
+        duration: 0.8,
       stagger: 0.03,
       ease: "power3.out"
     });
@@ -70,23 +70,23 @@ const Hero = () => {
     tl.to(lastNameLetters, {
       y: 0,
       opacity: 1,
-      duration: 0.8,
+        duration: 0.8,
       stagger: 0.03,
       ease: "power3.out"
     }, "-=0.5");
-    
+
     // Efecto de brillo suave
     tl.to([firstNameLetters, lastNameLetters], {
       textShadow: "0 0 10px rgba(255,154,158,0.3)",
       duration: 1.2,
       ease: "power2.inOut"
     }, "-=0.5");
-    
+
     // Mostrar el indicador de scroll al final
     tl.to(scrollIndicator, {
       opacity: 1,
       y: 0,
-      duration: 0.8,
+        duration: 0.8,
       ease: "power2.out"
     });
     
@@ -174,8 +174,8 @@ const Hero = () => {
           <Model3D audioEnabled={audioEnabled} />
           <OrbitControls enableZoom={false} />
         </Canvas>
-      </div>
-      
+          </div>
+
       <div className="simple-content">
         <div className="name-container" ref={nameContainerRef}>
           <div className="hero-name" ref={nameRef}>
@@ -183,15 +183,15 @@ const Hero = () => {
             <div className="last-name" ref={lastNameRef}>{createLetterSpans("RÁBAGO")}</div>
           </div>
         </div>
-        
+
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
-          <span>Scroll</span>
-          <div className="arrow"></div>
+            <span>Scroll</span>
+            <div className="arrow"></div>
         </div>
       </div>
       
       <AudioButton onToggle={setAudioEnabled} />
-    </section>
+      </section>
   );
 };
 

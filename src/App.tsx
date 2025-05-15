@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import SmoothScroll from './components/SmoothScroll'
 import Hero from './components/Hero'
+import QuoteSection from './components/QuoteSection'
 import AboutSection from './components/AboutSection'
 import ProjectsSection from './components/ProjectsSection'
 import CustomCursor from './components/CustomCursor'
@@ -18,6 +19,9 @@ function App() {
         <main className="app">
           {/* Hero Section */}
           <Hero />
+
+          {/* Quote Section */}
+          <QuoteSection />
 
           {/* About Section */}
           <AboutSection />

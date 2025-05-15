@@ -1,0 +1,179 @@
+.quote-section {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  
+  // Elementos decorativos
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  
+  // Elemento decorativo superior izquierdo
+  &::before {
+    width: 50vw;
+    height: 50vh;
+    top: -5%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(255,154,158,0.15) 0%, rgba(255,154,158,0) 70%);
+    filter: blur(40px);
+  }
+  
+  // Elemento decorativo inferior derecho
+  &::after {
+    width: 40vw;
+    height: 40vh;
+    bottom: -5%;
+    right: -5%;
+    background: radial-gradient(circle, rgba(78,78,255,0.1) 0%, rgba(78,78,255,0) 70%);
+    filter: blur(50px);
+  }
+  
+  .quote-card {
+    max-width: 800px;
+    width: 90%;
+    padding: 4rem;
+    border-radius: 20px;
+    position: relative;
+    z-index: 10;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    // Efecto cristal mejorado (glassmorphism)
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 15px 35px rgba(0, 0, 0, 0.3), 
+      0 3px 10px rgba(0, 0, 0, 0.1);
+    
+    @media (max-width: 768px) {
+      min-height: 250px;
+      padding: 3rem 2rem;
+    }
+    
+    // Resplandor sutil en los bordes
+    &::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      z-index: -1;
+      background: linear-gradient(45deg, 
+        transparent, 
+        rgba(255, 154, 158, 0.3), 
+        rgba(78, 78, 255, 0.2), 
+        transparent
+      );
+      border-radius: 22px;
+      opacity: 0.4;
+      animation: borderGlow 8s ease-in-out infinite;
+    }
+    
+    @keyframes borderGlow {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.4; }
+    }
+    
+    .quote-text {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.4;
+      color: #ffffff;
+      font-weight: 500;
+      margin-bottom: 2.5rem;
+      text-align: center;
+      letter-spacing: 0.5px;
+      font-style: italic;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+      min-height: 4.2em; // Altura mínima para mantener consistencia
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+        min-height: 3em;
+      }
+      
+      // Comillas ornamentales con ::before y ::after
+      &::before, &::after {
+        font-family: 'Georgia', serif;
+        position: absolute;
+        font-size: 5rem;
+        color: rgba(255,154,158,0.2);
+        line-height: 0;
+        pointer-events: none;
+        
+        @media (max-width: 768px) {
+          font-size: 3.5rem;
+        }
+      }
+      
+      &::before {
+        content: '"';
+        top: -0.5rem;
+        left: -1.5rem;
+        
+        @media (max-width: 768px) {
+          top: -0.5rem;
+          left: -1rem;
+        }
+      }
+      
+      &::after {
+        content: '"';
+        bottom: -1.5rem;
+        right: -1.5rem;
+        
+        @media (max-width: 768px) {
+          bottom: -1rem;
+          right: -1rem;
+        }
+      }
+    }
+    
+    .quote-author {
+      text-align: right;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+      transform: translateZ(10px);
+      height: 2em; // Altura fija para evitar saltos
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      
+      span {
+        position: relative;
+        padding-left: 2rem;
+        display: inline-block;
+        
+        @media (max-width: 768px) {
+          padding-left: 1.5rem;
+        }
+        
+        // Línea y guión decorativo antes del autor
+        &::before {
+          content: '—';
+          position: absolute;
+          left: 0;
+          color: rgba(255, 154, 158, 0.6);
+        }
+      }
+    }
+  }
+} 
