@@ -4,9 +4,10 @@ import { AudioVisualizer } from './AudioVisualizer';
 
 interface AudioButtonProps {
   onToggle: (isPlaying: boolean) => void;
+  onAnalyserStateChange?: (analyser: AnalyserNode | null, isPlaying: boolean) => void;
 }
 
-export function AudioButton({ onToggle }: AudioButtonProps) {
+export function AudioButton({ onToggle, onAnalyserStateChange }: AudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
@@ -27,6 +28,9 @@ export function AudioButton({ onToggle }: AudioButtonProps) {
     analyser.fftSize = 256;
     analyser.smoothingTimeConstant = 0.8;
     analyserRef.current = analyser;
+    if (onAnalyserStateChange) {
+      onAnalyserStateChange(analyserRef.current, isPlaying);
+    }
     
     // Crear fuente de audio y conectarla
     const source = context.createMediaElementSource(audio);
@@ -64,6 +68,9 @@ export function AudioButton({ onToggle }: AudioButtonProps) {
     const newState = !isPlaying;
     setIsPlaying(newState);
     onToggle(newState);
+    if (onAnalyserStateChange) {
+      onAnalyserStateChange(analyserRef.current, newState);
+    }
   };
 
   return (

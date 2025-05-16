@@ -11,9 +11,15 @@ import { AudioController } from './AudioController';
 
 interface Model3DProps {
   audioEnabled?: boolean;
+  analyser?: AnalyserNode | null;
+  isAudioPlaying?: boolean;
 }
 
-export const Model3D = React.memo(function Model3D({ audioEnabled = false }: Model3DProps) {
+export const Model3D = React.memo(function Model3D({ 
+  audioEnabled = false, 
+  analyser = null,
+  isAudioPlaying = false 
+}: Model3DProps) {
   const modelRef = useRef<THREE.Group>(null);
   const { nodes, animations } = useGLTF('/models/carlos-3.glb');
   const { actions } = useAnimations(animations, modelRef);
@@ -101,10 +107,44 @@ export const Model3D = React.memo(function Model3D({ audioEnabled = false }: Mod
 
   useFrame(() => {
     if (modelRef.current) {
-      // Interpolación suave entre la rotación actual y la objetivo
-      const smoothFactor = 0.1;
-      currentRotation.current += (targetRotation.current - currentRotation.current) * smoothFactor;
+      // Interpolación suave entre la rotación actual y la objetivo para el scroll
+      const scrollSmoothFactor = 0.1;
+      currentRotation.current += (targetRotation.current - currentRotation.current) * scrollSmoothFactor;
       modelRef.current.rotation.y = currentRotation.current;
+
+      // Animación de piezas con la música
+      if (analyser && isAudioPlaying && modelRef.current.children.length > 0) {
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Usar el promedio de las frecuencias más bajas para un pulso más notorio
+        const lowerHalf = dataArray.slice(0, dataArray.length / 4);
+        const averageIntensity = lowerHalf.reduce((sum, value) => sum + value, 0) / lowerHalf.length;
+        const normalizedIntensity = (averageIntensity / 128); // Normalizado entre 0 y ~2
+
+        // Itera sobre los hijos directos de la escena/grupo principal del modelo
+        // Asumimos que estos son las "piezas" a animar.
+        // Es posible que necesites ser más específico si el modelo tiene una jerarquía compleja,
+        // por ejemplo, modelRef.current.getObjectByName("NombreDelGrupoDePiezas")?.children
+        modelRef.current.children.forEach((child, index) => {
+          if (child instanceof THREE.Mesh || child instanceof THREE.Group) { // Asegurarse de que es un Object3D con escala
+            if (!child.userData.originalScale) {
+              child.userData.originalScale = child.scale.clone();
+            }
+            
+            // Aplicar un factor de movimiento diferente a cada pieza o grupo de piezas
+            // para que no todas se muevan exactamente igual.
+            // Aquí usamos el índice para variar un poco, pero podría ser por nombre, etc.
+            const movementFactor = 0.05 + (index % 5) * 0.01; // Pequeña variación
+            const targetScaleFactor = 1 + normalizedIntensity * movementFactor;
+            
+            // Aplicar a todas las escalas para un pulso uniforme, o solo a Y para "estirar"
+            const targetScale = child.userData.originalScale.clone().multiplyScalar(targetScaleFactor);
+
+            child.scale.lerp(targetScale, 0.2); // 0.2 para suavidad
+          }
+        });
+      }
     }
   });
 

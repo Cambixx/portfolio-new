@@ -46,6 +46,8 @@ const Hero = () => {
   const [showLoader, setShowLoader] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
+  const [isAudioActuallyPlaying, setIsAudioActuallyPlaying] = useState(false);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
@@ -194,6 +196,11 @@ const Hero = () => {
     return () => cleanupAnimations();
   }, [isMobile, cleanupAnimations]);
 
+  const handleAnalyserStateChange = useCallback((analyser: AnalyserNode | null, playing: boolean) => {
+    setAnalyserNode(analyser);
+    setIsAudioActuallyPlaying(playing);
+  }, []);
+
   return (
     <section className="hero" ref={heroRef}>
       <ModelLoader show={showLoader} />
@@ -211,7 +218,11 @@ const Hero = () => {
           <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           <directionalLight position={[0, 5, 5]} intensity={1} castShadow />
-          <Model3D audioEnabled={audioEnabled} />
+          <Model3D 
+            audioEnabled={audioEnabled} 
+            analyser={analyserNode} 
+            isAudioPlaying={isAudioActuallyPlaying} 
+          />
           <OrbitControls 
             enableZoom={false}
             enablePan={false}
@@ -271,7 +282,7 @@ const Hero = () => {
         </div>
       </div>
       
-      <AudioButton onToggle={setAudioEnabled} />
+      <AudioButton onToggle={setAudioEnabled} onAnalyserStateChange={handleAnalyserStateChange} />
     </section>
   );
 };
