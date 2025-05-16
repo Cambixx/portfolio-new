@@ -169,8 +169,6 @@ export function AudioButton({ onToggle, onAnalyserStateChange }: AudioButtonProp
         </button>
       </div>
       <AudioVisualizer 
-        audioContext={audioContext}
-        audioElement={audioElement}
         isPlaying={isPlaying}
         analyser={analyserRef.current}
       />
