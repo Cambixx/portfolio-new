@@ -11,7 +11,7 @@ export function AudioController() {
     if (isInitializedRef.current) return;
     
     // Crear elemento de audio
-    audioRef.current = new Audio('/sounds/beat.mp3');
+    audioRef.current = new Audio('/sounds/beat3.mp3');
     audioRef.current.loop = true;
 
     // Configurar el contexto de audio

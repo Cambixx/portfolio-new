@@ -14,7 +14,7 @@ export function AudioButton({ onToggle }: AudioButtonProps) {
 
   useEffect(() => {
     // Crear elemento de audio
-    const audio = new Audio('/sounds/beat.mp3');
+    const audio = new Audio('/sounds/beat3.mp3');
     audio.loop = true;
     setAudioElement(audio);
 
