@@ -3,8 +3,8 @@ import { useState } from 'react';
 import '../styles/audio-visualizer.scss';
 
 interface AudioVisualizerProps {
-  audioContext: AudioContext | null;
-  audioElement: HTMLAudioElement | null;
+  // audioContext: AudioContext | null; // Eliminado
+  // audioElement: HTMLAudioElement | null; // Eliminado
   isPlaying: boolean;
   analyser: AnalyserNode | null;
 }
@@ -43,7 +43,7 @@ const VISUALIZER_CONFIG = {
   },
 };
 
-export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyser }: AudioVisualizerProps) {
+export function AudioVisualizer({ /* audioContext, audioElement, */ isPlaying, analyser }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const [barCount, setBarCount] = useState(VISUALIZER_CONFIG.DESKTOP_BAR_COUNT);

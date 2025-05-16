@@ -92,7 +92,7 @@ const QuoteSection = () => {
         trigger: sectionRef.current,
         start: "top bottom",
         end: "bottom top",
-        onToggle: (self) => { // self.isActive se actualiza automáticamente
+        onToggle: (_self) => { // Cambiado de self a _self
           manageInterval();
         }
       });
