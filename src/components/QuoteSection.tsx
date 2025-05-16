@@ -13,16 +13,24 @@ const QuoteSection = () => {
   const quoteTextRef = useRef<HTMLParagraphElement>(null);
   const quoteAuthorRef = useRef<HTMLDivElement>(null);
   
+  const intervalRef = useRef<number | null>(null);
+  const isAnimatingRef = useRef(false); // Ref to track animation state
+  const scrollTriggerVisibilityInstanceRef = useRef<ScrollTrigger | null>(null); // Ref for the visibility ScrollTrigger
+
   // Estado para el índice de la cita actual
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const intervalRef = useRef<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false); // State to trigger effects
 
-  // Optimizado: Reducido el uso de callbacks y mejorada la eficiencia de la animación
+  // Sync isAnimating state to isAnimatingRef
+  useEffect(() => {
+    isAnimatingRef.current = isAnimating;
+  }, [isAnimating]);
+
+  // Optimizado: animateToNextQuote es ahora estable
   const animateToNextQuote = useCallback(() => {
-    if (isAnimating || !quoteTextRef.current || !quoteAuthorRef.current) return;
+    if (isAnimatingRef.current || !quoteTextRef.current || !quoteAuthorRef.current) return;
     
-    setIsAnimating(true);
+    setIsAnimating(true); // Signal animation start
     
     const elements = [quoteTextRef.current, quoteAuthorRef.current];
     
@@ -30,6 +38,8 @@ const QuoteSection = () => {
       onComplete: () => {
         setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
         
+        // Reset for incoming animation
+        gsap.set(elements, { y: 20, opacity: 0, scale: 0.99 });
         gsap.to(elements, {
           y: 0,
           opacity: 1,
@@ -37,7 +47,7 @@ const QuoteSection = () => {
           duration: 0.5,
           stagger: 0.08,
           ease: "power2.out",
-          onComplete: () => setIsAnimating(false)
+          onComplete: () => setIsAnimating(false) // Signal animation end
         });
       }
     }).to(elements, {
@@ -48,62 +58,60 @@ const QuoteSection = () => {
       stagger: 0.06,
       ease: "power1.in"
     });
-  }, [isAnimating]);
+  }, [setCurrentQuoteIndex, setIsAnimating]); // Depends on stable setters
 
-  // Optimizado: Aumentado el intervalo de cambio de citas
-  useEffect(() => {
-    const initialDelay = setTimeout(() => {
+  // Optimizado: Lógica centralizada y estable para manejar el intervalo
+  const manageInterval = useCallback(() => {
+    const st = scrollTriggerVisibilityInstanceRef.current;
+    const sectionIsVisible = st ? st.isActive : false;
+
+    const shouldBeRunning =
+      !document.hidden &&
+      sectionIsVisible &&
+      !isAnimatingRef.current;
+
+    if (shouldBeRunning && !intervalRef.current) {
       intervalRef.current = window.setInterval(animateToNextQuote, 6000);
-    }, 3000);
-    
-    return () => {
-      clearTimeout(initialDelay);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [animateToNextQuote]);
+    } else if (!shouldBeRunning && intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, [animateToNextQuote]); // Depends on stable animateToNextQuote
 
-  // Optimizado: Mejorado el manejo de visibilidad
+  // Optimizado: Efecto para llamar a manageInterval cuando isAnimating cambia
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-      } else if (!intervalRef.current && !isAnimating) {
-        intervalRef.current = window.setInterval(animateToNextQuote, 6000);
-      }
-    };
+    manageInterval();
+  }, [isAnimating, manageInterval]);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+  // Optimizado: Efecto para configurar listeners (visibilidad y scroll) - se ejecuta una vez
+  useEffect(() => {
+    document.addEventListener('visibilitychange', manageInterval);
+
     if (sectionRef.current) {
-      const scrollTrigger = ScrollTrigger.create({
+      scrollTriggerVisibilityInstanceRef.current = ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top bottom",
         end: "bottom top",
-        onEnter: handleVisibilityChange,
-        onLeave: () => {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-        },
-        onEnterBack: handleVisibilityChange,
-        onLeaveBack: () => {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
+        onToggle: (self) => { // self.isActive se actualiza automáticamente
+          manageInterval();
         }
       });
-
-      return () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        scrollTrigger.kill();
-      };
     }
-  }, [animateToNextQuote, isAnimating]);
+    
+    manageInterval(); // Comprobación inicial
+
+    return () => {
+      document.removeEventListener('visibilitychange', manageInterval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (scrollTriggerVisibilityInstanceRef.current) {
+        scrollTriggerVisibilityInstanceRef.current.kill();
+        scrollTriggerVisibilityInstanceRef.current = null;
+      }
+    };
+  }, [manageInterval]); // Depende de manageInterval estable, por lo que se ejecuta una vez para configuración/limpieza
 
   // Optimizado: Mejorada la animación inicial
   useEffect(() => {
@@ -153,15 +161,23 @@ const QuoteSection = () => {
         pin: true,
         pinSpacing: true,
         onUpdate: (self) => {
+          if (!card) return;
+
+          const currentIsMobile = window.innerWidth <= 768; // Recalculate in case of resize during scroll
+          const currentScaleFactorTo = currentIsMobile ? 1 : scaleFactor.to;
+
+          let y = 0;
+          let opacity = 1;
+          let scale = currentScaleFactorTo;
+
           if (self.progress > 0.3) {
-            const fadeOutProgress = (self.progress - 0.3) / 0.7;
-            gsap.to(card, {
-              y: fadeOutProgress * (isMobile ? 20 : 40),
-              opacity: 1 - fadeOutProgress,
-              scale: isMobile ? 1 : scaleFactor.to - (fadeOutProgress * 0.05),
-              duration: 0.1
-            });
+            const fadeOutProgress = Math.min(1, Math.max(0, (self.progress - 0.3) / 0.7));
+            y = fadeOutProgress * (currentIsMobile ? 20 : 40);
+            opacity = 1 - fadeOutProgress;
+            scale = currentIsMobile ? 1 : currentScaleFactorTo - (fadeOutProgress * 0.05);
           }
+          
+          gsap.set(card, { y, opacity, scale });
         }
       });
     }, section);
