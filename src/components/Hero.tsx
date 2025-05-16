@@ -230,7 +230,6 @@ const Hero = () => {
               width="100%" 
               height={isMobile ? "120" : "200"} 
               className="name-svg"
-              style={{ willChange: 'transform' }}
             >
               <defs>
                 <linearGradient id="nameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -245,7 +244,6 @@ const Hero = () => {
                 textAnchor="middle"
                 className="first-name"
                 fill="url(#nameGradient)"
-                style={{ willChange: 'transform, opacity' }}
               >
                 CARLOS
               </text>
@@ -253,10 +251,10 @@ const Hero = () => {
                 ref={lastNameRef}
                 x="50%"
                 y={isMobile ? "85%" : "80%"}
+                dominantBaseline="middle"
                 textAnchor="middle"
                 className="last-name"
                 fill="url(#nameGradient)"
-                style={{ willChange: 'transform, opacity' }}
               >
                 RÁBAGO
               </text>
@@ -267,7 +265,6 @@ const Hero = () => {
         <div 
           className="scroll-indicator" 
           ref={scrollIndicatorRef}
-          style={{ willChange: 'transform, opacity' }}
         >
           <span>Scroll</span>
           <div className="arrow"></div>

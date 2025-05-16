@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import React from 'react';
 import { useGLTF, useAnimations, Float, Environment, Lightformer } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -12,7 +13,7 @@ interface Model3DProps {
   audioEnabled?: boolean;
 }
 
-export function Model3D({ audioEnabled = false }: Model3DProps) {
+export const Model3D = React.memo(function Model3D({ audioEnabled = false }: Model3DProps) {
   const modelRef = useRef<THREE.Group>(null);
   const { nodes, animations } = useGLTF('/models/carlos-3.glb');
   const { actions } = useAnimations(animations, modelRef);
@@ -140,6 +141,6 @@ export function Model3D({ audioEnabled = false }: Model3DProps) {
       </Float>
     </>
   );
-}
+});
 
 useGLTF.preload('/models/carlos-3.glb');

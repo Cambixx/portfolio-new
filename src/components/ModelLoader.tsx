@@ -1,10 +1,11 @@
 import { useProgress } from '@react-three/drei';
+import React from 'react';
 
 interface ModelLoaderProps {
   show: boolean;
 }
 
-export function ModelLoader({ show }: ModelLoaderProps) {
+export const ModelLoader = React.memo(function ModelLoader({ show }: ModelLoaderProps) {
   const { progress, active } = useProgress();
 
   return (
@@ -48,4 +49,4 @@ export function ModelLoader({ show }: ModelLoaderProps) {
       </p>
     </div>
   );
-}
+});
