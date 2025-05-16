@@ -20,6 +20,7 @@ const VISUALIZER_CONFIG = {
   DESKTOP_MAX_BAR_WIDTH: 200, // Ancho máximo de las barras en escritorio
   MOBILE_MAX_BAR_WIDTH: 70, // Ancho máximo de las barras en móvil
   BAR_WIDTH_SCALE: 0.9, // Factor de escala para el ancho máximo de las barras (0-1)
+  SMOOTHING_FACTOR: 0.15, // Factor para suavizar el movimiento (0-1, más bajo es más suave)
   
   // Configuración de la distribución del espectro
   FREQUENCY_DISTRIBUTION: {
@@ -46,6 +47,7 @@ export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyse
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const [barCount, setBarCount] = useState(VISUALIZER_CONFIG.DESKTOP_BAR_COUNT);
+  const currentBarVisualDataRef = useRef<{ width: number }[]>([]); // Almacena los anchos suavizados
 
   // Efecto para manejar el cambio de barras según el tamaño de la pantalla
   useEffect(() => {
@@ -59,12 +61,16 @@ export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyse
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Efecto para inicializar/reiniciar currentBarVisualDataRef cuando barCount cambia
+  useEffect(() => {
+    currentBarVisualDataRef.current = Array.from({ length: barCount }, () => ({ width: 0 }));
+  }, [barCount]);
   
   // No necesitamos configurar el analizador aquí, ya lo recibimos como prop
-  useEffect(() => {
-    // Este useEffect puede usarse para inicializar o actualizar el canvas cuando cambian las dependencias
-  }, [audioContext, audioElement]);
-  
+  // Este useEffect puede usarse para inicializar o actualizar el canvas cuando cambian las dependencias
+  // Lo eliminamos porque estaba vacío y no se usaba.
+
   // Iniciar o detener la animación según el estado de reproducción
   useEffect(() => {
     if (isPlaying && analyser) {
@@ -132,13 +138,23 @@ export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyse
         ? VISUALIZER_CONFIG.MOBILE_MAX_BAR_WIDTH 
         : VISUALIZER_CONFIG.DESKTOP_MAX_BAR_WIDTH;
       
-      const barWidth = Math.max(
+      const targetBarWidth = Math.max(
         VISUALIZER_CONFIG.MIN_BAR_WIDTH,
         Math.min(
           maxBarWidth,
           (value / 255) * canvas.width * VISUALIZER_CONFIG.BAR_WIDTH_SCALE
         )
       );
+
+      // Asegurarse de que la entrada existe en la referencia
+      if (!currentBarVisualDataRef.current[i]) {
+        currentBarVisualDataRef.current[i] = { width: 0 };
+      }
+      
+      const previousBarWidth = currentBarVisualDataRef.current[i].width;
+      const smoothedBarWidth = previousBarWidth + (targetBarWidth - previousBarWidth) * VISUALIZER_CONFIG.SMOOTHING_FACTOR;
+      
+      currentBarVisualDataRef.current[i].width = smoothedBarWidth;
       
       // Posición y de la barra
       const y = i * (barHeight + VISUALIZER_CONFIG.BAR_GAP);
@@ -150,7 +166,7 @@ export function AudioVisualizer({ audioContext, audioElement, isPlaying, analyse
       
       ctx.fillStyle = gradient;
       // Dibujamos desde la derecha hacia la izquierda
-      ctx.fillRect(canvas.width - barWidth, y, barWidth, barHeight);
+      ctx.fillRect(canvas.width - smoothedBarWidth, y, smoothedBarWidth, barHeight);
     }
   };
   
