@@ -3,6 +3,7 @@ import SmoothScroll from './components/SmoothScroll'
 import Hero from './components/Hero'
 import QuoteSection from './components/QuoteSection'
 import AboutSection from './components/AboutSection'
+import SkillsSection from './components/SkillsSection'
 import ProjectsSection from './components/ProjectsSection'
 import CustomCursor from './components/CustomCursor'
 import './styles/global.scss'
@@ -25,6 +26,9 @@ function App() {
 
           {/* About Section */}
           <AboutSection />
+
+          {/* Skills Section */}
+          <SkillsSection />
 
           {/* Projects Section */}
           <ProjectsSection />
