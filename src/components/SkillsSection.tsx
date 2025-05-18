@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useAnimation } from 'framer-motion';
 // Importamos los iconos necesarios
 import { 
-  FaHtml5, FaCss3Alt, FaSass, FaJs, FaReact, FaNodeJs, FaPhp, FaDatabase, 
+  FaHtml5, FaCss3Alt, FaSass, FaJs, FaReact, FaNodeJs, FaPhp, 
   FaGitAlt, FaGithub, FaDocker, FaFigma, FaAws
 } from 'react-icons/fa';
 import { SiTypescript, SiTailwindcss, SiBootstrap, SiVite, SiWebpack, SiMysql, SiThreedotjs } from 'react-icons/si';
@@ -137,7 +137,7 @@ const SkillsSection = () => {
   const titleRef = useRef<HTMLDivElement>(null);
   const contentContainerRef = useRef<HTMLDivElement>(null);
   const categoriesRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [categoriesVisible, setCategoriesVisible] = useState([false, false, false]);
+  const [, setCategoriesVisible] = useState([false, false, false]);
   const categoryControls = useRef([useAnimation(), useAnimation(), useAnimation()]);
   const lastScrollY = useRef(0);
 
@@ -168,7 +168,8 @@ const SkillsSection = () => {
     // Función para detectar dirección de scroll
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const isScrollingDown = scrollY > lastScrollY.current;
+      // Mantenemos la variable para referencia futura, pero no usamos la dirección por ahora
+      // const isScrollingDown = scrollY > lastScrollY.current;
       lastScrollY.current = scrollY;
     };
 
