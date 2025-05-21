@@ -14,18 +14,18 @@ gsap.registerPlugin(ScrollTrigger);
 // Configuración optimizada de la animación
 const NAME_ANIMATION_CONFIG = {
   DESKTOP: {
-    FINAL_SCALE: 70,
-    SCROLL_DURATION: "+=120%",
-    FADE_OUT_START: 0.65,
-    FADE_OUT_END: 0.85,
+    SCROLL_Y_TRANSLATE_PERCENT: -30,
+    SCROLL_DURATION: "+=100%",
+    FADE_OUT_START: 0.1,
+    FADE_OUT_END: 0.7,
     INITIAL_Y: 100,
     SCRUB_SMOOTHNESS: 0.8
   },
   MOBILE: {
-    FINAL_SCALE: 50,
-    SCROLL_DURATION: "+=80%",
-    FADE_OUT_START: 0.7,
-    FADE_OUT_END: 0.9,
+    SCROLL_Y_TRANSLATE_PERCENT: -25,
+    SCROLL_DURATION: "+=100%",
+    FADE_OUT_START: 0.1,
+    FADE_OUT_END: 0.7,
     INITIAL_Y: 50,
     SCRUB_SMOOTHNESS: 0.5
   },
@@ -168,13 +168,16 @@ const Hero = () => {
       scrub: config.SCRUB_SMOOTHNESS,
       onUpdate: (self) => {
         const progress = self.progress;
-        const scale = 1 + (progress * (config.FINAL_SCALE - 1));
+        
+        // Calculamos el desplazamiento vertical en porcentaje
+        const yPercent = config.SCROLL_Y_TRANSLATE_PERCENT * progress;
         
         let opacity = 1;
         if (progress > config.FADE_OUT_START) {
           opacity = gsap.utils.clamp(
             0,
             1,
+            // Ajustamos la fórmula para que el fundido sea más gradual
             1 - (progress - config.FADE_OUT_START) / 
               (config.FADE_OUT_END - config.FADE_OUT_START)
           );
@@ -182,13 +185,13 @@ const Hero = () => {
         
         // Aplicar transformaciones de manera más eficiente
         gsap.set(nameContainer, {
-          scale: scale,
+          yPercent: yPercent,
           opacity: opacity
         });
         
         gsap.set(scrollIndicator, {
-          opacity: gsap.utils.clamp(0, 1, 1 - progress * 2.5),
-          y: progress * 15
+          opacity: gsap.utils.clamp(0, 1, 1 - progress * 3),
+          y: progress * 20
         });
       }
     });
