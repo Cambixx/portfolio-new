@@ -268,13 +268,8 @@ const SkillsSection = () => {
               variants={skillItemVariants}
               whileHover={{ 
                 scale: 1.05, 
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderColor: "rgba(255, 255, 255, 0.25)",
+                // El backgroundColor y borderColor se gestionarán ahora desde SCSS para el hover
                 transition: { duration: 0.3 }
-              }}
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
               }}
             >
               <div className="skill-icon">

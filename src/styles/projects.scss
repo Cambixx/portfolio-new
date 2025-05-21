@@ -34,6 +34,7 @@
       line-height: 0.9;
       position: relative;
       display: inline-block;
+      text-shadow: 0 0 10px rgba(255, 154, 158, 0.5);
     }
 
     .vertical-line {
@@ -57,18 +58,19 @@
     .project-card {
       min-width: 500px;
       height: 500px;
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 1.5rem;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
       background-size: cover;
       background-position: center;
       position: relative;
       transform-origin: center;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
       background-image: none !important; /* Ocultar imagen en la tarjeta normal */
       
@@ -86,9 +88,13 @@
 
       @media (max-width: 768px) {
         min-width: 100%;
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.22);
       }
       
       &:hover {
+        background: rgba(255, 255, 255, 0.2);
         border-color: #FF8A8E;
         box-shadow: 0 0 20px rgba(255, 138, 142, 0.15),
                    0 0 40px rgba(255, 138, 142, 0.1),
@@ -165,6 +171,7 @@
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          text-shadow: 0 0 10px rgba(255, 154, 158, 0.4);
         }
         
         p {
@@ -176,6 +183,7 @@
           display: -webkit-box;
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
+          text-shadow: 0 0 8px rgba(255, 154, 158, 0.4);
         }
         
         .technologies {
@@ -315,6 +323,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        text-shadow: 0 0 10px rgba(255, 154, 158, 0.4);
       }
 
       p {
@@ -322,6 +331,7 @@
         line-height: 1.8;
         font-size: 1.1rem;
         margin: 0;
+        text-shadow: 0 0 8px rgba(255, 154, 158, 0.4);
       }
 
       .technologies {
