@@ -12,7 +12,7 @@ interface AudioVisualizerProps {
 // Configuración del visualizador
 const VISUALIZER_CONFIG = {
   // Configuración de las barras
-  DESKTOP_BAR_COUNT: 70, // Número de barras para escritorio
+  DESKTOP_BAR_COUNT: 50, // Número de barras para escritorio
   MOBILE_BAR_COUNT: 30, // Número de barras para móvil
   MIN_BAR_HEIGHT: 1, // Altura mínima de cada barra
   BAR_GAP: 0.5, // Espacio entre barras
@@ -38,8 +38,8 @@ const VISUALIZER_CONFIG = {
   
   // Configuración del gradiente
   GRADIENT: {
-    START_COLOR: 'rgba(121, 40, 202, 0)', // Color inicial (Púrpura)
-    END_COLOR: 'rgba(255, 154, 158, 0.5)', // Color final (Rosa)
+    START_COLOR: 'rgba(161, 81, 241, 0)', // Color inicial (Púrpura)
+    END_COLOR: 'rgba(255, 154, 158, 0.4)', // Color final (Rosa)
   },
 };
 
