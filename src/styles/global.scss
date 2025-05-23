@@ -36,8 +36,8 @@ html, body {
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #000;
-  color: #E0E0E0;
+  background-color: var(--background-color);
+  color: var(--text-color);
   line-height: 1.5;
   overflow-x: hidden;
   transition: opacity 0.3s ease;
@@ -48,8 +48,8 @@ body {
 :root {
   --primary-color: #FF9A9E;
   --primary-gradient: linear-gradient(to right, #FF9A9E, #FFECD2);
-  --text-color: #ffffff;
-  --background-color: #000000;
+  --text-color: #e0e0e0;
+  --background-color: #121212;
   --transition-smooth: all 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
@@ -107,4 +107,25 @@ button, .button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #FF8A8E;
+}
+
+// Media Query para Tema Claro
+@media (prefers-color-scheme: light) {
+  :root {
+    --text-color: #000000;
+    --background-color: #ffffff;
+  }
+
+  // Ajustes de scrollbar para tema claro
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 } 

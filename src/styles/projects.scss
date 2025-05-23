@@ -487,3 +487,79 @@
     }
   }
 }
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .projects-section {
+    .title-container {
+      .title {
+        background: none;
+        -webkit-text-fill-color: var(--text-color);
+        color: var(--text-color);
+        text-shadow: none;
+      }
+      .vertical-line {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.4), rgba(0,0,0,0.05));
+      }
+    }
+
+    .projects-wrapper {
+      .project-card {
+        background: rgba(0, 0, 0, 0.03); // Fondo oscuro muy sutil
+        border: 1px solid rgba(0, 0, 0, 0.08); // Borde oscuro sutil
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05); // Sombra más sutil
+
+        @media (max-width: 768px) {
+          background: rgba(0, 0, 0, 0.04); // Ligeramente diferente para móvil si es necesario
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        &::after { // Gradiente overlay en hover
+          background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+          border-color: var(--text-color); // Borde con color de texto principal (negro)
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.05),
+                     0 0 40px rgba(0, 0, 0, 0.03);
+          // inset box-shadow podría eliminarse o ajustarse a oscuro
+        }
+
+        .project-content {
+          h3 {
+            background: none;
+            -webkit-text-fill-color: var(--text-color);
+            color: var(--text-color);
+            text-shadow: none;
+          }
+
+          p {
+            color: var(--text-color); // Texto principal (negro)
+            opacity: 0.8; // Ligeramente más suave que el negro puro si es necesario
+            text-shadow: none;
+          }
+
+          .technologies {
+            .tech-tag {
+              background: rgba(0, 0, 0, 0.08); // Fondo oscuro sutil para la etiqueta
+              color: var(--text-color); // Texto principal (negro)
+              opacity: 0.9;
+              &:hover {
+                background: rgba(0, 0, 0, 0.12);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .project-modal {
+    // background: var(--background-color); // Ya se adapta
+    border: 1px solid var(--text-color); // Borde con color de texto principal (negro)
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1),
+                0 0 40px rgba(0, 0, 0, 0.05);
+    // inset shadow puede necesitar ajuste o eliminación
+  }
+}

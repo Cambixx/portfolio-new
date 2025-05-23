@@ -183,4 +183,48 @@
       height: 100%;
     }
   }
+}
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .about-section {
+    .title-container {
+      .title {
+        background: none; // Quitar gradiente
+        -webkit-text-fill-color: var(--text-color); // Usar color de texto del tema
+        color: var(--text-color); // Usar color de texto del tema
+        text-shadow: none; // Quitar sombra que podría no contrastar
+      }
+
+      .vertical-line {
+        // Usar un gradiente de gris oscuro o un color sólido
+        background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.4), rgba(0,0,0,0.05));
+      }
+    }
+
+    .text-container {
+      .text-block {
+        background: rgba(0, 0, 0, 0.03); // Negro muy sutil semitransparente
+        border: 1px solid rgba(0, 0, 0, 0.08); // Borde oscuro sutil
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); // Sombra más sutil
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+          border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        h3 {
+          background: none; // Quitar gradiente
+          -webkit-text-fill-color: var(--text-color);
+          color: var(--text-color);
+          text-shadow: none; // Quitar sombra
+        }
+
+        p {
+          color: var(--text-color); // Usar color de texto del tema (negro)
+          text-shadow: none; // Quitar sombra que puede no contrastar
+        }
+      }
+    }
+  }
 } 

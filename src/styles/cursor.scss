@@ -110,7 +110,28 @@ label,
   }
 }
 
-// Restaurar cursores nativos solo en móviles
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .custom-cursor {
+    .cursor-dot {
+      border-color: rgba(0, 0, 0, 0.5); // Borde oscuro para tema claro
+    }
+
+    &.pointer {
+      .cursor-dot {
+        border-color: rgba(0, 0, 0, 0.7); // Borde más oscuro en estado pointer
+      }
+    }
+
+    &.clicking {
+      .cursor-dot {
+        border-color: rgba(0, 0, 0, 1); // Borde oscuro opaco en estado clicking
+      }
+    }
+  }
+}
+
+// Restaurar cursores nativos solo en móviles (esta sección se mantiene como estaba)
 @media (max-width: 768px) {
   .custom-cursor {
     display: none;

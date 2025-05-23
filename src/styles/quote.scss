@@ -182,4 +182,60 @@
       }
     }
   }
+}
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .quote-section {
+    &::before {
+      background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+      // Considerar si el filter: blur(30px) sigue siendo adecuado o necesita ajuste
+    }
+    
+    &::after {
+      // Usando un gris oscuro en lugar del azul para el segundo decorativo
+      background: radial-gradient(circle, rgba(50,50,50,0.05) 0%, rgba(50,50,50,0) 70%);
+    }
+
+    .quote-card {
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+
+      @media (max-width: 768px) {
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      &::before { // Resplandor del borde
+        background: linear-gradient(45deg, 
+          transparent, 
+          rgba(0, 0, 0, 0.05), 
+          rgba(50, 50, 50, 0.03), 
+          transparent
+        );
+      }
+
+      .quote-text {
+        color: var(--text-color);
+        text-shadow: none;
+
+        &::before, &::after { // Comillas ornamentales
+          color: rgba(0,0,0,0.2);
+        }
+      }
+
+      .quote-author {
+        color: var(--text-color);
+        opacity: 0.8; // Un poco más suave que el texto principal
+        text-shadow: none;
+
+        span {
+          &::before { // Guion
+            color: rgba(0,0,0,0.6);
+          }
+        }
+      }
+    }
+  }
 } 

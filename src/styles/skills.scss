@@ -289,4 +289,95 @@
       width: 100%;
     }
   }
+}
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .skills-section {
+    .title-container {
+      .title {
+        background: none;
+        -webkit-text-fill-color: var(--text-color);
+        color: var(--text-color);
+        text-shadow: none;
+      }
+      .subtitle {
+        color: var(--text-color);
+        opacity: 0.7;
+        text-shadow: none;
+      }
+      .vertical-line {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.4), rgba(0,0,0,0.05));
+      }
+    }
+
+    .content-wrapper {
+      .categories-container {
+        .category {
+          .category-header {
+            h3 {
+              background: none;
+              -webkit-text-fill-color: var(--text-color);
+              color: var(--text-color);
+              text-shadow: none;
+            }
+            .line {
+              background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.05));
+            }
+          }
+
+          .skills-grid {
+            .skill-item {
+              background: rgba(0, 0, 0, 0.03);
+              border: 1px solid rgba(0, 0, 0, 0.08);
+              color: var(--text-color);
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+              @media (max-width: 768px) {
+                background: rgba(0, 0, 0, 0.04);
+                border: 1px solid rgba(0, 0, 0, 0.1);
+              }
+
+              .skill-icon {
+                color: var(--text-color); // Usar color de texto principal
+                opacity: 0.8;
+                svg {
+                  filter: none; // Quitar drop-shadow claro
+                }
+              }
+
+              .skill-name {
+                color: var(--text-color);
+                opacity: 0.9;
+                text-shadow: none;
+              }
+
+              &:hover {
+                color: var(--text-color);
+                background: rgba(0, 0, 0, 0.05);
+                border-color: rgba(0, 0, 0, 0.15);
+                
+                .skill-icon {
+                  // transform: scale(1.1); // Mantener si se desea
+                  color: var(--text-color); // Asegurar color de texto en hover
+                  opacity: 1;
+                }
+
+                // Ajustar el efecto de brillo ::before si es necesario para tema claro
+                // Podría ser un radial-gradient con rgba(0,0,0,0.05) o similar
+                &::before {
+                  background: radial-gradient(
+                    circle,
+                    rgba(0, 0, 0, 0.05) 0%,
+                    rgba(0, 0, 0, 0) 50%,
+                    transparent 70%
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 } 

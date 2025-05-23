@@ -147,3 +147,37 @@ section {
     transform: translateY(-30px);
   }
 }
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .hero {
+    h1 {
+      .greeting {
+        color: var(--text-color); // Usar color de texto del tema (negro)
+      }
+      .name {
+        background: none;
+        -webkit-background-clip: initial;
+        color: var(--text-color);
+      }
+    }
+    .description {
+      color: rgba(0, 0, 0, 0.8); // Texto oscuro semitransparente
+    }
+  }
+
+  .about,
+  .projects,
+  .contact {
+    h2 {
+      background: none;
+      -webkit-background-clip: initial;
+      color: var(--text-color);
+    }
+  }
+
+  .about p,
+  .contact p {
+    color: rgba(0, 0, 0, 0.8); // Texto oscuro semitransparente
+  }
+}

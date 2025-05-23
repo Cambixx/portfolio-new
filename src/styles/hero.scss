@@ -2,8 +2,8 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--background-color);
+  color: var(--text-color);
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -172,5 +172,28 @@
   100% {
     opacity: 1;
     top: 0.5rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .hero {
+    // Los colores de fondo y texto principales ya se manejan con var()
+    // No se necesita un cambio específico aquí a menos que queramos anularlos.
+  }
+
+  .simple-content {
+    .scroll-indicator {
+      span {
+        color: rgba(0, 0, 0, 0.7);
+      }
+
+      .arrow {
+        border: 1px solid rgba(0, 0, 0, 0.3);
+
+        &::after {
+          background-color: #333333;
+        }
+      }
+    }
   }
 }

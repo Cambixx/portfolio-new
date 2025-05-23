@@ -92,3 +92,15 @@
 .play-prompt-text {
   color: #aaaaaa;
 }
+
+// Ajustes para el tema claro
+@media (prefers-color-scheme: light) {
+  .audio-button {
+    // El fondo del botón es rgba(0,0,0,0.7), por lo que el color: white del ícono y los colores de las olas
+    // deberían seguir teniendo buen contraste y no necesitan cambiarse explícitamente aquí.
+    // Si el fondo del botón cambiara con el tema, entonces sí necesitaríamos ajustar el color del ícono.
+  }
+  .play-prompt-text {
+    color: #555555; // Gris oscuro para el texto de ayuda en tema claro
+  }
+}
