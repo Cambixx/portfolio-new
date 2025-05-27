@@ -64,95 +64,12 @@ const skillsData = {
   ]
 };
 
-// Variantes de animación para framer-motion
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    }
-  },
-  exit: {
-    opacity: 0,
-    transition: {
-      staggerChildren: 0.1,
-      staggerDirection: -1,
-    }
-  }
-};
-
-const categoryVariants = {
-  hidden: { opacity: 0, x: 50 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.25, 0.1, 0.25, 1],
-      staggerChildren: 0.15,
-    }
-  },
-  exit: {
-    opacity: 0,
-    x: 50,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.1, 0.25, 1],
-    }
-  }
-};
-
-// Modificamos las variantes para entrada horizontal y salida inversa
-const skillItemVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.95,
-    x: 50,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    x: 0,
-    transition: {
-      duration: 0.7,
-      ease: [0.25, 0.1, 0.25, 1]
-    }
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    x: -20,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1]
-    }
-  }
-};
-
 const SkillsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const contentContainerRef = useRef<HTMLDivElement>(null);
   const categoriesRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [, setCategoriesVisible] = useState([false, false, false]);
-  const categoryControls = useRef([useAnimation(), useAnimation(), useAnimation()]);
-  const lastScrollY = useRef(0);
-
-  // Función para resetear animaciones de una categoría
-  const resetCategory = (index: number) => {
-    // Resetear el estado de visibilidad
-    setCategoriesVisible(prev => {
-      const newState = [...prev];
-      newState[index] = false;
-      return newState;
-    });
-    
-    // Resetear manualmente la animación a estado inicial
-    categoryControls.current[index].set("hidden");
-  };
 
   const setCategoryRef = (el: HTMLDivElement | null, index: number) => {
     categoriesRef.current[index] = el;
@@ -165,16 +82,6 @@ const SkillsSection = () => {
     const title = titleRef.current;
     const categories = categoriesRef.current.filter(Boolean);
 
-    // Función para detectar dirección de scroll
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      // Mantenemos la variable para referencia futura, pero no usamos la dirección por ahora
-      // const isScrollingDown = scrollY > lastScrollY.current;
-      lastScrollY.current = scrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
     // Aplicar pin solo en pantallas grandes
     const mediaQuery = window.matchMedia('(min-width: 769px)');
     
@@ -184,7 +91,7 @@ const SkillsSection = () => {
         start: 'top 20%',
         endTrigger: categories[categories.length - 1],
         end: 'bottom 40%',
-        pin: title,
+        pin: titleContainer,
         pinSpacing: false,
         onEnter: () => {
           title.classList.add('title-pinned');
@@ -201,44 +108,32 @@ const SkillsSection = () => {
       });
     }
 
-    // Configuramos ScrollTriggers para cada categoría
-    categories.forEach((category, index) => {
-      ScrollTrigger.create({
-        trigger: category,
-        start: 'top 85%', // Activar más temprano
-        end: 'bottom 15%', // Detectar salida
-        markers: false, // Quitar en producción
-        onEnter: () => {
-          // La categoría entra en el viewport
-          setCategoriesVisible(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-          categoryControls.current[index].start("visible");
-        },
-        onLeave: () => {
-          // La categoría sale por abajo
-          categoryControls.current[index].start("exit");
-        },
-        onEnterBack: () => {
-          // La categoría vuelve a entrar desde abajo
-          setCategoriesVisible(prev => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-          categoryControls.current[index].start("visible");
-        },
-        onLeaveBack: () => {
-          // La categoría sale por arriba - REINICIAR COMPLETAMENTE
-          resetCategory(index);
-        }
-      });
+    // Animaciones para cada skill dentro de cada categoría
+    categories.forEach((category) => {
+      if (category) {  // Verificamos que category no sea null
+        const skills = category.querySelectorAll('.skill-item');
+        skills.forEach((skill, index) => {
+          gsap.fromTo(skill,
+            {
+              x: 250
+            },
+            {
+              x: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: skill,
+                start: "top 85%",
+                end: "top 60%",
+                scrub: 1,
+                toggleActions: "play none none reverse"
+              }
+            }
+          );
+        });
+      }
     });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
   }, []);
@@ -246,30 +141,22 @@ const SkillsSection = () => {
   // Función para renderizar una categoría de habilidades
   const renderCategory = (title: string, skills: string[], index: number) => {
     return (
-      <motion.div 
+      <div 
         className="category"
         ref={(el) => setCategoryRef(el, index)}
-        initial="hidden"
-        animate={categoryControls.current[index]}
-        variants={categoryVariants}
       >
         <div className="category-header">
           <h3>{title}</h3>
           <div className="line"></div>
         </div>
-        <motion.div 
-          className="skills-grid"
-          variants={containerVariants}
-        >
+        <div className="skills-grid">
           {skills.map((skill, skillIndex) => (
             <motion.div 
               key={`${title.toLowerCase()}-${skillIndex}`}
               className="skill-item"
-              variants={skillItemVariants}
               whileHover={{ 
-                scale: 1.05, 
-                // El backgroundColor y borderColor se gestionarán ahora desde SCSS para el hover
-                transition: { duration: 0.3 }
+                scale: 1.05,
+                transition: { duration: 0.2 }
               }}
             >
               <div className="skill-icon">
@@ -278,8 +165,8 @@ const SkillsSection = () => {
               <div className="skill-name">{skill}</div>
             </motion.div>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     );
   };
 
