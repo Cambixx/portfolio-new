@@ -9,6 +9,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 import { AudioController } from './AudioController';
 
+// Constante para configurar el número de rotaciones completas durante el scroll
+const TOTAL_ROTATIONS = 0.9; // Número de vueltas completas durante todo el scroll
+
 interface Model3DProps {
   audioEnabled?: boolean;
   analyser?: AnalyserNode | null;
@@ -73,8 +76,12 @@ export const Model3D = React.memo(function Model3D({
     });
     
     const handleScroll = () => {
-      // Factor de rotación base
-      const baseRotation = window.scrollY * 0.002;
+      // Calcula el progreso del scroll (0 a 1)
+      const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      
+      // Calcula la rotación total basada en el número de vueltas deseadas
+      // Multiplicamos por 2PI para convertir el número de vueltas en radianes
+      const baseRotation = scrollProgress * (TOTAL_ROTATIONS * Math.PI * 2);
       
       // Ajuste adicional para dispositivos móviles (medio giro más = PI/2)
       const isMobile = window.innerWidth < 768;
@@ -84,13 +91,13 @@ export const Model3D = React.memo(function Model3D({
       targetRotation.current = baseRotation + mobileRotationAdjust;
       
       // Controla la animación directamente con el progreso del scroll (invertido)
-      const scrollProgress = 1 - (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight));
+      const animationProgress = 1 - scrollProgress;
       
       Object.values(actions).forEach((action) => {
         if (action) {
           // Establecer el tiempo de la animación basado en el progreso invertido del scroll
           const duration = action.getClip().duration;
-          action.time = scrollProgress * duration;
+          action.time = animationProgress * duration;
           action.play();
           action.paused = true; // Mantener pausado pero actualizar el tiempo
         }
