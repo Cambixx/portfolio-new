@@ -7,8 +7,9 @@
   padding-bottom: 4rem; // Padding base para todas las pantallas
   
   @media (max-width: 768px) {
-    min-height: auto; // Ajustamos la altura para móvil
-    padding-bottom: 8rem; // Aumentamos significativamente el espacio en móvil
+    min-height: unset;
+    height: auto;
+    padding-bottom: 4rem;
   }
   
   .about-layout {
@@ -22,7 +23,7 @@
     
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 3rem;
       padding: 0 1.5rem;
     }
   }
@@ -32,8 +33,9 @@
     padding-top: 6rem;
 
     @media (max-width: 768px) {
-      padding-top: 3rem;
-      margin-bottom: 2rem;
+      padding-top: 2rem;
+      margin-bottom: 0;
+      height: auto !important; // Forzar altura automática en móvil
     }
   }
   
@@ -44,6 +46,10 @@
     
     @media (max-width: 768px) {
       padding-left: 1rem;
+      position: relative !important; // Forzar posición relativa en móvil
+      transform: none !important; // Eliminar cualquier transformación en móvil
+      top: auto !important; // Eliminar posicionamiento top en móvil
+      left: auto !important; // Eliminar posicionamiento left en móvil
     }
     
     &.title-pinned {
@@ -103,7 +109,7 @@
     padding-top: 6rem;
 
     @media (max-width: 768px) {
-      padding-top: 0;
+      padding-top: 1rem;
     }
   }
 
@@ -114,7 +120,7 @@
     max-width: 800px;
     
     @media (max-width: 768px) {
-      gap: 2rem;
+      gap: 1.5rem;
     }
     
     .text-block {
@@ -136,8 +142,8 @@
       }
       
       @media (max-width: 768px) {
-        margin-bottom: 1rem;
-        transform: translateY(50px);
+        margin-bottom: 0.5rem;
+        transform: translateY(30px);
         padding: 1.5rem;
       }
       

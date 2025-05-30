@@ -51,13 +51,13 @@
     display: flex;
     gap: 4rem;
     padding: 2rem;
-    padding-right: calc(50vw - 250px);
+    padding-right: calc(50vw - 200px);
     will-change: transform;
     position: relative;
     
     .project-card {
-      min-width: 500px;
-      height: 500px;
+      min-width: 400px;
+      height: 400px;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 1.5rem;
       overflow: hidden;
@@ -130,11 +130,11 @@
       .project-content {
         position: relative;
         z-index: 2;
-        padding: 2rem;
+        padding: 1.75rem;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
         justify-content: flex-end;
         opacity: 1;
         transform: translateY(0);
@@ -163,7 +163,7 @@
         }
         
         h3 {
-          font-size: 2rem;
+          font-size: 1.75rem;
           font-weight: 600;
           color: #FFF;
           line-height: 1.2;
@@ -177,7 +177,7 @@
         p {
           color: rgba(255, 255, 255, 0.7);
           line-height: 1.6;
-          font-size: 1rem;
+          font-size: 0.95rem;
           max-height: 4.8em;
           overflow: hidden;
           display: -webkit-box;
@@ -193,11 +193,11 @@
           margin-top: auto;
           
           .tech-tag {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.9rem;
             background: rgba(255, 154, 158, 0.1);
             color: var(--primary-color);
             border-radius: 2rem;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 0.5px;
             transition: all 0.3s ease;

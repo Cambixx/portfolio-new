@@ -12,24 +12,30 @@ const AboutSection = () => {
   const contentContainerRef = useRef<HTMLDivElement>(null);
   const textBlocksRef = useRef<(HTMLDivElement | null)[]>([]);
   const lastBlockTitleRef = useRef<HTMLHeadingElement>(null);
+  const scrollTriggerInstanceRef = useRef<ScrollTrigger | null>(null);
 
   const setTextBlockRef = (el: HTMLDivElement | null, index: number) => {
     textBlocksRef.current[index] = el;
   };
 
-  useEffect(() => {
-    if (!titleContainerRef.current || !titleRef.current || !contentContainerRef.current || !lastBlockTitleRef.current) return;
+  // Función para configurar el ScrollTrigger
+  const setupScrollTrigger = () => {
+    if (!titleContainerRef.current || !titleRef.current || !lastBlockTitleRef.current) return;
 
     const titleContainer = titleContainerRef.current;
     const title = titleRef.current;
     const lastBlockTitle = lastBlockTitleRef.current;
-    const textBlocks = textBlocksRef.current.filter(Boolean);
+
+    // Limpiar el ScrollTrigger anterior si existe
+    if (scrollTriggerInstanceRef.current) {
+      scrollTriggerInstanceRef.current.kill();
+    }
 
     // Solo aplicar el pin en pantallas grandes
     const mediaQuery = window.matchMedia('(min-width: 769px)');
     
     if (mediaQuery.matches) {
-      ScrollTrigger.create({
+      scrollTriggerInstanceRef.current = ScrollTrigger.create({
         trigger: titleContainer,
         start: 'top 20%',
         endTrigger: lastBlockTitle,
@@ -50,12 +56,17 @@ const AboutSection = () => {
         }
       });
     }
+  };
 
-    // Animación de los bloques de texto apareciendo en secuencia
-    textBlocks.forEach((block, _index) => {
-      gsap.fromTo(block, 
+  useEffect(() => {
+    setupScrollTrigger();
+
+    // Configurar las animaciones de los bloques de texto
+    const textBlocks = textBlocksRef.current.filter(Boolean);
+    const textAnimations = textBlocks.map((block) => {
+      return gsap.fromTo(block, 
         { 
-          y: 50, // Reducido para móvil
+          y: window.innerWidth <= 768 ? 30 : 50,
           opacity: 0 
         }, 
         {
@@ -71,8 +82,24 @@ const AboutSection = () => {
       );
     });
 
+    // Manejar cambios de tamaño de ventana
+    const handleResize = () => {
+      setupScrollTrigger();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Limpieza
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      window.removeEventListener('resize', handleResize);
+      if (scrollTriggerInstanceRef.current) {
+        scrollTriggerInstanceRef.current.kill();
+      }
+      textAnimations.forEach(animation => {
+        if (animation.scrollTrigger) {
+          animation.scrollTrigger.kill();
+        }
+      });
     };
   }, []);
 
