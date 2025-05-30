@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import React from 'react';
-import { useGLTF, useAnimations, Float, Environment, Lightformer } from '@react-three/drei';
+import { useGLTF, useAnimations, Float, Environment, Lightformer, Stars } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -158,29 +158,85 @@ export const Model3D = React.memo(function Model3D({
   return (
     <>
       {audioEnabled && <AudioController />}
-      <Environment resolution={512}>
-        {/* Techo */}
-        <Lightformer intensity={2.5} rotation-x={Math.PI / 2} position={[0, 3, -4]} scale={[10, 1, 1]} />
-        <Lightformer intensity={2.5} rotation-x={Math.PI / 2} position={[0, 3, 0]} scale={[10, 1, 1]} />
-        <Lightformer intensity={2.5} rotation-x={Math.PI / 2} position={[0, 3, 4]} scale={[10, 1, 1]} />
-        
-        {/* Laterales */}
-        <Lightformer intensity={3} rotation-y={Math.PI / 2} position={[-3, 1, 0]} scale={[6, 3, 1]} />
-        <Lightformer intensity={3} rotation-y={-Math.PI / 2} position={[3, 1, 0]} scale={[6, 3, 1]} />
-        
-        {/* Luces de acento */}
-        <Lightformer form="ring" color="#ff3e3e" intensity={8} scale={2} position={[2, 1, 2]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-        <Lightformer form="ring" color="#7928ca" intensity={8} scale={2} position={[-2, 1, 2]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-        
-        {/* Luz frontal */}
-        <Lightformer intensity={4} position={[0, 1, 3]} scale={[3, 3, 1]} />
-      </Environment>
+      <color attach="background" args={['#000']} />
+      <fog attach="fog" args={['#161616', 30, 40]} />
+      <Stars
+        radius={100}
+        depth={50}
+        count={5000}
+        factor={4}
+        saturation={0}
+        fade
+        speed={1}
+      />
       
+      <Environment resolution={256}>
+        {/* Aurora Effect - Top Layer */}
+        <Lightformer
+          form="ring"
+          color="#4CC9F0"
+          intensity={2}
+          scale={[20, 5, 1]}
+          position={[0, 8, -15]}
+          target={[0, 0, 0]}
+        >
+          <meshBasicMaterial color="#4CC9F0" opacity={0.5} transparent />
+        </Lightformer>
+
+        {/* Aurora Effect - Middle Layer */}
+        <Lightformer
+          form="ring"
+          color="#7209B7"
+          intensity={1.5}
+          scale={[15, 5, 1]}
+          position={[0, 6, -12]}
+          target={[0, 0, 0]}
+        >
+          <meshBasicMaterial color="#7209B7" opacity={0.4} transparent />
+        </Lightformer>
+
+        {/* Aurora Effect - Bottom Layer */}
+        <Lightformer
+          form="ring"
+          color="#F72585"
+          intensity={1}
+          scale={[10, 5, 1]}
+          position={[0, 4, -10]}
+          target={[0, 0, 0]}
+        >
+          <meshBasicMaterial color="#F72585" opacity={0.3} transparent />
+        </Lightformer>
+
+        {/* Ambient Light */}
+        <Lightformer 
+          intensity={0.5} 
+          position={[0, 5, 5]} 
+          scale={[10, 10, 1]}
+          color="#4CC9F0"
+        />
+
+        {/* Side Lights for Depth */}
+        <Lightformer
+          intensity={2}
+          rotation-y={Math.PI / 2}
+          position={[-5, 2, 0]}
+          scale={[20, 2, 1]}
+          color="#7209B7"
+        />
+        <Lightformer
+          intensity={2}
+          rotation-y={-Math.PI / 2}
+          position={[5, 2, 0]}
+          scale={[20, 2, 1]}
+          color="#F72585"
+        />
+      </Environment>
+
       <Float
-        speed={2.5} // Velocidad de la animación
-        rotationIntensity={0.2} // Desactivamos la rotación automática ya que tenemos la nuestra
-        floatIntensity={0.5} // Intensidad del efecto de flotación
-        floatingRange={[0.3, 0.4]} // Rango de movimiento vertical
+        speed={2.5}
+        rotationIntensity={0.2}
+        floatIntensity={0.5}
+        floatingRange={[0.3, 0.4]}
       >
         <group ref={modelRef} dispose={null} position={[0, 0, 0]} scale={0.3}>
           <primitive object={nodes.Scene} />
