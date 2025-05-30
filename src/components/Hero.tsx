@@ -6,6 +6,7 @@ import { OrbitControls, useProgress } from '@react-three/drei';
 import { Model3D } from './Model3D';
 import { ModelLoader } from './ModelLoader';
 import { AudioButton } from './AudioButton';
+import Ballpit from './Ballpit';
 import '../styles/hero.scss';
 
 // Registramos ScrollTrigger para poder usarlo
@@ -206,6 +207,24 @@ const Hero = () => {
 
   return (
     <section className="hero" ref={heroRef}>
+      {/* Fondo Ballpit */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          overflow: 'hidden',
+          minHeight: '500px',
+          maxHeight: '100vh',
+          width: '100%',
+          pointerEvents: 'none',
+        }}
+      >
+        <Ballpit
+          followCursor={true}
+        />
+      </div>
+      {/* Fin fondo Ballpit */}
       <ModelLoader show={showLoader} />
       
       <div className="hero-right">
