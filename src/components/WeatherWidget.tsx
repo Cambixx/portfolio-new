@@ -201,13 +201,6 @@ const ForecastGrid = styled.div`
   }
 `;
 
-const DateDisplay = styled.div`
-  font-size: 0.8rem;
-  opacity: 0.8;
-  margin-bottom: 10px;
-  text-transform: capitalize;
-`;
-
 const WeatherInfo = styled.div`
   display: flex;
   align-items: center;
@@ -253,12 +246,6 @@ const DateAndLocation = styled.div`
   flex-shrink: 0;
 `;
 
-const ErrorMessage = styled.div`
-  color: #ff6b6b;
-  font-size: 0.8rem;
-  margin-top: 8px;
-`;
-
 interface WeatherData {
   temp: number;
   description: string;
@@ -301,7 +288,6 @@ const WeatherWidget = () => {
   const [currentTime, setCurrentTime] = useState<Date>(() => new Date(Date.now()));
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [animationData, setAnimationData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -339,7 +325,6 @@ const WeatherWidget = () => {
   useEffect(() => {
     const getWeatherData = async () => {
       try {
-        setError(null);
         const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
         if (!apiKey || apiKey === 'tu_api_key_aqui') {
@@ -375,7 +360,7 @@ const WeatherWidget = () => {
           forecast.list
             .filter((item: any) => {
               const itemDate = new Date(item.dt * 1000);
-              return itemDate.getHours() === 12 || itemDate.getHours() === 13; // Flexibilizar la hora para obtener más resultados
+              return itemDate.getHours() === 12 || itemDate.getHours() === 13;
             })
             .slice(0, 5)
             .map(async (item: any) => {
@@ -392,11 +377,6 @@ const WeatherWidget = () => {
 
         setForecast(processedForecasts);
       } catch (error) {
-        let errorMessage = 'Error al obtener datos del clima';
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        setError(errorMessage);
         console.error('Error detallado:', error);
       }
     };

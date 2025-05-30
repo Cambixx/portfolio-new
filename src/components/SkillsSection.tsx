@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 // Importamos los iconos necesarios
 import { 
   FaHtml5, FaCss3Alt, FaSass, FaJs, FaReact, FaNodeJs, FaPhp, 
@@ -150,9 +150,9 @@ const SkillsSection = () => {
           <div className="line"></div>
         </div>
         <div className="skills-grid">
-          {skills.map((skill, skillIndex) => (
+          {skills.map((skill) => (
             <motion.div 
-              key={`${title.toLowerCase()}-${skillIndex}`}
+              key={skill}
               className="skill-item"
               whileHover={{ 
                 scale: 1.05,
