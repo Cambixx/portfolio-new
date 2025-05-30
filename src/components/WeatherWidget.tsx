@@ -246,6 +246,28 @@ const DateAndLocation = styled.div`
   flex-shrink: 0;
 `;
 
+const ErrorContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 82, 82, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 12px 15px;
+  border-radius: 20px;
+  color: #fff;
+  box-shadow: 0 8px 32px 0 rgba(255, 82, 82, 0.15);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  z-index: 1000;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
 interface WeatherData {
   temp: number;
   description: string;
@@ -290,6 +312,7 @@ const WeatherWidget = () => {
   const [forecast, setForecast] = useState<ForecastData[]>([]);
   const [animationData, setAnimationData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -300,15 +323,22 @@ const WeatherWidget = () => {
   }, []);
 
   const fetchWeatherData = async (latitude: number, longitude: number, apiKey: string) => {
-    const weatherResponse = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=es`
-    );
+    try {
+      const weatherResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=es`
+      );
 
-    const forecastResponse = await axios.get(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=es`
-    );
+      const forecastResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=es`
+      );
 
-    return { weather: weatherResponse.data, forecast: forecastResponse.data };
+      return { weather: weatherResponse.data, forecast: forecastResponse.data };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw new Error('API key inválida o no configurada correctamente');
+      }
+      throw error;
+    }
   };
 
   const loadAnimation = async (weatherMain: string) => {
@@ -325,10 +355,11 @@ const WeatherWidget = () => {
   useEffect(() => {
     const getWeatherData = async () => {
       try {
+        setError(null);
         const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
         if (!apiKey || apiKey === 'tu_api_key_aqui') {
-          throw new Error('API key no configurada correctamente en el archivo .env');
+          throw new Error('API key no configurada. Por favor, configura la variable de entorno VITE_OPENWEATHER_API_KEY');
         }
 
         const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -377,6 +408,11 @@ const WeatherWidget = () => {
 
         setForecast(processedForecasts);
       } catch (error) {
+        let errorMessage = 'Error al obtener datos del clima';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        setError(errorMessage);
         console.error('Error detallado:', error);
       }
     };
@@ -394,6 +430,10 @@ const WeatherWidget = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
+  if (error) {
+    return <ErrorContainer>{error}</ErrorContainer>;
+  }
 
   return (
     <>
