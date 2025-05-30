@@ -112,7 +112,7 @@ const SkillsSection = () => {
     categories.forEach((category) => {
       if (category) {  // Verificamos que category no sea null
         const skills = category.querySelectorAll('.skill-item');
-        skills.forEach((skill, index) => {
+        skills.forEach((skill) => {
           gsap.fromTo(skill,
             {
               x: 250
