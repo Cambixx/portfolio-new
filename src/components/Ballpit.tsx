@@ -415,7 +415,7 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
     renderer: WebGLRenderer;
     size = { width: 0, height: 0, wWidth: 0, wHeight: 0, ratio: 0, pixelRatio: 0 };
     render = this.#render;
-    onBeforeRender = (delta?: number) => {};
+    onBeforeRender = (_delta?: number) => {};
     onAfterRender = () => {};
     onAfterResize = () => {};
     #raf: any;
@@ -424,8 +424,6 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
     #resizeObs: ResizeObserver | null = null;
     #intersectionObs: IntersectionObserver | null = null;
     #visible = true;
-    #pointer: any;
-    #paused = false;
     constructor() {
       this.canvas = canvas;
       this.camera = new PerspectiveCamera();
