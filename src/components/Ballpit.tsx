@@ -112,14 +112,12 @@ function onPointerLeave() {
 const { randFloat, randFloatSpread } = MathUtils;
 const TMP_VEC3 = new Vector3();
 const TMP_VEC3_2 = new Vector3();
-const TMP_VEC3_3 = new Vector3();
 const TMP_VEC3_4 = new Vector3();
 const TMP_VEC3_5 = new Vector3();
 const TMP_VEC3_6 = new Vector3();
 const TMP_VEC3_7 = new Vector3();
 const TMP_VEC3_8 = new Vector3();
 const TMP_VEC3_9 = new Vector3();
-const TMP_VEC3_10 = new Vector3();
 
 class BallPhysics {
   config: any;
@@ -307,7 +305,7 @@ class BallpitMesh extends InstancedMesh {
   physics: BallPhysics;
   ambientLight: AmbientLight = new AmbientLight();
   light: PointLight = new PointLight();
-  cursorLight: PointLight = new PointLight(0xffffff, 3, 4);
+  cursorLight: PointLight = new PointLight();
   constructor(renderer: WebGLRenderer, config: any = {}) {
     const mergedConfig = { ...DEFAULT_CONFIG, ...config };
     const env = new RoomEnvironment();
@@ -665,8 +663,8 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   }
 
   three.onBeforeRender = (delta?: number) => {
-    if (!paused && typeof delta === 'number') {
-      mesh.update({ delta });
+    if (!paused) {
+      mesh.update({ delta: delta || 0 });
     }
   };
 
