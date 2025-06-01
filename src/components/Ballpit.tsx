@@ -224,63 +224,6 @@ const TMP_VEC3_7 = new Vector3();
 const TMP_VEC3_8 = new Vector3();
 const TMP_VEC3_9 = new Vector3();
 
-// Constantes para optimización
-const PHYSICS_STEP = 1 / 120; // Más preciso para física
-const MAX_DELTA = 0.05; // Más suave
-const COLLISION_CHECK_FREQUENCY = 1; // Revisar colisiones cada frame para más precisión
-let frameCount = 0;
-
-class SpatialGrid {
-  cells: Map<string, number[]>;
-  cellSize: number;
-  
-  constructor(maxBounds: number, divisions: number) {
-    this.cells = new Map();
-    this.cellSize = (maxBounds * 2) / divisions;
-  }
-
-  getCellKey(x: number, y: number, z: number): string {
-    const cx = Math.floor(x / this.cellSize);
-    const cy = Math.floor(y / this.cellSize);
-    const cz = Math.floor(z / this.cellSize);
-    return `${cx},${cy},${cz}`;
-  }
-
-  clear() {
-    this.cells.clear();
-  }
-
-  insert(index: number, x: number, y: number, z: number) {
-    const key = this.getCellKey(x, y, z);
-    if (!this.cells.has(key)) {
-      this.cells.set(key, []);
-    }
-    this.cells.get(key)?.push(index);
-  }
-
-  getNearbyIndices(x: number, y: number, z: number): number[] {
-    const key = this.getCellKey(x, y, z);
-    const nearby: number[] = [];
-    
-    // Obtener índices de la celda actual y adyacentes
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dz = -1; dz <= 1; dz++) {
-          const cx = Math.floor(x / this.cellSize) + dx;
-          const cy = Math.floor(y / this.cellSize) + dy;
-          const cz = Math.floor(z / this.cellSize) + dz;
-          const nKey = `${cx},${cy},${cz}`;
-          const indices = this.cells.get(nKey);
-          if (indices) {
-            nearby.push(...indices);
-          }
-        }
-      }
-    }
-    return nearby;
-  }
-}
-
 class BallPhysics {
   config: any;
   positionData: Float32Array;
@@ -326,7 +269,6 @@ class BallPhysics {
   update(e: { delta: number }) {
     const { config, center, positionData, sizeData, velocityData } = this;
     
-    // Control de la bola principal (cursor/centro)
     let r = 0;
     if (config.controlSphere0) {
       r = 1;
@@ -335,7 +277,6 @@ class BallPhysics {
       TMP_VEC3_4.set(0, 0, 0).toArray(velocityData, 0);
     }
 
-    // Aplicar fuerzas de movimiento a todas las bolas
     if (this.motionForce.lengthSq() > 0) {
       for (let idx = r; idx < config.count; idx++) {
         const base = 3 * idx;
@@ -350,7 +291,6 @@ class BallPhysics {
       }
     }
 
-    // Actualizar posiciones y velocidades
     for (let idx = r; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
@@ -363,7 +303,6 @@ class BallPhysics {
       TMP_VEC3_4.toArray(velocityData, base);
     }
 
-    // Colisiones entre bolas
     for (let idx = r; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
@@ -394,8 +333,7 @@ class BallPhysics {
         }
       }
 
-      // Colisión con la bola principal (cursor)
-      if (config.controlSphere0 && idx > 0) {
+      if (config.controlSphere0) {
         TMP_VEC3_6.copy(center).sub(TMP_VEC3);
         const dist = TMP_VEC3_6.length();
         const sumRadius0 = radius + sizeData[0];
@@ -410,7 +348,6 @@ class BallPhysics {
         }
       }
 
-      // Colisiones con paredes
       if (Math.abs(TMP_VEC3.x) + radius > config.maxX) {
         TMP_VEC3.x = Math.sign(TMP_VEC3.x) * (config.maxX - radius);
         TMP_VEC3_4.x = -TMP_VEC3_4.x * config.wallBounce;
