@@ -52,7 +52,15 @@ const PHYSICS_CONFIG = {
 
 // Configuración de luces
 const LIGHT_CONFIG = {
-  COLORS: [0x4444ff, 0x4444ff],
+  // Paleta de colores que combina con la web
+  COLORS: [
+    0x4444ff,  // Azul principal
+    0x6b46c1,  // Morado oscuro
+    0x805ad5,  // Morado medio
+    0x9f7aea,  // Morado claro
+    0x667eea,  // Azul medio
+    0x4299e1,  // Azul claro
+  ],
   AMBIENT: {
     COLOR: 0xffffff,
     INTENSITY: 1.0,
@@ -63,7 +71,7 @@ const LIGHT_CONFIG = {
     DECAY: 1,
   },
   CURSOR_LIGHT: {
-    COLOR: 0xffffff,
+    COLOR: 0x4444ff, // Color principal para la luz del cursor
     INTENSITY: 200,
     DISTANCE: 10,
     DECAY: 1.5,
@@ -464,24 +472,38 @@ class BallpitMesh extends InstancedMesh {
       const colorLerp = (function (arr: any[]) {
         let arrColors = arr.map((c) => new Color(c));
         return {
-          getColorAt: (ratio: number, out = new Color()) => {
+          getColorAt: function (ratio: number, out = new Color()) {
+            // Modificamos la distribución de colores para que sea más aleatoria
+            // pero manteniendo una transición suave
             const scaled = Math.max(0, Math.min(1, ratio)) * (arrColors.length - 1);
             const idx = Math.floor(scaled);
             const start = arrColors[idx];
             if (idx >= arrColors.length - 1) return start.clone();
             const alpha = scaled - idx;
             const end = arrColors[idx + 1];
-            out.r = start.r + alpha * (end.r - start.r);
-            out.g = start.g + alpha * (end.g - start.g);
-            out.b = start.b + alpha * (end.b - start.b);
+            
+            // Añadimos una pequeña variación aleatoria al color
+            const variation = 0.1; // 10% de variación
+            out.r = start.r + alpha * (end.r - start.r) + (Math.random() - 0.5) * variation;
+            out.g = start.g + alpha * (end.g - start.g) + (Math.random() - 0.5) * variation;
+            out.b = start.b + alpha * (end.b - start.b) + (Math.random() - 0.5) * variation;
+            
+            // Aseguramos que los valores estén en el rango correcto
+            out.r = Math.max(0, Math.min(1, out.r));
+            out.g = Math.max(0, Math.min(1, out.g));
+            out.b = Math.max(0, Math.min(1, out.b));
+            
             return out;
           },
         };
       })(colors);
+
+      // Asignamos colores con un poco de aleatoriedad en el orden
       for (let idx = 0; idx < this.count; idx++) {
-        this.setColorAt(idx, colorLerp.getColorAt(idx / this.count));
+        const randomOffset = Math.random() * 0.2 - 0.1; // ±10% de variación
+        this.setColorAt(idx, colorLerp.getColorAt((idx / this.count) + randomOffset));
         if (idx === 0) {
-          this.light.color.copy(colorLerp.getColorAt(idx / this.count));
+          this.light.color.copy(colorLerp.getColorAt(0));
         }
       }
       // @ts-ignore
