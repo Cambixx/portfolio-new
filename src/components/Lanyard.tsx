@@ -46,9 +46,16 @@ const CARD_CONFIG = {
       letterSpacing: '0.05em',
       lineHeight: 1,
       position: {
-        x: -0.15,
-        y: 0.1,
-        z: 0.03 // depth + 0.01
+        desktop: {
+          x: -0.15,
+          y: 0.1,
+          z: 0.03
+        },
+        mobile: {
+          x: -0.15,
+          y: 0.2,
+          z: 0.03
+        }
       },
       width: '0.6rem'
     },
@@ -57,9 +64,16 @@ const CARD_CONFIG = {
       letterSpacing: '0.02em',
       lineHeight: 0.8,
       position: {
-        x: -0.15,
-        y: -0.45,
-        z: 0.03 // depth + 0.01
+        desktop: {
+          x: -0.15,
+          y: -0.45,
+          z: 0.03
+        },
+        mobile: {
+          x: -0.15,
+          y: -0.25,
+          z: 0.03
+        }
       },
       width: '0.6rem',
       opacity: 0.8
@@ -474,9 +488,9 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
 
             {/* Texto */}
             <group position={[
-              CARD_CONFIG.text.name.position.x, 
-              CARD_CONFIG.text.name.position.y, 
-              CARD_CONFIG.text.name.position.z
+              CARD_CONFIG.text.name.position[isSmall ? 'mobile' : 'desktop'].x,
+              CARD_CONFIG.text.name.position[isSmall ? 'mobile' : 'desktop'].y,
+              CARD_CONFIG.text.name.position[isSmall ? 'mobile' : 'desktop'].z
             ]}>
               <Html
                 transform
@@ -499,9 +513,9 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
             </group>
 
             <group position={[
-              CARD_CONFIG.text.title.position.x, 
-              CARD_CONFIG.text.title.position.y, 
-              CARD_CONFIG.text.title.position.z
+              CARD_CONFIG.text.title.position[isSmall ? 'mobile' : 'desktop'].x,
+              CARD_CONFIG.text.title.position[isSmall ? 'mobile' : 'desktop'].y,
+              CARD_CONFIG.text.title.position[isSmall ? 'mobile' : 'desktop'].z
             ]}>
               <Html
                 transform
