@@ -92,11 +92,75 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   const [isSmall, setIsSmall] = useState(() =>
     typeof window !== 'undefined' && window.innerWidth < 1024
   );
+  
+  // Estados para el sensor de orientación (solo móvil)
+  const [orientation, setOrientation] = useState({ beta: 0, gamma: 0 });
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => 
+    typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  );
 
   useRopeJoint(fixed as any, j1 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
   useRopeJoint(j1 as any, j2 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
   useRopeJoint(j2 as any, j3 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
   useSphericalJoint(j3 as any, card as any, [[0, 0, 0], [0, 1.10, 0]]);
+
+  // Solicitar permisos y configurar sensores de orientación para móvil
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const requestPermission = async () => {
+      if (typeof (DeviceOrientationEvent as any)?.requestPermission === 'function') {
+        // iOS 13+
+        try {
+          const permission = await (DeviceOrientationEvent as any).requestPermission();
+          if (permission === 'granted') {
+            setPermissionGranted(true);
+          } else {
+            console.log('Permiso de orientación denegado');
+          }
+        } catch (error) {
+          console.error('Error solicitando permisos:', error);
+        }
+      } else {
+        // Android y otros
+        setPermissionGranted(true);
+      }
+    };
+
+    // Solicitar permisos al hacer click/touch en la pantalla
+    const handleInteraction = () => {
+      requestPermission();
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+  }, [isMobile]);
+
+  // Manejar eventos de orientación para móvil
+  useEffect(() => {
+    if (!isMobile || !permissionGranted) return;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      const beta = event.beta || 0;   // inclinación hacia adelante/atrás (-180 a 180)
+      const gamma = event.gamma || 0; // inclinación izquierda/derecha (-90 a 90)
+      
+      setOrientation({ beta, gamma });
+    };
+
+    window.addEventListener('deviceorientation', handleOrientation);
+
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
+  }, [isMobile, permissionGranted]);
 
   useEffect(() => {
     if (hovered) {
@@ -108,6 +172,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   useEffect(() => {
     const handleResize = () => {
       setIsSmall(window.innerWidth < 1024);
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
     };
 
     window.addEventListener('resize', handleResize);
@@ -132,6 +197,28 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   }, [carlosTexture]);
 
   useFrame((state, delta) => {
+    // Aplicar fuerzas basadas en la orientación del dispositivo (solo móvil)
+    if (isMobile && permissionGranted && !dragged) {
+      const gravityMultiplier = 15; // Ajustar intensidad
+      const dampingFactor = 0.8; // Suavizar movimiento
+      
+      // Convertir orientación a fuerzas
+      const forceX = (orientation.gamma / 90) * gravityMultiplier * dampingFactor;
+      const forceZ = (orientation.beta / 180) * gravityMultiplier * dampingFactor;
+      
+      // Aplicar fuerzas a los joints móviles
+      [j1, j2, j3, card].forEach((ref) => {
+        if (ref.current) {
+          const currentVel = ref.current.linvel();
+          ref.current.setLinvel({
+            x: currentVel.x + forceX * delta,
+            y: currentVel.y,
+            z: currentVel.z + forceZ * delta
+          }, true);
+        }
+      });
+    }
+
     if (dragged && card.current) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
