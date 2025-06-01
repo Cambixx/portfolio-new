@@ -7,6 +7,7 @@ import { Model3D } from './Model3D';
 import { ModelLoader } from './ModelLoader';
 import { AudioButton } from './AudioButton';
 import Ballpit from './Ballpit';
+import Lanyard from './Lanyard';
 import '../styles/hero.scss';
 
 // Registramos ScrollTrigger para poder usarlo
@@ -164,8 +165,6 @@ const Hero = () => {
       trigger: hero,
       start: "top top",
       end: config.SCROLL_DURATION,
-      pin: container,
-      pinSpacing: true,
       scrub: config.SCRUB_SMOOTHNESS,
       onUpdate: (self) => {
         const progress = self.progress;
@@ -178,7 +177,6 @@ const Hero = () => {
           opacity = gsap.utils.clamp(
             0,
             1,
-            // Ajustamos la fórmula para que el fundido sea más gradual
             1 - (progress - config.FADE_OUT_START) / 
               (config.FADE_OUT_END - config.FADE_OUT_START)
           );
@@ -259,39 +257,7 @@ const Hero = () => {
       <div className="simple-content">
         <div className="name-container" ref={nameContainerRef}>
           <div className="hero-name" ref={nameRef}>
-            <svg 
-              width="100%" 
-              height={isMobile ? "120" : "200"} 
-              className="name-svg"
-            >
-              <defs>
-                <linearGradient id="nameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#FF9A9E" />
-                  <stop offset="100%" stopColor="#FFECD2" />
-                </linearGradient>
-              </defs>
-              <text
-                ref={firstNameRef}
-                x="50%"
-                y={isMobile ? "45%" : "40%"}
-                textAnchor="middle"
-                className="first-name"
-                fill="url(#nameGradient)"
-              >
-                CARLOS
-              </text>
-              <text
-                ref={lastNameRef}
-                x="50%"
-                y={isMobile ? "85%" : "80%"}
-                dominantBaseline="middle"
-                textAnchor="middle"
-                className="last-name"
-                fill="url(#nameGradient)"
-              >
-                RÁBAGO
-              </text>
-            </svg>
+            <Lanyard position={[0, 0, 25]} gravity={[0, -30, 0]} />
           </div>
         </div>
 
