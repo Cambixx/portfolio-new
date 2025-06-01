@@ -35,6 +35,33 @@ const CARD_CONFIG = {
     metal: '#888888',
     metalDark: '#666666'
   },
+  text: {
+    name: {
+      fontSize: '0.34rem',
+      letterSpacing: '0.05em',
+      lineHeight: 1,
+      position: {
+        x: -0.15,
+        y: 0.1,
+        z: 0.03 // depth + 0.01
+      },
+      width: '0.6rem'
+    },
+    title: {
+      fontSize: '0.18rem',
+      letterSpacing: '0.02em',
+      lineHeight: 0.8,
+      position: {
+        x: -0.15,
+        y: -0.45,
+        z: 0.03 // depth + 0.01
+      },
+      width: '0.6rem',
+      opacity: 0.8
+    },
+    fontFamily: 'Inter, sans-serif',
+    fontWeight: '300'
+  }
 };
 
 const segmentProps = { 
@@ -369,39 +396,50 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
             </group>
 
             {/* Texto */}
-            <group position={[0.25, 0, CARD_CONFIG.depth + 0.01]} rotation={[0, 0, Math.PI / 2]}>
+            <group position={[
+              CARD_CONFIG.text.name.position.x, 
+              CARD_CONFIG.text.name.position.y, 
+              CARD_CONFIG.text.name.position.z
+            ]}>
               <Html
                 transform
                 occlude
                 style={{
-                  fontSize: '0.2rem',
-                  fontWeight: 'bold',
+                  fontSize: CARD_CONFIG.text.name.fontSize,
+                  fontWeight: 'normal',
                   color: CARD_CONFIG.colors.secondary,
-                  textAlign: 'center',
+                  textAlign: 'left',
                   userSelect: 'none',
-                  fontFamily: 'Inter, sans-serif',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  whiteSpace: 'nowrap',
+                  fontFamily: CARD_CONFIG.text.fontFamily,
+                  letterSpacing: CARD_CONFIG.text.name.letterSpacing,
+                  lineHeight: CARD_CONFIG.text.name.lineHeight,
+                  whiteSpace: 'pre-line',
+                  width: CARD_CONFIG.text.name.width,
                 }}
               >
-                CARLOS RÁBAGO
+                {'Carlos\nRábago'}
               </Html>
             </group>
 
-            <group position={[0, -0.3, CARD_CONFIG.depth + 0.01]}>
+            <group position={[
+              CARD_CONFIG.text.title.position.x, 
+              CARD_CONFIG.text.title.position.y, 
+              CARD_CONFIG.text.title.position.z
+            ]}>
               <Html
                 transform
                 occlude
                 style={{
-                  fontSize: '0.12rem',
+                  fontSize: CARD_CONFIG.text.title.fontSize,
                   fontWeight: 'normal',
                   color: CARD_CONFIG.colors.secondary,
-                  textAlign: 'center',
+                  textAlign: 'left',
                   userSelect: 'none',
-                  fontFamily: 'Inter, sans-serif',
-                  letterSpacing: '0.02em',
-                  opacity: 0.8,
+                  fontFamily: CARD_CONFIG.text.fontFamily,
+                  letterSpacing: CARD_CONFIG.text.title.letterSpacing,
+                  opacity: CARD_CONFIG.text.title.opacity,
+                  width: CARD_CONFIG.text.title.width,
+                  lineHeight: CARD_CONFIG.text.title.lineHeight,
                 }}
               >
                 Web Developer
