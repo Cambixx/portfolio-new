@@ -23,6 +23,111 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
+// Configuración de cantidad de bolas
+const BALLS_CONFIG = {
+  DESKTOP_COUNT: 180,
+  MOBILE_COUNT: 90,
+};
+
+// Configuración de tamaños
+const SIZE_CONFIG = {
+  MIN_SIZE: 0.4,
+  MAX_SIZE: 0.8,
+  CURSOR_BALL_SIZE: 0.5,
+  MOBILE_SCALE: 0.5, // Factor de escala para móvil
+};
+
+// Configuración de físicas
+const PHYSICS_CONFIG = {
+  GRAVITY: 0.5,
+  FRICTION: 0.9975,
+  WALL_BOUNCE: 0.95,
+  MAX_VELOCITY: 0.15,
+  BOUNDARIES: {
+    MAX_X: 5,
+    MAX_Y: 5,
+    MAX_Z: 2,
+  },
+};
+
+// Configuración de luces
+const LIGHT_CONFIG = {
+  COLORS: [0x4444ff, 0x4444ff],
+  AMBIENT: {
+    COLOR: 0xffffff,
+    INTENSITY: 1.0,
+  },
+  POINT_LIGHT: {
+    INTENSITY: 100,
+    DISTANCE: 15,
+    DECAY: 1,
+  },
+  CURSOR_LIGHT: {
+    COLOR: 0xffffff,
+    INTENSITY: 200,
+    DISTANCE: 10,
+    DECAY: 1.5,
+  },
+};
+
+// Configuración del material
+const MATERIAL_CONFIG = {
+  METALNESS: 0.3,
+  ROUGHNESS: 0.4,
+  CLEARCOAT: 0.5,
+  CLEARCOAT_ROUGHNESS: 0.4,
+  TRANSMISSION: 0.0,
+  IOR: 1.5,
+  THICKNESS: {
+    DISTORTION: 0.2,
+    AMBIENT: 0.1,
+    ATTENUATION: 0.3,
+    POWER: 2,
+    SCALE: 8,
+  },
+};
+
+// Configuración de efectos
+const EFFECTS_CONFIG = {
+  SCROLL_GRAVITY_THRESHOLD: 6,
+  SCROLL_GRAVITY_VALUE: -0.2,
+  CURSOR_Z_OSCILLATION: 0.8,
+  CURSOR_Z_FREQUENCY: 1.2,
+};
+
+// Detector de dispositivo móvil simple
+const isMobile = () => window.innerWidth <= 768;
+
+const DEFAULT_CONFIG = {
+  count: BALLS_CONFIG.DESKTOP_COUNT,
+  colors: LIGHT_CONFIG.COLORS,
+  ambientColor: LIGHT_CONFIG.AMBIENT.COLOR,
+  ambientIntensity: LIGHT_CONFIG.AMBIENT.INTENSITY,
+  lightIntensity: LIGHT_CONFIG.POINT_LIGHT.INTENSITY,
+  materialParams: {
+    metalness: MATERIAL_CONFIG.METALNESS,
+    roughness: MATERIAL_CONFIG.ROUGHNESS,
+    clearcoat: MATERIAL_CONFIG.CLEARCOAT,
+    clearcoatRoughness: MATERIAL_CONFIG.CLEARCOAT_ROUGHNESS,
+    transmission: MATERIAL_CONFIG.TRANSMISSION,
+    ior: MATERIAL_CONFIG.IOR,
+  },
+  minSize: SIZE_CONFIG.MIN_SIZE,
+  maxSize: SIZE_CONFIG.MAX_SIZE,
+  size0: SIZE_CONFIG.CURSOR_BALL_SIZE,
+  gravity: PHYSICS_CONFIG.GRAVITY,
+  friction: PHYSICS_CONFIG.FRICTION,
+  wallBounce: PHYSICS_CONFIG.WALL_BOUNCE,
+  maxVelocity: PHYSICS_CONFIG.MAX_VELOCITY,
+  maxX: PHYSICS_CONFIG.BOUNDARIES.MAX_X,
+  maxY: PHYSICS_CONFIG.BOUNDARIES.MAX_Y,
+  maxZ: PHYSICS_CONFIG.BOUNDARIES.MAX_Z,
+  controlSphere0: false,
+  followCursor: true,
+  spatialGridDivisions: 8,
+  updateRadius: 8,
+};
+
 // --- Utilidades de interacción y físicas ---
 const pointerMap = new Map<any, any>();
 const pointerPos = new Vector2();
@@ -119,6 +224,63 @@ const TMP_VEC3_7 = new Vector3();
 const TMP_VEC3_8 = new Vector3();
 const TMP_VEC3_9 = new Vector3();
 
+// Constantes para optimización
+const PHYSICS_STEP = 1 / 120; // Más preciso para física
+const MAX_DELTA = 0.05; // Más suave
+const COLLISION_CHECK_FREQUENCY = 1; // Revisar colisiones cada frame para más precisión
+let frameCount = 0;
+
+class SpatialGrid {
+  cells: Map<string, number[]>;
+  cellSize: number;
+  
+  constructor(maxBounds: number, divisions: number) {
+    this.cells = new Map();
+    this.cellSize = (maxBounds * 2) / divisions;
+  }
+
+  getCellKey(x: number, y: number, z: number): string {
+    const cx = Math.floor(x / this.cellSize);
+    const cy = Math.floor(y / this.cellSize);
+    const cz = Math.floor(z / this.cellSize);
+    return `${cx},${cy},${cz}`;
+  }
+
+  clear() {
+    this.cells.clear();
+  }
+
+  insert(index: number, x: number, y: number, z: number) {
+    const key = this.getCellKey(x, y, z);
+    if (!this.cells.has(key)) {
+      this.cells.set(key, []);
+    }
+    this.cells.get(key)?.push(index);
+  }
+
+  getNearbyIndices(x: number, y: number, z: number): number[] {
+    const key = this.getCellKey(x, y, z);
+    const nearby: number[] = [];
+    
+    // Obtener índices de la celda actual y adyacentes
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const cx = Math.floor(x / this.cellSize) + dx;
+          const cy = Math.floor(y / this.cellSize) + dy;
+          const cz = Math.floor(z / this.cellSize) + dz;
+          const nKey = `${cx},${cy},${cz}`;
+          const indices = this.cells.get(nKey);
+          if (indices) {
+            nearby.push(...indices);
+          }
+        }
+      }
+    }
+    return nearby;
+  }
+}
+
 class BallPhysics {
   config: any;
   positionData: Float32Array;
@@ -126,6 +288,7 @@ class BallPhysics {
   sizeData: Float32Array;
   center: Vector3;
   motionForce: Vector3;
+
   constructor(config: any) {
     this.config = config;
     this.positionData = new Float32Array(3 * config.count).fill(0);
@@ -136,6 +299,7 @@ class BallPhysics {
     this.resetPositions();
     this.setSizes();
   }
+
   resetPositions() {
     const { config, positionData } = this;
     this.center.toArray(positionData, 0);
@@ -146,6 +310,7 @@ class BallPhysics {
       positionData[idx + 2] = randFloatSpread(2 * config.maxZ);
     }
   }
+
   setSizes() {
     const { config, sizeData } = this;
     sizeData[0] = config.size0;
@@ -153,35 +318,40 @@ class BallPhysics {
       sizeData[i] = randFloat(config.minSize, config.maxSize);
     }
   }
+
   applyMotionForce(normalizedX: number, normalizedY: number, normalizedZ: number) {
     this.motionForce.set(-normalizedX, normalizedY, normalizedZ * 0.5);
   }
+
   update(e: { delta: number }) {
     const { config, center, positionData, sizeData, velocityData } = this;
     
+    // Control de la bola principal (cursor/centro)
+    let r = 0;
+    if (config.controlSphere0) {
+      r = 1;
+      TMP_VEC3.fromArray(positionData, 0);
+      TMP_VEC3.lerp(center, 0.1).toArray(positionData, 0);
+      TMP_VEC3_4.set(0, 0, 0).toArray(velocityData, 0);
+    }
+
     // Aplicar fuerzas de movimiento a todas las bolas
     if (this.motionForce.lengthSq() > 0) {
-      for (let idx = 0; idx < config.count; idx++) {
+      for (let idx = r; idx < config.count; idx++) {
         const base = 3 * idx;
         TMP_VEC3.fromArray(velocityData, base);
-        
-        // Calcular fuerza basada en el tamaño de la bola y su posición
         const size = sizeData[idx];
-        const forceFactor = 0.05 * size; // Las bolas más grandes se mueven más lento
-        
-        // Añadir variación basada en la posición
+        const forceFactor = 0.05 * size;
         TMP_VEC3_2.fromArray(positionData, base);
         const distanceFromCenter = TMP_VEC3_2.length();
         const positionFactor = Math.max(0.5, 1 - distanceFromCenter / (config.maxX * 2));
-        
-        // Aplicar la fuerza del movimiento
         TMP_VEC3.add(this.motionForce.clone().multiplyScalar(forceFactor * positionFactor));
         TMP_VEC3.toArray(velocityData, base);
       }
     }
 
-    // Resto del código de update original
-    for (let idx = 0; idx < config.count; idx++) {
+    // Actualizar posiciones y velocidades
+    for (let idx = r; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
       TMP_VEC3_4.fromArray(velocityData, base);
@@ -192,11 +362,14 @@ class BallPhysics {
       TMP_VEC3.toArray(positionData, base);
       TMP_VEC3_4.toArray(velocityData, base);
     }
-    for (let idx = 0; idx < config.count; idx++) {
+
+    // Colisiones entre bolas
+    for (let idx = r; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
       TMP_VEC3_4.fromArray(velocityData, base);
       const radius = sizeData[idx];
+
       for (let jdx = idx + 1; jdx < config.count; jdx++) {
         const otherBase = 3 * jdx;
         TMP_VEC3_2.fromArray(positionData, otherBase);
@@ -220,7 +393,9 @@ class BallPhysics {
           TMP_VEC3_5.toArray(velocityData, otherBase);
         }
       }
-      if (config.controlSphere0) {
+
+      // Colisión con la bola principal (cursor)
+      if (config.controlSphere0 && idx > 0) {
         TMP_VEC3_6.copy(center).sub(TMP_VEC3);
         const dist = TMP_VEC3_6.length();
         const sumRadius0 = radius + sizeData[0];
@@ -230,19 +405,18 @@ class BallPhysics {
           TMP_VEC3_8.copy(TMP_VEC3_7).multiplyScalar(Math.max(TMP_VEC3_4.length(), 2));
           TMP_VEC3.sub(TMP_VEC3_7);
           TMP_VEC3_4.sub(TMP_VEC3_8);
+          TMP_VEC3.toArray(positionData, base);
+          TMP_VEC3_4.toArray(velocityData, base);
         }
       }
+
+      // Colisiones con paredes
       if (Math.abs(TMP_VEC3.x) + radius > config.maxX) {
         TMP_VEC3.x = Math.sign(TMP_VEC3.x) * (config.maxX - radius);
         TMP_VEC3_4.x = -TMP_VEC3_4.x * config.wallBounce;
       }
-      if (config.gravity === 0) {
-        if (Math.abs(TMP_VEC3.y) + radius > config.maxY) {
-          TMP_VEC3.y = Math.sign(TMP_VEC3.y) * (config.maxY - radius);
-          TMP_VEC3_4.y = -TMP_VEC3_4.y * config.wallBounce;
-        }
-      } else if (TMP_VEC3.y - radius < -config.maxY) {
-        TMP_VEC3.y = -config.maxY + radius;
+      if (Math.abs(TMP_VEC3.y) + radius > config.maxY) {
+        TMP_VEC3.y = Math.sign(TMP_VEC3.y) * (config.maxY - radius);
         TMP_VEC3_4.y = -TMP_VEC3_4.y * config.wallBounce;
       }
       const maxBoundary = Math.max(config.maxZ, config.maxSize);
@@ -250,6 +424,7 @@ class BallPhysics {
         TMP_VEC3.z = Math.sign(TMP_VEC3.z) * (config.maxZ - radius);
         TMP_VEC3_4.z = -TMP_VEC3_4.z * config.wallBounce;
       }
+
       TMP_VEC3.toArray(positionData, base);
       TMP_VEC3_4.toArray(velocityData, base);
     }
@@ -263,11 +438,11 @@ class BallMaterial extends MeshPhysicalMaterial {
   constructor(params: any) {
     super(params);
     this.uniforms = {
-      thicknessDistortion: { value: 0.1 },
-      thicknessAmbient: { value: 0 },
-      thicknessAttenuation: { value: 0.1 },
-      thicknessPower: { value: 2 },
-      thicknessScale: { value: 10 },
+      thicknessDistortion: { value: MATERIAL_CONFIG.THICKNESS.DISTORTION },
+      thicknessAmbient: { value: MATERIAL_CONFIG.THICKNESS.AMBIENT },
+      thicknessAttenuation: { value: MATERIAL_CONFIG.THICKNESS.ATTENUATION },
+      thicknessPower: { value: MATERIAL_CONFIG.THICKNESS.POWER },
+      thicknessScale: { value: MATERIAL_CONFIG.THICKNESS.SCALE },
     };
     this.defines = { USE_UV: '' };
     this.onBeforeCompile = (shader) => {
@@ -289,40 +464,6 @@ class BallMaterial extends MeshPhysicalMaterial {
   }
 }
 
-const DEFAULT_CONFIG = {
-  count: 200,
-  mobileCount: 100, // Cantidad de bolas para dispositivos móviles
-  colors: [0, 0, 0],
-  ambientColor: 0xffffff,
-  ambientIntensity: 1,
-  lightIntensity: 200,
-  materialParams: {
-    metalness: 0.5,
-    roughness: 0.5,
-    clearcoat: 1,
-    clearcoatRoughness: 0.15,
-  },
-  minSize: 0.5,
-  maxSize: 1,
-  // Tamaños para móviles
-  mobileMinSize: 0.3,
-  mobileMaxSize: 0.6,
-  size0: 1,
-  gravity: 0.5,
-  friction: 0.9975,
-  wallBounce: 0.95,
-  maxVelocity: 0.15,
-  maxX: 5,
-  maxY: 5,
-  maxZ: 2,
-  // Límites para móviles
-  mobileMaxX: 7,
-  mobileMaxY: 7,
-  mobileMaxZ: 3,
-  controlSphere0: false,
-  followCursor: true,
-};
-
 const TMP_OBJ3D = new Object3D();
 
 class BallpitMesh extends InstancedMesh {
@@ -335,37 +476,48 @@ class BallpitMesh extends InstancedMesh {
     const mergedConfig = { ...DEFAULT_CONFIG, ...config };
     const env = new RoomEnvironment();
     const pmrem = new PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
     const envMap = pmrem.fromScene(env).texture;
-    const geometry = new SphereGeometry();
-    const material = new BallMaterial({ envMap, ...mergedConfig.materialParams });
-    // @ts-ignore
-    material.envMapRotation = { x: -Math.PI / 2 };
+    const geometry = new SphereGeometry(1, 32, 24);
+    const material = new BallMaterial({ 
+      envMap,
+      ...mergedConfig.materialParams,
+      flatShading: false,
+      dithering: true,
+    });
+    
     super(geometry, material, mergedConfig.count);
     this.config = mergedConfig;
     this.physics = new BallPhysics(mergedConfig);
     this.setupLights();
     this.setColors(mergedConfig.colors);
+    
+    this.frustumCulled = true;
+    this.matrixAutoUpdate = true;
   }
   setupLights() {
     this.ambientLight = new AmbientLight(
-      this.config.ambientColor,
-      this.config.ambientIntensity
+      LIGHT_CONFIG.AMBIENT.COLOR,
+      LIGHT_CONFIG.AMBIENT.INTENSITY
     );
     this.add(this.ambientLight);
-    this.light = new PointLight(this.config.colors[0], this.config.lightIntensity);
+    
+    this.light = new PointLight(this.config.colors[0], LIGHT_CONFIG.POINT_LIGHT.INTENSITY);
+    this.light.distance = LIGHT_CONFIG.POINT_LIGHT.DISTANCE;
+    this.light.decay = LIGHT_CONFIG.POINT_LIGHT.DECAY;
     this.add(this.light);
     
-    // Configuración mejorada de la luz del cursor
-    this.cursorLight.intensity = 3;
-    this.cursorLight.distance = 4;
-    this.cursorLight.decay = 1.5;
-    this.cursorLight.color.set(0xffffff);
+    this.cursorLight = new PointLight(
+      LIGHT_CONFIG.CURSOR_LIGHT.COLOR,
+      LIGHT_CONFIG.CURSOR_LIGHT.INTENSITY
+    );
+    this.cursorLight.distance = LIGHT_CONFIG.CURSOR_LIGHT.DISTANCE;
+    this.cursorLight.decay = LIGHT_CONFIG.CURSOR_LIGHT.DECAY;
     this.add(this.cursorLight);
   }
   setCursorLightPosition(pos: Vector3) {
     this.cursorLight.position.copy(pos);
-    // Asegurar que la luz esté activa
-    this.cursorLight.intensity = 3;
+    this.cursorLight.intensity = 200;
   }
   hideCursorLight() {
     this.cursorLight.intensity = 0;
@@ -417,21 +569,13 @@ class BallpitMesh extends InstancedMesh {
   }
 }
 
-const isMobile = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-};
-
 function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
-  // Ajustar la configuración según el dispositivo
+  // Ajustar configuración según el dispositivo
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
   if (isMobile()) {
-    mergedConfig.count = mergedConfig.mobileCount || Math.floor(mergedConfig.count / 2);
-    mergedConfig.minSize = mergedConfig.mobileMinSize || mergedConfig.minSize * 0.6;
-    mergedConfig.maxSize = mergedConfig.mobileMaxSize || mergedConfig.maxSize * 0.6;
-    // Ajustar los límites para móvil
-    mergedConfig.maxX = mergedConfig.mobileMaxX;
-    mergedConfig.maxY = mergedConfig.mobileMaxY;
-    mergedConfig.maxZ = mergedConfig.mobileMaxZ;
+    mergedConfig.count = BALLS_CONFIG.MOBILE_COUNT;
+    mergedConfig.minSize *= SIZE_CONFIG.MOBILE_SCALE;
+    mergedConfig.maxSize *= SIZE_CONFIG.MOBILE_SCALE;
   }
 
   const three = new (class {
@@ -576,17 +720,10 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   let mesh: BallpitMesh;
   let paused = false;
   let pointerHandler: any;
-  let isUsingMotion = false;
 
   function initialize(config: any) {
     if (mesh) {
       three.scene.remove(mesh);
-    }
-    // Asegurar que se mantenga la cantidad correcta al reinicializar
-    if (isMobile() && !config.mobileCount) {
-      config.count = config.mobileCount || Math.floor(config.count / 2);
-      config.minSize = config.mobileMinSize || config.minSize * 0.6;
-      config.maxSize = config.mobileMaxSize || config.maxSize * 0.6;
     }
     mesh = new BallpitMesh(three.renderer, config);
     three.scene.add(mesh);
@@ -594,96 +731,33 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
 
   initialize(mergedConfig);
 
-  // Interacción con el cursor y sensores de movimiento
   const raycaster = new Raycaster();
   const plane = new Plane(new Vector3(0, 0, 1), 0);
   const intersection = new Vector3();
   
-  // Configuración para dispositivos móviles
-  if (isMobile()) {
-    // Verificar si el dispositivo tiene sensores de movimiento
-    if (typeof DeviceMotionEvent !== 'undefined') {
-      // Solicitar permiso en iOS 13+
-      if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-        (DeviceMotionEvent as any).requestPermission()
-          .then((response: string) => {
-            if (response === 'granted') {
-              setupMotionControls();
-            }
-          })
-          .catch(console.error);
-      } else {
-        // Android y versiones anteriores de iOS
-        setupMotionControls();
-      }
-    }
-  }
-
-  function setupMotionControls() {
-    isUsingMotion = true;
-    let motionX = 0;
-    let motionY = 0;
-    let motionZ = 0;
-
-    window.addEventListener('devicemotion', (event) => {
-      if (!paused) {
-        // Obtener datos del acelerómetro
-        const accelerationX = event.accelerationIncludingGravity?.x ?? 0;
-        const accelerationY = event.accelerationIncludingGravity?.y ?? 0;
-        const accelerationZ = event.accelerationIncludingGravity?.z ?? 0;
-
-        // Suavizar los movimientos con interpolación
-        const smoothingFactor = 0.1;
-        motionX += (accelerationX - motionX) * smoothingFactor;
-        motionY += (accelerationY - motionY) * smoothingFactor;
-        motionZ += (accelerationZ - motionZ) * smoothingFactor;
-
-        // Calcular la posición basada en la orientación del dispositivo
-        const maxTilt = 5; // Máximo desplazamiento
-        const normalizedX = (motionX / 9.81) * maxTilt;
-        const normalizedY = (motionY / 9.81) * maxTilt;
-        const normalizedZ = ((motionZ - 9.81) / 9.81) * maxTilt;
-
-        // Aplicar la fuerza del movimiento a todas las bolas
-        mesh.physics.applyMotionForce(normalizedX, normalizedY, normalizedZ);
-
-        // Actualizar la luz del cursor si está habilitada
-        if (mesh.cursorLight) {
-          const lightPos = new Vector3(-normalizedX, normalizedY, normalizedZ * 0.5);
-          mesh.setCursorLightPosition(lightPos);
-        }
-      }
-    });
-  }
-
-  // Mantener el control del cursor para dispositivos no móviles
-  if (!isMobile()) {
-    pointerHandler = setupPointer(canvas, {
-      onMove(state: any) {
-        raycaster.setFromCamera(state.nPosition, three.camera);
-        three.camera.getWorldDirection(plane.normal);
-        raycaster.ray.intersectPlane(plane, intersection);
-        
-        const t = performance.now() * 0.001;
-        const zOsc = Math.sin(t * 1.2) * 0.8;
-        const cursorPos = new Vector3(
-          intersection.x,
-          intersection.y,
-          zOsc
-        );
-        mesh.physics.center.copy(cursorPos);
-        mesh.config.controlSphere0 = true;
-        
-        mesh.setCursorLightPosition(cursorPos);
-      },
-      onLeave() {
-        if (!isUsingMotion) {
-          mesh.config.controlSphere0 = false;
-          mesh.hideCursorLight();
-        }
-      },
-    });
-  }
+  pointerHandler = setupPointer(canvas, {
+    onMove(state: any) {
+      raycaster.setFromCamera(state.nPosition, three.camera);
+      three.camera.getWorldDirection(plane.normal);
+      raycaster.ray.intersectPlane(plane, intersection);
+      
+      const t = performance.now() * 0.001;
+      const zOsc = Math.sin(t * EFFECTS_CONFIG.CURSOR_Z_FREQUENCY) * EFFECTS_CONFIG.CURSOR_Z_OSCILLATION;
+      const cursorPos = new Vector3(
+        intersection.x,
+        intersection.y,
+        zOsc
+      );
+      mesh.physics.center.copy(cursorPos);
+      mesh.config.controlSphere0 = true;
+      
+      mesh.setCursorLightPosition(cursorPos);
+    },
+    onLeave() {
+      mesh.config.controlSphere0 = false;
+      mesh.hideCursorLight();
+    },
+  });
 
   three.onBeforeRender = (delta?: number) => {
     if (!paused) {
@@ -692,14 +766,9 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   };
 
   three.onAfterResize = () => {
-    // Ajustar los límites basados en el tamaño de la pantalla
-    if (isMobile()) {
-      mesh.config.maxX = Math.max(three.size.wWidth / 1.5, mergedConfig.mobileMaxX);
-      mesh.config.maxY = Math.max(three.size.wHeight / 1.5, mergedConfig.mobileMaxY);
-    } else {
-      mesh.config.maxX = three.size.wWidth / 2;
-      mesh.config.maxY = three.size.wHeight / 2;
-    }
+    // Mantener el mismo tamaño del contenedor tanto en móvil como en desktop
+    mesh.config.maxX = three.size.wWidth / 2;
+    mesh.config.maxY = three.size.wHeight / 2;
   };
 
   return {
@@ -714,9 +783,7 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
       paused = !paused;
     },
     dispose() {
-      if (!isMobile()) {
-        pointerHandler?.dispose();
-      }
+      pointerHandler?.dispose();
       three.dispose();
     },
   };
@@ -731,29 +798,20 @@ const Ballpit = ({ className = '', followCursor = true, ...props }: any) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Ajustar la configuración según el dispositivo
     const config = { followCursor, ...props };
-    if (isMobile()) {
-      config.count = config.mobileCount || Math.floor((config.count || DEFAULT_CONFIG.count) / 2);
-      config.minSize = config.mobileMinSize || (config.minSize || DEFAULT_CONFIG.minSize) * 0.6;
-      config.maxSize = config.mobileMaxSize || (config.maxSize || DEFAULT_CONFIG.maxSize) * 0.6;
-    }
-
     spheresInstanceRef.current = createBallpit(canvas, config);
 
-    // Efecto de scroll para cambiar la gravedad
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const instance = spheresInstanceRef.current;
       if (!instance) return;
       const mesh = instance.spheres;
       if (!mesh) return;
-      // Guarda la gravedad original solo la primera vez
       if (originalGravity.current === null) {
         originalGravity.current = mesh.physics.config.gravity;
       }
-      if (scrollY > 6) {
-        mesh.physics.config.gravity = -0.2;
+      if (scrollY > EFFECTS_CONFIG.SCROLL_GRAVITY_THRESHOLD) {
+        mesh.physics.config.gravity = EFFECTS_CONFIG.SCROLL_GRAVITY_VALUE;
       } else {
         mesh.physics.config.gravity = originalGravity.current;
       }
@@ -766,14 +824,19 @@ const Ballpit = ({ className = '', followCursor = true, ...props }: any) => {
       }
       window.removeEventListener('scroll', handleScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <canvas
       className={className}
       ref={canvasRef}
-      style={{ width: '100%', height: '100%' }}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        zIndex: 10,
+        pointerEvents: 'auto',
+      }}
     />
   );
 };
