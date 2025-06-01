@@ -125,12 +125,14 @@ class BallPhysics {
   velocityData: Float32Array;
   sizeData: Float32Array;
   center: Vector3;
+  motionForce: Vector3;
   constructor(config: any) {
     this.config = config;
     this.positionData = new Float32Array(3 * config.count).fill(0);
     this.velocityData = new Float32Array(3 * config.count).fill(0);
     this.sizeData = new Float32Array(config.count).fill(1);
     this.center = new Vector3();
+    this.motionForce = new Vector3();
     this.resetPositions();
     this.setSizes();
   }
@@ -151,16 +153,35 @@ class BallPhysics {
       sizeData[i] = randFloat(config.minSize, config.maxSize);
     }
   }
+  applyMotionForce(normalizedX: number, normalizedY: number, normalizedZ: number) {
+    this.motionForce.set(-normalizedX, normalizedY, normalizedZ * 0.5);
+  }
   update(e: { delta: number }) {
     const { config, center, positionData, sizeData, velocityData } = this;
-    let r = 0;
-    if (config.controlSphere0) {
-      r = 1;
-      TMP_VEC3.fromArray(positionData, 0);
-      TMP_VEC3.lerp(center, 0.1).toArray(positionData, 0);
-      TMP_VEC3_4.set(0, 0, 0).toArray(velocityData, 0);
+    
+    // Aplicar fuerzas de movimiento a todas las bolas
+    if (this.motionForce.lengthSq() > 0) {
+      for (let idx = 0; idx < config.count; idx++) {
+        const base = 3 * idx;
+        TMP_VEC3.fromArray(velocityData, base);
+        
+        // Calcular fuerza basada en el tamaño de la bola y su posición
+        const size = sizeData[idx];
+        const forceFactor = 0.05 * size; // Las bolas más grandes se mueven más lento
+        
+        // Añadir variación basada en la posición
+        TMP_VEC3_2.fromArray(positionData, base);
+        const distanceFromCenter = TMP_VEC3_2.length();
+        const positionFactor = Math.max(0.5, 1 - distanceFromCenter / (config.maxX * 2));
+        
+        // Aplicar la fuerza del movimiento
+        TMP_VEC3.add(this.motionForce.clone().multiplyScalar(forceFactor * positionFactor));
+        TMP_VEC3.toArray(velocityData, base);
+      }
     }
-    for (let idx = r; idx < config.count; idx++) {
+
+    // Resto del código de update original
+    for (let idx = 0; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
       TMP_VEC3_4.fromArray(velocityData, base);
@@ -171,7 +192,7 @@ class BallPhysics {
       TMP_VEC3.toArray(positionData, base);
       TMP_VEC3_4.toArray(velocityData, base);
     }
-    for (let idx = r; idx < config.count; idx++) {
+    for (let idx = 0; idx < config.count; idx++) {
       const base = 3 * idx;
       TMP_VEC3.fromArray(positionData, base);
       TMP_VEC3_4.fromArray(velocityData, base);
@@ -294,6 +315,10 @@ const DEFAULT_CONFIG = {
   maxX: 5,
   maxY: 5,
   maxZ: 2,
+  // Límites para móviles
+  mobileMaxX: 7,
+  mobileMaxY: 7,
+  mobileMaxZ: 3,
   controlSphere0: false,
   followCursor: true,
 };
@@ -403,6 +428,10 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
     mergedConfig.count = mergedConfig.mobileCount || Math.floor(mergedConfig.count / 2);
     mergedConfig.minSize = mergedConfig.mobileMinSize || mergedConfig.minSize * 0.6;
     mergedConfig.maxSize = mergedConfig.mobileMaxSize || mergedConfig.maxSize * 0.6;
+    // Ajustar los límites para móvil
+    mergedConfig.maxX = mergedConfig.mobileMaxX;
+    mergedConfig.maxY = mergedConfig.mobileMaxY;
+    mergedConfig.maxZ = mergedConfig.mobileMaxZ;
   }
 
   const three = new (class {
@@ -615,17 +644,13 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
         const normalizedY = (motionY / 9.81) * maxTilt;
         const normalizedZ = ((motionZ - 9.81) / 9.81) * maxTilt;
 
-        // Actualizar la posición del centro de física
-        mesh.physics.center.set(
-          -normalizedX,
-          normalizedY,
-          normalizedZ * 0.5
-        );
-        mesh.config.controlSphere0 = true;
+        // Aplicar la fuerza del movimiento a todas las bolas
+        mesh.physics.applyMotionForce(normalizedX, normalizedY, normalizedZ);
 
         // Actualizar la luz del cursor si está habilitada
         if (mesh.cursorLight) {
-          mesh.setCursorLightPosition(mesh.physics.center);
+          const lightPos = new Vector3(-normalizedX, normalizedY, normalizedZ * 0.5);
+          mesh.setCursorLightPosition(lightPos);
         }
       }
     });
@@ -667,8 +692,15 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   };
 
   three.onAfterResize = () => {
-    mesh.config.maxX = three.size.wWidth / 2;
-    mesh.config.maxY = three.size.wHeight / 2;
+    // Ajustar los límites basados en el tamaño de la pantalla
+    const aspectRatio = three.size.width / three.size.height;
+    if (isMobile()) {
+      mesh.config.maxX = Math.max(three.size.wWidth / 1.5, mergedConfig.mobileMaxX);
+      mesh.config.maxY = Math.max(three.size.wHeight / 1.5, mergedConfig.mobileMaxY);
+    } else {
+      mesh.config.maxX = three.size.wWidth / 2;
+      mesh.config.maxY = three.size.wHeight / 2;
+    }
   };
 
   return {
