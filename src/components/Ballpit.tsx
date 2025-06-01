@@ -693,7 +693,6 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
 
   three.onAfterResize = () => {
     // Ajustar los límites basados en el tamaño de la pantalla
-    const aspectRatio = three.size.width / three.size.height;
     if (isMobile()) {
       mesh.config.maxX = Math.max(three.size.wWidth / 1.5, mergedConfig.mobileMaxX);
       mesh.config.maxY = Math.max(three.size.wHeight / 1.5, mergedConfig.mobileMaxY);
