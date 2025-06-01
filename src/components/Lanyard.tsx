@@ -2,7 +2,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Canvas, extend, useFrame } from '@react-three/fiber';
-import { useTexture, Environment, Lightformer, Html, Center, RoundedBox } from '@react-three/drei';
+import { useTexture, Environment, Lightformer, Html, RoundedBox } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
