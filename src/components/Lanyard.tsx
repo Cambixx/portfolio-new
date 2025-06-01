@@ -93,10 +93,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
     typeof window !== 'undefined' && window.innerWidth < 1024
   );
 
-  useRopeJoint(fixed as any, j1 as any, [[0, 0, 0], [0, 0, 0], 0.6]);
-  useRopeJoint(j1 as any, j2 as any, [[0, 0, 0], [0, 0, 0], 0.6]);
-  useRopeJoint(j2 as any, j3 as any, [[0, 0, 0], [0, 0, 0], 0.6]);
-  useSphericalJoint(j3 as any, card as any, [[0, 0, 0], [0, 0.8, 0]]);
+  useRopeJoint(fixed as any, j1 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useRopeJoint(j1 as any, j2 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useRopeJoint(j2 as any, j3 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
+  useSphericalJoint(j3 as any, card as any, [[0, 0, 0], [0, 1.10, 0]]);
 
   useEffect(() => {
     if (hovered) {
@@ -174,19 +174,19 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
     <>
       <group position={[0, 5.5, 0]}>
         <RigidBody ref={fixed as any} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.4, -0.5, 0]} ref={j1 as any} {...segmentProps}>
+        <RigidBody position={[0.3, -0.5, 0]} ref={j1 as any} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[0.8, -1.0, 0]} ref={j2 as any} {...segmentProps}>
+        <RigidBody position={[0.6, -1.0, 0]} ref={j2 as any} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1.2, -1.5, 0]} ref={j3 as any} {...segmentProps}>
+        <RigidBody position={[0.9, -1.5, 0]} ref={j3 as any} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1.6, -2.0, 0]} ref={card as any} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+        <RigidBody position={[1.2, -2.0, 0]} ref={card as any} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
-            scale={2.5}
+            scale={2.25}
             position={[0, -0.8, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
@@ -202,6 +202,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                 drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current!.translation())));
               }
             }}>
+            
             {/* Tarjeta base */}
             <RoundedBox 
               args={[CARD_CONFIG.width, CARD_CONFIG.height, CARD_CONFIG.depth]}
@@ -234,9 +235,9 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               />
             </mesh>
             
-            {/* Clip superior y enganche */}
+            {/* Sistema de enganche mejorado */}
             <group position={[0, 0.5, CARD_CONFIG.depth]}>
-              {/* Clip base */}
+              {/* Base del clip */}
               <mesh castShadow>
                 <boxGeometry args={[0.15, 0.3, 0.04]} />
                 <meshStandardMaterial 
@@ -246,11 +247,11 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                 />
               </mesh>
               
-              {/* Enganche tipo clip */}
+              {/* Sistema de enganche tipo clip */}
               <group position={[0, 0.2, 0]}>
-                {/* Parte trasera del clip */}
-                <mesh castShadow position={[0, 0.05, -0.01]}>
-                  <boxGeometry args={[0.08, 0.15, 0.02]} />
+                {/* Parte trasera */}
+                <mesh castShadow position={[0, 0.05, -0.02]}>
+                  <boxGeometry args={[0.08, 0.2, 0.02]} />
                   <meshStandardMaterial 
                     color={CARD_CONFIG.colors.metalDark}
                     roughness={0.3}
@@ -258,8 +259,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                   />
                 </mesh>
 
-                {/* Parte curva superior */}
-                <mesh castShadow position={[0, 0.125, 0]} rotation={[Math.PI/2, 0, 0]}>
+                {/* Curva superior */}
+                <mesh castShadow position={[0, 0.15, 0]} rotation={[Math.PI/2, 0, 0]}>
                   <torusGeometry args={[0.02, 0.01, 16, 32, Math.PI]} />
                   <meshStandardMaterial 
                     color={CARD_CONFIG.colors.metalDark}
@@ -268,9 +269,9 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                   />
                 </mesh>
 
-                {/* Parte frontal del clip */}
-                <mesh castShadow position={[0, 0.05, 0.01]}>
-                  <boxGeometry args={[0.08, 0.15, 0.02]} />
+                {/* Parte frontal */}
+                <mesh castShadow position={[0, 0.05, 0.02]}>
+                  <boxGeometry args={[0.08, 0.2, 0.02]} />
                   <meshStandardMaterial 
                     color={CARD_CONFIG.colors.metalDark}
                     roughness={0.3}
@@ -280,7 +281,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               </group>
             </group>
 
-            {/* Nombre */}
+            {/* Texto */}
             <group position={[0.25, 0, CARD_CONFIG.depth + 0.01]} rotation={[0, 0, Math.PI / 2]}>
               <Html
                 transform
@@ -301,7 +302,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               </Html>
             </group>
 
-            {/* Título */}
             <group position={[0, -0.3, CARD_CONFIG.depth + 0.01]}>
               <Html
                 transform
@@ -331,8 +331,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
           resolution={isSmall ? [1000, 2000] : [1000, 1000]}
           useMap={true}
           map={texture}
-          repeat={[4, 1]}
-          lineWidth={0.8}
+          repeat={[-4, 1]}
+          lineWidth={0.6}
           transparent={true}
           opacity={1}
         />
