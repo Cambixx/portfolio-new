@@ -22,6 +22,14 @@ const VISUALIZER_CONFIG = {
   BAR_WIDTH_SCALE: 0.9, // Factor de escala para el ancho máximo de las barras (0-1)
   SMOOTHING_FACTOR: 0.15, // Factor para suavizar el movimiento (0-1, más bajo es más suave)
   
+  // Configuración de segmentos
+  SEGMENTS: {
+    DESKTOP_COUNT: 8, // Número de segmentos por barra en escritorio
+    MOBILE_COUNT: 6, // Número de segmentos por barra en móvil
+    GAP: 2, // Espacio entre segmentos en píxeles
+    MIN_WIDTH: 3, // Ancho mínimo de cada segmento
+  },
+  
   // Configuración de la distribución del espectro
   FREQUENCY_DISTRIBUTION: {
     DESKTOP: {
@@ -121,10 +129,13 @@ export function AudioVisualizer({ /* audioContext, audioElement, */ isPlaying, a
       (canvas.height / barCount) - VISUALIZER_CONFIG.BAR_GAP
     );
     
+    // Configuración de segmentos según el dispositivo
+    const isMobile = window.innerWidth <= 768;
+    const segmentCount = isMobile ? VISUALIZER_CONFIG.SEGMENTS.MOBILE_COUNT : VISUALIZER_CONFIG.SEGMENTS.DESKTOP_COUNT;
+    
     // Dibujar cada barra horizontal
     for (let i = 0; i < barCount; i++) {
       // Distribución logarítmica para representar mejor el espectro de audio
-      const isMobile = window.innerWidth <= 768;
       const freqConfig = isMobile ? VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.MOBILE : VISUALIZER_CONFIG.FREQUENCY_DISTRIBUTION.DESKTOP;
       const index = Math.floor(
         Math.pow(i / barCount, freqConfig.POWER) *
@@ -159,14 +170,31 @@ export function AudioVisualizer({ /* audioContext, audioElement, */ isPlaying, a
       // Posición y de la barra
       const y = i * (barHeight + VISUALIZER_CONFIG.BAR_GAP);
       
+      // Calcular cuántos segmentos mostrar basado en el ancho de la barra
+      const totalGapWidth = (segmentCount - 1) * VISUALIZER_CONFIG.SEGMENTS.GAP;
+      const availableWidth = smoothedBarWidth - totalGapWidth;
+      const segmentWidth = Math.max(VISUALIZER_CONFIG.SEGMENTS.MIN_WIDTH, availableWidth / segmentCount);
+      
+      // Calcular cuántos segmentos completos caben
+      const activeSegments = Math.max(1, Math.floor(smoothedBarWidth / (segmentWidth + VISUALIZER_CONFIG.SEGMENTS.GAP)));
+      const segmentsToShow = Math.min(activeSegments, segmentCount);
+      
       // Gradiente para las barras (ahora horizontal)
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
       gradient.addColorStop(0, VISUALIZER_CONFIG.GRADIENT.START_COLOR);
-      gradient.addColorStop(1, VISUALIZER_CONFIG.GRADIENT.END_COLOR)
+      gradient.addColorStop(1, VISUALIZER_CONFIG.GRADIENT.END_COLOR);
       
       ctx.fillStyle = gradient;
-      // Dibujamos desde la derecha hacia la izquierda
-      ctx.fillRect(canvas.width - smoothedBarWidth, y, smoothedBarWidth, barHeight);
+      
+      // Dibujar los segmentos desde la derecha hacia la izquierda
+      for (let segment = 0; segment < segmentsToShow; segment++) {
+        const segmentX = canvas.width - (segment + 1) * (segmentWidth + VISUALIZER_CONFIG.SEGMENTS.GAP);
+        
+        // Solo dibujar si el segmento está dentro del canvas
+        if (segmentX >= 0) {
+          ctx.fillRect(segmentX, y, segmentWidth, barHeight);
+        }
+      }
     }
   };
   
