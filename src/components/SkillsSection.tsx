@@ -115,8 +115,6 @@ function SkillsSection() {
                   key={idx} 
                   {...category} 
                   index={idx}
-                  isMobile={false}
-                  isActive={false}
                 />
               ))}
             </nav>
@@ -129,11 +127,9 @@ function SkillsSection() {
 
 interface SkillCategoryProps extends SkillCategory {
   index: number;
-  isMobile: boolean;
-  isActive: boolean;
 }
 
-function SkillCategoryComponent({ name, skills, index, isMobile, isActive }: SkillCategoryProps) {
+function SkillCategoryComponent({ name, skills, index }: SkillCategoryProps) {
   const itemRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
   const marqueeInnerRef = useRef<HTMLDivElement>(null);
