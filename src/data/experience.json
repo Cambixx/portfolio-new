@@ -1,0 +1,54 @@
+[
+  {
+    "id": "exp-01",
+    "title": "Senior Frontend Developer",
+    "company": "TechCorp Solutions",
+    "period": "2022 - Presente",
+    "description": "Lidero el desarrollo de aplicaciones web modernas utilizando React, TypeScript y Node.js. Implemento arquitecturas escalables y optimizo el rendimiento para mejorar la experiencia del usuario.",
+    "technologies": ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
+    "achievements": [
+      "Reduje el tiempo de carga de la aplicación principal en un 40%",
+      "Lideré un equipo de 5 desarrolladores frontend",
+      "Implementé pipelines de CI/CD que redujeron los errores en producción en un 60%"
+    ]
+  },
+  {
+    "id": "exp-02",
+    "title": "Frontend Developer",
+    "company": "Digital Innovation Lab",
+    "period": "2020 - 2022",
+    "description": "Desarrollé interfaces de usuario responsivas y accesibles para aplicaciones web. Colaboré estrechamente con diseñadores UX/UI para crear experiencias digitales excepcionales.",
+    "technologies": ["React", "JavaScript", "SASS", "Figma", "Jest"],
+    "achievements": [
+      "Desarrollé 15+ componentes reutilizables para el design system",
+      "Mejoré la accesibilidad web alcanzando el nivel AA de WCAG",
+      "Participé en la migración de jQuery a React"
+    ]
+  },
+  {
+    "id": "exp-03",
+    "title": "Junior Web Developer",
+    "company": "StartUp Ventures",
+    "period": "2018 - 2020",
+    "description": "Inicié mi carrera profesional desarrollando sitios web y aplicaciones simples. Aprendí las bases del desarrollo web moderno y las mejores prácticas de la industria.",
+    "technologies": ["HTML", "CSS", "JavaScript", "PHP", "MySQL"],
+    "achievements": [
+      "Creé mi primer proyecto full-stack desde cero",
+      "Optimicé 10+ sitios web existentes mejorando su SEO",
+      "Completé certificaciones en desarrollo web frontend"
+    ]
+  },
+  {
+    "id": "exp-04",
+    "title": "Freelance Web Developer",
+    "company": "Trabajo Independiente",
+    "period": "2017 - 2018",
+    "description": "Comencé mi trayecto en el desarrollo web trabajando con clientes locales. Desarrollé sitios web corporativos y landing pages utilizando tecnologías básicas.",
+    "technologies": ["HTML", "CSS", "JavaScript", "WordPress", "Bootstrap"],
+    "achievements": [
+      "Completé 20+ proyectos para clientes satisfechos",
+      "Desarrollé mi primera aplicación web interactiva",
+      "Establecí mi reputación profesional en el mercado local"
+    ]
+  }
+] 
