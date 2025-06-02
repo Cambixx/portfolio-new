@@ -1,7 +1,5 @@
-import { useEffect, useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion } from 'framer-motion';
 // Importamos los iconos necesarios
 import { 
   FaHtml5, FaCss3Alt, FaSass, FaJs, FaReact, FaNodeJs, FaPhp, 
@@ -10,7 +8,11 @@ import {
 import { SiTypescript, SiTailwindcss, SiBootstrap, SiVite, SiWebpack, SiMysql, SiThreedotjs } from 'react-icons/si';
 import '../styles/skills.scss';
 
-gsap.registerPlugin(ScrollTrigger);
+// Tipos TypeScript
+interface SkillCategory {
+  name: string;
+  skills: string[];
+}
 
 // Objeto que mapea cada skill con su icono correspondiente
 const skillIcons = {
@@ -36,161 +38,226 @@ const skillIcons = {
 };
 
 // Datos de habilidades divididos por categorías
-const skillsData = {
-  frontend: [
-    'HTML5',
-    'CSS3',
-    'Sass',
-    'JavaScript',
-    'TypeScript',
-    'React',
-    'Three.js',
-    'Tailwind CSS',
-    'Bootstrap'
-  ],
-  backend: [
-    'Node.js',
-    'PHP',
-    'MySQL'
-  ],
-  tools: [
-    'Git',
-    'GitHub',
-    'Docker',
-    'Vite',
-    'Webpack',
-    'Figma',
-    'AWS'
-  ]
-};
+const skillsData: SkillCategory[] = [
+  {
+    name: 'Frontend',
+    skills: ['HTML5', 'CSS3', 'Sass', 'JavaScript', 'TypeScript', 'React', 'Three.js', 'Tailwind CSS', 'Bootstrap']
+  },
+  {
+    name: 'Backend',
+    skills: ['Node.js', 'PHP', 'MySQL']
+  },
+  {
+    name: 'Herramientas',
+    skills: ['Git', 'GitHub', 'Docker', 'Vite', 'Webpack', 'Figma', 'AWS']
+  }
+];
 
-const SkillsSection = () => {
+function SkillsSection() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const titleContainerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const contentContainerRef = useRef<HTMLDivElement>(null);
-  const categoriesRef = useRef<(HTMLDivElement | null)[]>([]);
-
-  const setCategoryRef = (el: HTMLDivElement | null, index: number) => {
-    categoriesRef.current[index] = el;
-  };
 
   useEffect(() => {
-    if (!titleContainerRef.current || !titleRef.current || !contentContainerRef.current) return;
-
-    const titleContainer = titleContainerRef.current;
-    const title = titleRef.current;
-    const categories = categoriesRef.current.filter(Boolean);
-
-    // Aplicar pin solo en pantallas grandes
-    const mediaQuery = window.matchMedia('(min-width: 769px)');
-    
-    if (mediaQuery.matches) {
-      ScrollTrigger.create({
-        trigger: titleContainer,
-        start: 'top 20%',
-        endTrigger: categories[categories.length - 1],
-        end: 'bottom 40%',
-        pin: titleContainer,
-        pinSpacing: false,
-        onEnter: () => {
-          title.classList.add('title-pinned');
-        },
-        onLeave: () => {
-          title.classList.remove('title-pinned');
-        },
-        onEnterBack: () => {
-          title.classList.add('title-pinned');
-        },
-        onLeaveBack: () => {
-          title.classList.remove('title-pinned');
-        }
-      });
-    }
-
-    // Animaciones para cada skill dentro de cada categoría
-    categories.forEach((category) => {
-      if (category) {  // Verificamos que category no sea null
-        const skills = category.querySelectorAll('.skill-item');
-        skills.forEach((skill) => {
-          gsap.fromTo(skill,
-            {
-              x: 250
-            },
-            {
-              x: 0,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: skill,
-                start: "top 85%",
-                end: "top 60%",
-                scrub: 1,
-                toggleActions: "play none none reverse"
-              }
-            }
-          );
-        });
-      }
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    // Detectar si es dispositivo móvil
+    const checkMobile = () => {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 768;
+      setIsMobile(isTouchDevice || isSmallScreen);
     };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Función para renderizar una categoría de habilidades
-  const renderCategory = (title: string, skills: string[], index: number) => {
-    return (
-      <div 
-        className="category"
-        ref={(el) => setCategoryRef(el, index)}
-      >
-        <div className="category-header">
-          <h3>{title}</h3>
-          <div className="line"></div>
-        </div>
-        <div className="skills-grid">
-          {skills.map((skill) => (
-            <motion.div 
-              key={skill}
-              className="skill-item"
-              whileHover={{ 
-                scale: 1.05,
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="skill-icon">
-                {skillIcons[skill as keyof typeof skillIcons]}
-              </div>
-              <div className="skill-name">{skill}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+  // Intersection Observer para móvil
+  useEffect(() => {
+    if (!isMobile || !sectionRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            setActiveIndex(index);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '-40% 0px -40% 0px', // Solo activa cuando está en el centro
+        threshold: 0
+      }
     );
-  };
+
+    // Observar todos los items del menú
+    const menuItems = sectionRef.current.querySelectorAll('.skills-menu__item');
+    menuItems.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, [isMobile]);
 
   return (
     <section ref={sectionRef} className="skills-section">
-      <div className="skills-layout">
-        <div ref={titleContainerRef} className="title-wrapper">
-          <div className="title-container" ref={titleRef}>
-            <h2 className="title">Habili<span>dades</span></h2>
-            <div className="vertical-line"></div>
-            <p className="subtitle">Un conjunto de tecnologías y herramientas que domino para crear experiencias web excepcionales.</p>
-          </div>
+      <div className="skills-container">
+        <div className="title-container">
+          <h2 className="title">Habilidades</h2>
+          <div className="vertical-line"></div>
         </div>
-
-        <div ref={contentContainerRef} className="content-wrapper">
-          <div className="categories-container">
-            {renderCategory("Frontend", skillsData.frontend, 0)}
-            {renderCategory("Backend", skillsData.backend, 1)}
-            {renderCategory("Herramientas", skillsData.tools, 2)}
-          </div>
+        
+        <div className="skills-wrap">
+          <nav className="skills-menu">
+            {skillsData.map((category, idx) => (
+              <SkillCategoryComponent 
+                key={idx} 
+                {...category} 
+                index={idx}
+                isMobile={isMobile}
+                isActive={isMobile ? activeIndex === idx : false}
+              />
+            ))}
+          </nav>
         </div>
       </div>
     </section>
   );
-};
+}
+
+interface SkillCategoryProps extends SkillCategory {
+  index: number;
+  isMobile: boolean;
+  isActive: boolean;
+}
+
+function SkillCategoryComponent({ name, skills, index, isMobile, isActive }: SkillCategoryProps) {
+  const itemRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const marqueeInnerRef = useRef<HTMLDivElement>(null);
+  const [manualActive, setManualActive] = useState(false);
+
+  const animationDefaults = { duration: 0.6, ease: 'expo' };
+
+  const findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): string => {
+    const topEdgeDist = distMetric(mouseX, mouseY, width / 2, 0);
+    const bottomEdgeDist = distMetric(mouseX, mouseY, width / 2, height);
+    return topEdgeDist < bottomEdgeDist ? 'top' : 'bottom';
+  };
+
+  const distMetric = (x: number, y: number, x2: number, y2: number): number => {
+    const xDiff = x - x2;
+    const yDiff = y - y2;
+    return xDiff * xDiff + yDiff * yDiff;
+  };
+
+  const showMarquee = (edge = 'bottom') => {
+    if (!marqueeRef.current || !marqueeInnerRef.current) return;
+
+    gsap.timeline({ defaults: animationDefaults })
+      .set(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+      .set(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0)
+      .to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' }, 0);
+  };
+
+  const hideMarquee = (edge = 'bottom') => {
+    if (!marqueeRef.current || !marqueeInnerRef.current) return;
+
+    gsap.timeline({ defaults: animationDefaults })
+      .to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+      .to(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0);
+  };
+
+  // Efecto para mostrar/ocultar marquee basado en isActive (solo móvil)
+  useEffect(() => {
+    if (!isMobile) return;
+
+    if (isActive) {
+      showMarquee();
+    } else {
+      hideMarquee();
+    }
+  }, [isActive, isMobile]);
+
+  const handleMouseEnter = (ev: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
+    
+    if (!itemRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+    showMarquee(edge);
+  };
+
+  const handleMouseLeave = (ev: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
+    
+    if (!itemRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const x = ev.clientX - rect.left;
+    const y = ev.clientY - rect.top;
+    const edge = findClosestEdge(x, y, rect.width, rect.height);
+
+    hideMarquee(edge);
+  };
+
+  const handleTouchStart = () => {
+    if (!isMobile) return;
+    
+    // En móvil, toggle manual solo si no está activo por scroll
+    if (!isActive) {
+      setManualActive(!manualActive);
+      if (!manualActive) {
+        showMarquee();
+      } else {
+        hideMarquee();
+      }
+    }
+  };
+
+  const repeatedMarqueeContent = Array.from({ length: isMobile ? 2 : 3 }).map((_, idx) => (
+    <React.Fragment key={idx}>
+      {skills.map((skill, skillIdx) => (
+        <div key={`${idx}-${skillIdx}`} className="marquee__skill">
+          <div className="skill-icon">
+            {skillIcons[skill as keyof typeof skillIcons]}
+          </div>
+          <span className="skill-name">{skill}</span>
+        </div>
+      ))}
+    </React.Fragment>
+  ));
+
+  const finalIsActive = isMobile ? isActive || manualActive : false;
+
+  return (
+    <div 
+      className={`skills-menu__item ${isMobile ? 'mobile' : ''} ${finalIsActive ? 'active' : ''}`} 
+      ref={itemRef}
+      data-index={index}
+    >
+      <div
+        className="skills-menu__item-link"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onClick={handleTouchStart}
+      >
+        {name}
+        {isMobile && !isActive && <span className="mobile-indicator">{manualActive ? '−' : '+'}</span>}
+        {isMobile && isActive && <span className="active-indicator">•</span>}
+      </div>
+      <div className="marquee" ref={marqueeRef}>
+        <div className="marquee__inner-wrap" ref={marqueeInnerRef}>
+          <div className="marquee__inner" aria-hidden="true">
+            {repeatedMarqueeContent}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default SkillsSection; 
