@@ -27,6 +27,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 const BALLS_CONFIG = {
   DESKTOP_COUNT: 180,
   MOBILE_COUNT: 90,
+  LOW_PERFORMANCE_COUNT: 60, // Para dispositivos menos potentes
 };
 
 // Configuración de tamaños
@@ -103,8 +104,90 @@ const EFFECTS_CONFIG = {
   CURSOR_Z_FREQUENCY: 1.2,
 };
 
+// Configuración de geometría
+const GEOMETRY_CONFIG = {
+  HIGH_QUALITY: { widthSegments: 32, heightSegments: 24 },
+  MEDIUM_QUALITY: { widthSegments: 24, heightSegments: 18 },
+  LOW_QUALITY: { widthSegments: 16, heightSegments: 12 },
+};
+
 // Detector de dispositivo móvil simple
 const isMobile = () => window.innerWidth <= 768;
+
+// Detector de rendimiento del dispositivo
+const getDevicePerformance = () => {
+  // Detectar GPU de bajo rendimiento
+  const canvas = document.createElement('canvas');
+  const gl = canvas.getContext('webgl') as WebGLRenderingContext | null || 
+             canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
+  
+  if (!gl) return 'low';
+  
+  const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+  const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : '';
+  
+  // Detectar GPUs integradas o de bajo rendimiento
+  const lowPerformanceGPUs = [
+    'Intel HD', 'Intel UHD', 'Intel Iris',
+    'Mali', 'Adreno 3', 'Adreno 4', 'Adreno 5',
+    'PowerVR', 'Tegra'
+  ];
+  
+  const isLowPerformanceGPU = lowPerformanceGPUs.some(gpu => 
+    renderer.toLowerCase().includes(gpu.toLowerCase())
+  );
+  
+  // Factores adicionales
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = (navigator as any).deviceMemory || 4;
+  const isMobileDevice = isMobile();
+  
+  // Lógica de clasificación
+  if (isLowPerformanceGPU || memory < 4 || cores < 4 || isMobileDevice) {
+    return 'low';
+  } else if (memory < 8 || cores < 8) {
+    return 'medium';
+  }
+  
+  return 'high';
+};
+
+// Función para obtener configuración optimizada
+const getOptimizedConfig = (baseConfig: any) => {
+  const performance = getDevicePerformance();
+  const mobile = isMobile();
+  
+  let optimizedConfig = { ...baseConfig };
+  
+  switch (performance) {
+    case 'low':
+      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT * 0.7 : BALLS_CONFIG.LOW_PERFORMANCE_COUNT;
+      optimizedConfig.geometryQuality = GEOMETRY_CONFIG.LOW_QUALITY;
+      optimizedConfig.enableAdvancedLighting = false;
+      optimizedConfig.pixelRatioLimit = 1.5;
+      break;
+    case 'medium':
+      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT : BALLS_CONFIG.DESKTOP_COUNT * 0.8;
+      optimizedConfig.geometryQuality = GEOMETRY_CONFIG.MEDIUM_QUALITY;
+      optimizedConfig.enableAdvancedLighting = true;
+      optimizedConfig.pixelRatioLimit = 2;
+      break;
+    case 'high':
+    default:
+      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT : BALLS_CONFIG.DESKTOP_COUNT;
+      optimizedConfig.geometryQuality = GEOMETRY_CONFIG.HIGH_QUALITY;
+      optimizedConfig.enableAdvancedLighting = true;
+      optimizedConfig.pixelRatioLimit = 2;
+      break;
+  }
+  
+  if (mobile) {
+    optimizedConfig.minSize *= SIZE_CONFIG.MOBILE_SCALE;
+    optimizedConfig.maxSize *= SIZE_CONFIG.MOBILE_SCALE;
+  }
+  
+  return optimizedConfig;
+};
 
 const DEFAULT_CONFIG = {
   count: BALLS_CONFIG.DESKTOP_COUNT,
@@ -423,7 +506,11 @@ class BallpitMesh extends InstancedMesh {
     const pmrem = new PMREMGenerator(renderer);
     pmrem.compileEquirectangularShader();
     const envMap = pmrem.fromScene(env).texture;
-    const geometry = new SphereGeometry(1, 32, 24);
+    
+    // Usar configuración de geometría optimizada
+    const geometryConfig = mergedConfig.geometryQuality || GEOMETRY_CONFIG.HIGH_QUALITY;
+    const geometry = new SphereGeometry(1, geometryConfig.widthSegments, geometryConfig.heightSegments);
+    
     const material = new BallMaterial({ 
       envMap,
       ...mergedConfig.materialParams,
@@ -530,12 +617,7 @@ class BallpitMesh extends InstancedMesh {
 
 function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   // Ajustar configuración según el dispositivo
-  const mergedConfig = { ...DEFAULT_CONFIG, ...config };
-  if (isMobile()) {
-    mergedConfig.count = BALLS_CONFIG.MOBILE_COUNT;
-    mergedConfig.minSize *= SIZE_CONFIG.MOBILE_SCALE;
-    mergedConfig.maxSize *= SIZE_CONFIG.MOBILE_SCALE;
-  }
+  const mergedConfig = getOptimizedConfig({ ...DEFAULT_CONFIG, ...config });
 
   const three = new (class {
     canvas: HTMLCanvasElement;
@@ -624,7 +706,7 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
       this.camera.updateProjectionMatrix();
       this.updateWorldSize();
       this.renderer.setSize(this.size.width, this.size.height);
-      const pixelRatio = Math.min(window.devicePixelRatio, 2); // Limitar el pixel ratio para mejor rendimiento
+      const pixelRatio = Math.min(window.devicePixelRatio, mergedConfig.pixelRatioLimit || 2);
       this.renderer.setPixelRatio(pixelRatio);
       this.size.pixelRatio = pixelRatio;
       this.onAfterResize();
