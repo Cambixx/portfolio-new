@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { useTexture, Environment, Lightformer, Html, RoundedBox } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
@@ -146,6 +146,9 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
     typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   );
 
+  // Referencia al canvas para obtener el renderer
+  const { gl: renderer } = useThree();
+
   useRopeJoint(fixed as any, j1 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
   useRopeJoint(j1 as any, j2 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
   useRopeJoint(j2 as any, j3 as any, [[0, 0, 0], [0, 0, 0], 0.5]);
@@ -228,11 +231,16 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   useEffect(() => {
     if (texture) {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(4, 1);
+      texture.repeat.set(2, 1);
       texture.offset.set(0, 0);
       texture.needsUpdate = true;
+      
+      // Mejoramos la calidad de la textura
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     }
-  }, [texture]);
+  }, [texture, renderer]);
 
   useEffect(() => {
     if (carlosTexture && carlosTexture.image) {
@@ -547,10 +555,12 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
           resolution={isSmall ? [1000, 2000] : [1000, 1000]}
           useMap={true}
           map={texture}
-          repeat={[-4, 1]}
-          lineWidth={0.6}
+          repeat={[-2, 1]}
+          lineWidth={0.8}
           transparent={true}
           opacity={1}
+          sizeAttenuation={1}
+          alphaTest={0.5}
         />
       </mesh>
     </>
