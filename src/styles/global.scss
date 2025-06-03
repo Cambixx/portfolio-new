@@ -65,6 +65,8 @@ body {
   --primary-gradient: linear-gradient(to right, #FF9A9E, #FFECD2);
   --text-color: #e0e0e0;
   --background-color: #121212;
+  --text-color-rgb: 224, 224, 224;
+  --background-color-rgb: 18, 18, 18;
   --transition-smooth: all 0.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
@@ -129,6 +131,13 @@ button, .button {
   :root {
     --text-color: #000000;
     --background-color: #ffffff;
+    --text-color-rgb: 0, 0, 0;
+    --background-color-rgb: 255, 255, 255;
+  }
+
+  body {
+    color: var(--text-color);
+    background-color: var(--background-color);
   }
 
   // Ajustes de scrollbar para tema claro

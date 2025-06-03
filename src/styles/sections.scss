@@ -4,6 +4,7 @@ section {
   display: flex;
   align-items: center;
   position: relative;
+  color: var(--text-color);
 }
 
 // Hero Section
@@ -55,7 +56,7 @@ section {
   
   .description {
     font-size: clamp(1.2rem, 2vw, 1.5rem);
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(var(--text-color-rgb), 0.8);
     max-width: 600px;
     opacity: 0;
     transform: translateY(20px);
@@ -153,16 +154,16 @@ section {
   .hero {
     h1 {
       .greeting {
-        color: var(--text-color); // Usar color de texto del tema (negro)
+        color: var(--text-color);
       }
       .name {
-        background: none;
-        -webkit-background-clip: initial;
-        color: var(--text-color);
+        background: linear-gradient(to right, var(--text-color), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     }
     .description {
-      color: rgba(0, 0, 0, 0.8); // Texto oscuro semitransparente
+      color: rgba(var(--text-color-rgb), 0.8);
     }
   }
 
@@ -170,14 +171,14 @@ section {
   .projects,
   .contact {
     h2 {
-      background: none;
-      -webkit-background-clip: initial;
       color: var(--text-color);
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-  }
-
-  .about p,
-  .contact p {
-    color: rgba(0, 0, 0, 0.8); // Texto oscuro semitransparente
+    
+    p {
+      color: rgba(var(--text-color-rgb), 0.8);
+    }
   }
 }
