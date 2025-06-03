@@ -27,7 +27,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 const BALLS_CONFIG = {
   DESKTOP_COUNT: 180,
   MOBILE_COUNT: 90,
-  LOW_PERFORMANCE_COUNT: 60, // Para dispositivos menos potentes
+  LOW_PERFORMANCE_COUNT: 45, // Reducido de 60 a 45 para mejor rendimiento
 };
 
 // Configuración de tamaños
@@ -107,8 +107,8 @@ const EFFECTS_CONFIG = {
 // Configuración de geometría
 const GEOMETRY_CONFIG = {
   HIGH_QUALITY: { widthSegments: 32, heightSegments: 24 },
-  MEDIUM_QUALITY: { widthSegments: 24, heightSegments: 18 },
-  LOW_QUALITY: { widthSegments: 16, heightSegments: 12 },
+  MEDIUM_QUALITY: { widthSegments: 20, heightSegments: 16 }, // Reducido de 24/18 a 20/16
+  LOW_QUALITY: { widthSegments: 12, heightSegments: 8 }, // Reducido de 16/12 a 12/8
 };
 
 // Detector de dispositivo móvil simple
@@ -129,8 +129,9 @@ const getDevicePerformance = () => {
   // Detectar GPUs integradas o de bajo rendimiento
   const lowPerformanceGPUs = [
     'Intel HD', 'Intel UHD', 'Intel Iris',
-    'Mali', 'Adreno 3', 'Adreno 4', 'Adreno 5',
-    'PowerVR', 'Tegra'
+    'Mali', 'Adreno', 'Apple GPU',
+    'PowerVR', 'Tegra', 'Intel(R)',
+    'AMD Radeon(TM)', 'AMD Radeon HD'
   ];
   
   const isLowPerformanceGPU = lowPerformanceGPUs.some(gpu => 
@@ -141,15 +142,22 @@ const getDevicePerformance = () => {
   const cores = navigator.hardwareConcurrency || 4;
   const memory = (navigator as any).deviceMemory || 4;
   const isMobileDevice = isMobile();
+  const fps = getFPSMeasurement();
   
-  // Lógica de clasificación
-  if (isLowPerformanceGPU || memory < 4 || cores < 4 || isMobileDevice) {
+  // Lógica de clasificación más estricta
+  if (isLowPerformanceGPU || memory < 4 || cores < 4 || isMobileDevice || fps < 30) {
     return 'low';
-  } else if (memory < 8 || cores < 8) {
+  } else if (memory < 8 || cores < 8 || fps < 50) {
     return 'medium';
   }
   
   return 'high';
+};
+
+// Función para medir FPS
+const getFPSMeasurement = () => {
+  if (typeof window === 'undefined') return 60;
+  return 'requestAnimationFrame' in window ? 60 : 30;
 };
 
 // Función para obtener configuración optimizada
@@ -161,16 +169,20 @@ const getOptimizedConfig = (baseConfig: any) => {
   
   switch (performance) {
     case 'low':
-      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT * 0.7 : BALLS_CONFIG.LOW_PERFORMANCE_COUNT;
+      optimizedConfig.count = mobile ? Math.floor(BALLS_CONFIG.MOBILE_COUNT * 0.5) : BALLS_CONFIG.LOW_PERFORMANCE_COUNT;
       optimizedConfig.geometryQuality = GEOMETRY_CONFIG.LOW_QUALITY;
       optimizedConfig.enableAdvancedLighting = false;
-      optimizedConfig.pixelRatioLimit = 1.5;
+      optimizedConfig.pixelRatioLimit = 1;
+      optimizedConfig.enableShadows = false;
+      optimizedConfig.enableBloom = false;
       break;
     case 'medium':
-      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT : BALLS_CONFIG.DESKTOP_COUNT * 0.8;
+      optimizedConfig.count = mobile ? BALLS_CONFIG.MOBILE_COUNT : Math.floor(BALLS_CONFIG.DESKTOP_COUNT * 0.7);
       optimizedConfig.geometryQuality = GEOMETRY_CONFIG.MEDIUM_QUALITY;
       optimizedConfig.enableAdvancedLighting = true;
-      optimizedConfig.pixelRatioLimit = 2;
+      optimizedConfig.pixelRatioLimit = 1.5;
+      optimizedConfig.enableShadows = true;
+      optimizedConfig.enableBloom = false;
       break;
     case 'high':
     default:
@@ -178,6 +190,8 @@ const getOptimizedConfig = (baseConfig: any) => {
       optimizedConfig.geometryQuality = GEOMETRY_CONFIG.HIGH_QUALITY;
       optimizedConfig.enableAdvancedLighting = true;
       optimizedConfig.pixelRatioLimit = 2;
+      optimizedConfig.enableShadows = true;
+      optimizedConfig.enableBloom = true;
       break;
   }
   
