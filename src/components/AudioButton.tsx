@@ -142,7 +142,7 @@ export function AudioButton({ onToggle, onAnalyserStateChange }: AudioButtonProp
               whiteSpace: 'nowrap' 
             }}
           >
-            Dale Play 😎 Dale Play 😎 Dale Play 😎
+            Mejor con Música 😎 Mejor con Música 😎 Mejor con Música 😎
           </span>
         </div>
         <button 
