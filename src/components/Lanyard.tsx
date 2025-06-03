@@ -7,7 +7,7 @@ import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphe
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 import { RigidBody as RigidBodyType } from '@dimforge/rapier3d-compat';
-import lanyardTexture from '../assets/lanyard/lanyard.png';
+import lanyardTexture from '../assets/lanyard/carlos-cinta.png';
 import carlosImage from '../assets/lanyard/carlos.PNG';
 
 import './Lanyard.css';
