@@ -97,37 +97,6 @@ const segmentProps = {
   linearDamping: 4    
 };
 
-const themes = {
-  light: {
-    primary: '#6b46c1',
-    secondary: '#ffffff',
-    metal: '#888888',
-    metalDark: '#666666',
-    lines: {
-      primary: {
-        color: '#6b46c1',
-        opacity: 0.06
-      },
-      secondary: {
-        color: '#6b46c1',
-        opacity: 0.03
-      },
-      accent: '#6b46c1'
-    }
-  },
-  dark: {
-    primary: {
-      color: '#6b46c1',
-      opacity: 0.06
-    },
-    secondary: {
-      color: '#6b46c1',
-      opacity: 0.03
-    },
-    accent: '#6b46c1'
-  }
-}
-
 export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] as [number, number, number], fov = 20, transparent = true }) {
   return (
     <div className="lanyard-wrapper">
@@ -347,24 +316,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   });
 
   curve.curveType = 'chordal';
-
-  const materials = {
-    primary: {
-      color: '#6b46c1',
-      opacity: 0.06,
-      transparent: true
-    },
-    secondary: {
-      color: '#6b46c1',
-      opacity: 0.03,
-      transparent: true
-    },
-    accent: {
-      color: '#6b46c1',
-      opacity: 0.08,
-      transparent: true
-    }
-  };
 
   return (
     <>
