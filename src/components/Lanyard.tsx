@@ -30,14 +30,14 @@ const CARD_CONFIG = {
   height: 1.2,
   depth: 0.02,
   colors: {
-    primary: '#ffffff',
-    secondary: '#6b46c1',
+    primary: '#6b46c1',
+    secondary: '#ffffff',
     metal: '#888888',
     metalDark: '#666666',
     lines: {
       primary: '#6b46c110',
       secondary: '#6b46c108',
-      accent: '#6b46c115'
+      accent: '#6b46c1'
     }
   },
   text: {
@@ -310,6 +310,24 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
   });
 
   curve.curveType = 'chordal';
+
+  const materials = {
+    primary: {
+      color: '#6b46c1',
+      opacity: 0.06,
+      transparent: true
+    },
+    secondary: {
+      color: '#6b46c1',
+      opacity: 0.03,
+      transparent: true
+    },
+    accent: {
+      color: '#6b46c1',
+      opacity: 0.08,
+      transparent: true
+    }
+  };
 
   return (
     <>

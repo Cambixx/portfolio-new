@@ -6,6 +6,7 @@ import AboutSection from './components/AboutSection'
 import ExperienceSection from './components/ExperienceSection'
 import SkillsSection from './components/SkillsSection'
 import ProjectsSection from './components/ProjectsSection'
+import ContactSection from './components/ContactSection'
 import CustomCursor from './components/CustomCursor'
 import WeatherWidget from './components/WeatherWidget'
 import './styles/global.scss'
@@ -40,12 +41,7 @@ function App() {
           <ProjectsSection />
 
           {/* Contact Section */}
-          <section className="contact">
-            <div className="container">
-              <h2>Contacto</h2>
-              <p>¿Tienes un proyecto en mente? ¡Hablemos!</p>
-            </div>
-          </section>
+          <ContactSection />
         </main>
       </SmoothScroll>
     </>

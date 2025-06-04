@@ -5,8 +5,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CSSPlugin } from 'gsap/CSSPlugin';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, CSSPlugin);
 import { AudioController } from './AudioController';
 
 // Constante para configurar el número de rotaciones completas durante el scroll
