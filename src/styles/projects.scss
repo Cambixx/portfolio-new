@@ -1,3 +1,5 @@
+@use 'global.scss' as *;
+
 .projects-section {
   min-height: 100vh;
   width: 100%;
@@ -23,18 +25,15 @@
     margin-left: 2rem;
     
     .title {
-      font-size: clamp(3rem, 8vw, 5rem);
-      font-weight: 800;
-      text-transform: uppercase;
-      color: #FFF;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 0.9;
-      position: relative;
-      display: inline-block;
-      text-shadow: 0 0 10px rgba(255, 154, 158, 0.5);
+      @include section-title-enhanced;
+      
+      & {
+        margin: 0;
+      }
+      
+      @media (max-width: 768px) {
+        margin: 0;
+      }
     }
 
     .vertical-line {
@@ -58,21 +57,29 @@
     .project-card {
       min-width: 400px;
       height: 400px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.22);
       border-radius: 1.5rem;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
       background-size: cover;
       background-position: center;
       position: relative;
       transform-origin: center;
-      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       cursor: pointer;
       background-image: none !important; /* Ocultar imagen en la tarjeta normal */
+      
+      // Optimizaciones críticas de rendimiento
+      will-change: transform, box-shadow, background;
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      contain: layout style paint;
+      isolation: isolate;
       
       &::after {
         content: '';
@@ -81,7 +88,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(255, 154, 158, 0.1), rgba(121, 40, 202, 0.1));
+        background: linear-gradient(135deg, rgba(255, 154, 158, 0.15), rgba(121, 40, 202, 0.15));
         opacity: 0;
         transition: opacity 0.3s ease;
       }
@@ -94,14 +101,13 @@
       }
       
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: #FF8A8E;
-        box-shadow: 0 0 20px rgba(255, 138, 142, 0.15),
-                   0 0 40px rgba(255, 138, 142, 0.1),
-                   inset 0 0 15px rgba(255, 138, 142, 0.05);
+        transform: translateY(-8px);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.35);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
         
         &::after {
-          opacity: 0.3;
+          opacity: 1;
         }
         
         &::before {
@@ -163,27 +169,23 @@
         }
         
         h3 {
-          font-size: 1.75rem;
-          font-weight: 600;
-          color: #FFF;
-          line-height: 1.2;
-          background: var(--primary-gradient);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          text-shadow: 0 0 10px rgba(255, 154, 158, 0.4);
+          @include subtitle-enhanced;
+          
+          & {
+            font-size: 1.2rem;
+          }
         }
         
         p {
-          color: rgba(255, 255, 255, 0.7);
-          line-height: 1.6;
-          font-size: 0.95rem;
-          max-height: 4.8em;
-          overflow: hidden;
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          text-shadow: 0 0 8px rgba(255, 154, 158, 0.4);
+          color: rgba(255, 255, 255, 0.95);
+          line-height: 1.7;
+          margin-bottom: 1.5rem;
+          font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+          font-weight: 500;
+          text-shadow: 
+            0 0 8px rgba(255, 154, 158, 0.3),
+            0 1px 4px rgba(0, 0, 0, 0.8),
+            0 1px 2px rgba(0, 0, 0, 0.9);
         }
         
         .technologies {
@@ -194,16 +196,19 @@
           
           .tech-tag {
             padding: 0.4rem 0.9rem;
-            background: rgba(255, 154, 158, 0.1);
-            color: var(--primary-color);
+            background: rgba(255, 154, 158, 0.2);
+            color: #ffffff;
             border-radius: 2rem;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 0.5px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 154, 158, 0.35);
             
             &:hover {
-              background: rgba(255, 154, 158, 0.2);
+              background: rgba(255, 154, 158, 0.3);
+              transform: translateY(-2px);
+              border-color: rgba(255, 154, 158, 0.5);
             }
           }
         }
@@ -226,6 +231,13 @@
   z-index: 1000;
   padding: 2rem;
   pointer-events: auto;
+  
+  // Optimizaciones de rendimiento
+  will-change: opacity, backdrop-filter;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 .project-modal {
@@ -242,6 +254,14 @@
               0 0 40px rgba(255, 138, 142, 0.1),
               inset 0 0 15px rgba(255, 138, 142, 0.05);
 
+  // Optimizaciones críticas de rendimiento
+  will-change: transform, opacity, box-shadow;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: layout style paint;
+  isolation: isolate;
+
   .close-button {
     position: absolute;
     top: 1rem;
@@ -257,10 +277,14 @@
     align-items: center;
     justify-content: center;
     z-index: 10;
-    transition: all 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     padding: 0;
     line-height: 1;
     transform-origin: center center;
+    
+    // Optimización para el botón
+    will-change: transform;
+    transform: translateZ(0);
 
     &::before {
       content: '×';
@@ -273,7 +297,9 @@
       padding: 0;
       position: relative;
       transform-origin: center center;
-      transition: all 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  text-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform, text-shadow;
     }
 
     &:hover {
@@ -292,8 +318,13 @@
     gap: 2rem;
     height: 100%;
     max-height: 90vh;
-    opacity: 1;
-    transform: none;
+    
+    // Optimizaciones de rendimiento para el contenido
+    will-change: opacity;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    contain: layout style;
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
@@ -306,6 +337,13 @@
       background-size: cover;
       background-position: center;
       border-radius: 1rem;
+      
+      // Optimización para la imagen
+      will-change: transform;
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      contain: layout style paint;
     }
 
     .project-details {
@@ -314,6 +352,10 @@
       flex-direction: column;
       gap: 1.5rem;
       overflow-y: auto;
+      
+      // Optimización para scroll suave
+      -webkit-overflow-scrolling: touch;
+      contain: layout style;
 
       h2 {
         font-size: 2.5rem;
@@ -324,6 +366,10 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
         text-shadow: 0 0 10px rgba(255, 154, 158, 0.4);
+        
+        // Optimización para texto
+        will-change: opacity;
+        transform: translateZ(0);
       }
 
       p {
@@ -332,6 +378,10 @@
         font-size: 1.1rem;
         margin: 0;
         text-shadow: 0 0 8px rgba(255, 154, 158, 0.4);
+        
+        // Optimización para texto
+        will-change: opacity;
+        transform: translateZ(0);
       }
 
       .technologies {
@@ -339,6 +389,10 @@
         flex-wrap: wrap;
         gap: 0.75rem;
         margin: 0;
+        
+        // Optimización para contenedor
+        will-change: opacity;
+        transform: translateZ(0);
         
         .tech-tag {
           padding: 0.5rem 1rem;
@@ -348,11 +402,18 @@
           font-size: 0.9rem;
           font-weight: 500;
           letter-spacing: 0.5px;
-          transition: all 0.3s ease;
+          transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                      background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           margin: 0;
+          
+          // Optimización para tags
+          will-change: transform, background-color;
+          transform: translateZ(0);
+          contain: layout style paint;
           
           &:hover {
             background: rgba(255, 154, 158, 0.2);
+            transform: translateY(-2px) translateZ(0);
           }
         }
       }
@@ -368,12 +429,18 @@
         font-weight: 600;
         font-size: 1rem;
         letter-spacing: 0.5px;
-        transition: all 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         text-align: center;
         width: fit-content;
         
+        // Optimización para botón
+        will-change: transform, box-shadow;
+        transform: translateZ(0);
+        contain: layout style paint;
+        
         &:hover {
-          transform: translateY(-2px);
+          transform: translateY(-2px) translateZ(0);
           box-shadow: 0 10px 20px rgba(255, 154, 158, 0.2);
         }
       }
@@ -492,12 +559,6 @@
 @media (prefers-color-scheme: light) {
   .projects-section {
     .title-container {
-      .title {
-        color: var(--text-color);
-        background: var(--primary-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
       .vertical-line {
         background: linear-gradient(to bottom, rgba(var(--text-color-rgb), 0.05), rgba(var(--text-color-rgb), 0.4), rgba(var(--text-color-rgb), 0.05));
       }
@@ -505,13 +566,13 @@
 
     .projects-wrapper {
       .project-card {
-        background: rgba(var(--text-color-rgb), 0.03);
-        border: 1px solid rgba(var(--text-color-rgb), 0.08);
-        box-shadow: 0 6px 25px rgba(var(--text-color-rgb), 0.05);
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
 
         @media (max-width: 768px) {
-          background: rgba(var(--text-color-rgb), 0.04);
-          border: 1px solid rgba(var(--text-color-rgb), 0.1);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(0, 0, 0, 0.18);
         }
         
         &::after {
@@ -519,33 +580,43 @@
         }
 
         &:hover {
-          background: rgba(var(--text-color-rgb), 0.05);
-          border-color: var(--text-color);
-          box-shadow: 0 0 20px rgba(var(--text-color-rgb), 0.05),
-                     0 0 40px rgba(var(--text-color-rgb), 0.03);
+          background: rgba(255, 255, 255, 0.95);
+          border-color: rgba(0, 0, 0, 0.18);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         }
 
         .project-content {
           h3 {
             color: var(--text-color);
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: none;
+            -webkit-text-fill-color: var(--text-color);
+            font-weight: 800;
+            text-shadow: 
+              0 1px 3px rgba(255, 255, 255, 0.8),
+              0 0 1px rgba(0, 0, 0, 0.3);
           }
 
           p {
-            color: rgba(var(--text-color-rgb), 0.8);
+            color: var(--text-color);
+            font-weight: 600;
+            text-shadow: 
+              0 1px 2px rgba(255, 255, 255, 0.8),
+              0 0 1px rgba(0, 0, 0, 0.2);
           }
 
           .technologies {
             .tech-tag {
-              background: rgba(var(--text-color-rgb), 0.08);
+              background: rgba(0, 0, 0, 0.08);
               color: var(--text-color);
-              border: 1px solid rgba(var(--text-color-rgb), 0.1);
+              border: 1px solid rgba(0, 0, 0, 0.15);
+              font-weight: 700;
+              text-shadow: 
+                0 1px 2px rgba(255, 255, 255, 0.8),
+                0 0 1px rgba(0, 0, 0, 0.2);
               
               &:hover {
-                background: rgba(var(--text-color-rgb), 0.12);
-                border-color: rgba(var(--text-color-rgb), 0.2);
+                background: rgba(0, 0, 0, 0.12);
+                border-color: rgba(0, 0, 0, 0.25);
               }
             }
           }

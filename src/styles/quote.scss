@@ -53,19 +53,19 @@
     will-change: transform, opacity;
     
     // Efecto cristal mejorado (glassmorphism)
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
     
     @media (max-width: 768px) {
       min-height: 250px;
       padding: 3rem 2rem;
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.35);
     }
     
     // Resplandor sutil en los bordes
@@ -95,14 +95,17 @@
       font-size: clamp(1.2rem, 2.5vw, 1.7rem);
       line-height: 1.4;
       color: #ffffff;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 2.5rem;
       text-align: center;
       letter-spacing: 0.5px;
       font-style: italic;
-      text-shadow: 0 0 8px rgba(255, 154, 158, 0.5);
+      text-shadow: 
+        0 0 12px rgba(255, 154, 158, 0.8),
+        0 2px 8px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 1);
       position: relative;
-      min-height: 4.2em; // Altura mínima para mantener consistencia
+      min-height: 4.2em;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -118,9 +121,12 @@
         font-family: Georgia, serif;
         position: absolute;
         font-size: 3.2rem;
-        color: rgba(255,154,158,0.7);
+        color: rgba(255,154,158,0.9);
         line-height: 0;
         pointer-events: none;
+        text-shadow: 
+          0 0 10px rgba(255, 154, 158, 0.8),
+          0 2px 6px rgba(0, 0, 0, 0.8);
         
         @media (max-width: 768px) {
           font-size: 2.2rem;
@@ -153,15 +159,18 @@
     .quote-author {
       text-align: right;
       font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 500;
       transform: translateZ(5px);
-      height: 2em; // Altura fija para evitar saltos
+      height: 2em;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       will-change: transform, opacity;
-      text-shadow: 0 0 6px rgba(255, 154, 158, 0.4);
+      text-shadow: 
+        0 0 8px rgba(255, 154, 158, 0.6),
+        0 1px 4px rgba(0, 0, 0, 0.8),
+        0 1px 2px rgba(0, 0, 0, 1);
       
       span {
         position: relative;
@@ -178,7 +187,10 @@
           content: '—';
           position: absolute;
           left: 0;
-          color: rgba(255, 154, 158, 0.6);
+          color: rgba(255, 154, 158, 0.8);
+          text-shadow: 
+            0 0 6px rgba(255, 154, 158, 0.8),
+            0 1px 3px rgba(0, 0, 0, 0.8);
         }
       }
     }
@@ -189,51 +201,59 @@
 @media (prefers-color-scheme: light) {
   .quote-section {
     &::before {
-      background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+      background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 70%);
       // Considerar si el filter: blur(30px) sigue siendo adecuado o necesita ajuste
     }
     
     &::after {
       // Usando un gris oscuro en lugar del azul para el segundo decorativo
-      background: radial-gradient(circle, rgba(50,50,50,0.05) 0%, rgba(50,50,50,0) 70%);
+      background: radial-gradient(circle, rgba(50,50,50,0.08) 0%, rgba(50,50,50,0) 70%);
     }
 
     .quote-card {
-      background: rgba(0, 0, 0, 0.03);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
 
       @media (max-width: 768px) {
-        background: rgba(0, 0, 0, 0.04);
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(0, 0, 0, 0.18);
       }
 
-      &::before { // Resplandor del borde
+      &::before {
         background: linear-gradient(45deg, 
           transparent, 
-          rgba(0, 0, 0, 0.05), 
-          rgba(50, 50, 50, 0.03), 
+          rgba(0, 0, 0, 0.08),
+          rgba(50, 50, 50, 0.06),
           transparent
         );
       }
 
       .quote-text {
         color: var(--text-color);
-        text-shadow: none;
+        font-weight: 700;
+        text-shadow: 
+          0 1px 3px rgba(255, 255, 255, 0.8),
+          0 0 1px rgba(0, 0, 0, 0.3);
 
-        &::before, &::after { // Comillas ornamentales
-          color: rgba(0,0,0,0.2);
+        &::before, &::after {
+          color: rgba(0,0,0,0.4);
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
         }
       }
 
       .quote-author {
         color: var(--text-color);
-        opacity: 0.8; // Un poco más suave que el texto principal
-        text-shadow: none;
+        opacity: 0.85;
+        font-weight: 600;
+        text-shadow: 
+          0 1px 2px rgba(255, 255, 255, 0.8),
+          0 0 1px rgba(0, 0, 0, 0.2);
 
         span {
-          &::before { // Guion
-            color: rgba(0,0,0,0.6);
+          &::before {
+            color: rgba(0,0,0,0.7);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
           }
         }
       }

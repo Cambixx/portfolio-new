@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import projectsData from '../data/projects.json';
 import '../styles/projects.scss';
 
@@ -57,68 +57,75 @@ const ProjectsSection = () => {
 
   return (
     <section ref={sectionRef} className="projects-section">
-      <LayoutGroup>
-        <div ref={containerRef} className="projects-container">
-          <div className="title-container">
-            <h2 className="title">Proyectos</h2>
-            <div className="vertical-line"></div>
-          </div>
-          
-          <div ref={projectsRef} className="projects-wrapper">
-            {projectsData.projects.map((project, index) => (
-              <motion.div 
-                key={project.id} 
-                layoutId={`project-card-${project.id}`}
-                className="project-card"
-                ref={index === projectsData.projects.length - 1 ? lastCardRef : null}
-                onClick={() => handleProjectClick(project.id)}
-                style={{ 
-                  cursor: 'pointer',
-                  backgroundImage: `url(${project.image})`
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ 
-                  opacity: 1
-                }}
-                transition={{ 
-                  layout: { type: "tween", duration: 0.2, ease: "easeInOut" }
-                }}
-              >
-                <motion.div 
-                  className="project-content"
-                  layoutId={`project-content-${project.id}`}
-                >
-                  <motion.h3 layoutId={`project-title-${project.id}`}>{project.title}</motion.h3>
-                  <motion.p layoutId={`project-description-${project.id}`}>{project.description}</motion.p>
-                  <motion.div 
-                    className="technologies"
-                    layoutId={`project-technologies-${project.id}`}
-                  >
-                    {project.technologies.map((tech, index) => (
-                      <motion.span 
-                        key={index} 
-                        className="tech-tag"
-                        layout
-                      >
-                        {tech}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
+      <div ref={containerRef} className="projects-container">
+        <div className="title-container">
+          <h2 className="title">Proyectos</h2>
+          <div className="vertical-line"></div>
         </div>
+        
+        <div ref={projectsRef} className="projects-wrapper">
+          {projectsData.projects.map((project, index) => (
+            <motion.div 
+              key={project.id} 
+              className="project-card"
+              ref={index === projectsData.projects.length - 1 ? lastCardRef : null}
+              onClick={() => handleProjectClick(project.id)}
+              style={{ 
+                cursor: 'pointer',
+                backgroundImage: `url(${project.image})`
+              }}
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ 
+                opacity: 1,
+                y: 0
+              }}
+              transition={{ 
+                duration: 0.6,
+                delay: index * 0.15,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              whileHover={{ 
+                y: -8,
+                transition: { 
+                  duration: 0.3,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }
+              }}
+              whileTap={{ 
+                scale: 0.98,
+                transition: { 
+                  duration: 0.15,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }
+              }}
+            >
+              <div className="project-content">
+                <h3>{project.title}</h3>
+                <p>{project.description}</p>
+                <div className="technologies">
+                  {project.technologies.map((tech, index) => (
+                    <span 
+                      key={index} 
+                      className="tech-tag"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
-        <AnimatePresence>
-          {selectedProject && (
-            <ProjectModal 
-              project={projectsData.projects.find(p => p.id === selectedProject)!}
-              onClose={() => setSelectedProject(null)}
-            />
-          )}
-        </AnimatePresence>
-      </LayoutGroup>
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal 
+            project={projectsData.projects.find(p => p.id === selectedProject)!}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };
@@ -132,14 +139,43 @@ const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
   return (
     <motion.div 
       className="project-modal-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+      animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+      exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+      transition={{ 
+        duration: 0.4, 
+        ease: [0.25, 0.46, 0.45, 0.94],
+        backdropFilter: { duration: 0.5 }
+      }}
       onClick={onClose}
     >
       <motion.div 
-        layoutId={`project-card-${project.id}`}
         className="project-modal"
+        initial={{ 
+          opacity: 0, 
+          scale: 0.85, 
+          y: 60,
+          rotateX: -12
+        }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,
+          rotateX: 0
+        }}
+        exit={{ 
+          opacity: 0, 
+          scale: 0.92, 
+          y: 40,
+          rotateX: -8
+        }}
+        transition={{ 
+          type: "spring",
+          damping: 22,
+          stiffness: 220,
+          mass: 1,
+          duration: 0.6
+        }}
         onClick={e => e.stopPropagation()}
       >
         <button className="close-button" onClick={onClose} aria-label="Cerrar modal"></button>
@@ -147,20 +183,58 @@ const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
           <motion.div 
             className="project-image" 
             style={{ backgroundImage: `url(${project.image})` }}
-            layoutId={`project-image-${project.id}`}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              delay: 0.15, 
+              duration: 0.6,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
           />
           <div className="project-details">
-            <motion.h2 layoutId={`project-title-${project.id}`}>{project.title}</motion.h2>
-            <motion.p layoutId={`project-description-${project.id}`}>{project.description}</motion.p>
+            <motion.h2 
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                delay: 0.2, 
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+            >
+              {project.title}
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                delay: 0.3, 
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+            >
+              {project.description}
+            </motion.p>
             <motion.div 
               className="technologies"
-              layoutId={`project-technologies-${project.id}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                delay: 0.4, 
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
             >
               {project.technologies.map((tech, index) => (
                 <motion.span 
                   key={index} 
                   className="tech-tag"
-                  layout
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ 
+                    delay: 0.5 + (index * 0.08), 
+                    duration: 0.4,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
                 >
                   {tech}
                 </motion.span>
@@ -172,10 +246,13 @@ const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="project-link"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ delay: 0.2 }}
+                initial={{ opacity: 0, y: 25, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ 
+                  delay: 0.6, 
+                  duration: 0.5,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
               >
                 Ver proyecto
               </motion.a>
