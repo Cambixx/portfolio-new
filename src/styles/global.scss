@@ -176,9 +176,9 @@ button, .button {
 // Media Query para Tema Claro
 @media (prefers-color-scheme: light) {
   :root {
-    --text-color: #000000;
+    --text-color: #121212;
     --background-color: #ffffff;
-    --text-color-rgb: 0, 0, 0;
+    --text-color-rgb: 18, 18, 18;
     --background-color-rgb: 255, 255, 255;
     
     // Colores minimalistas para tema claro
@@ -209,6 +209,10 @@ button, .button {
   body {
     color: var(--text-color);
     background-color: var(--background-color);
+    
+    &::before {
+      background: #ffffff;
+    }
   }
 
   // Ajustes de scrollbar para tema claro
