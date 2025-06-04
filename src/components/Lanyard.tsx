@@ -35,8 +35,14 @@ const CARD_CONFIG = {
     metal: '#888888',
     metalDark: '#666666',
     lines: {
-      primary: '#6b46c110',
-      secondary: '#6b46c108',
+      primary: {
+        color: '#6b46c1',
+        opacity: 0.06
+      },
+      secondary: {
+        color: '#6b46c1',
+        opacity: 0.03
+      },
       accent: '#6b46c1'
     }
   },
@@ -90,6 +96,37 @@ const segmentProps = {
   angularDamping: 4,  
   linearDamping: 4    
 };
+
+const themes = {
+  light: {
+    primary: '#6b46c1',
+    secondary: '#ffffff',
+    metal: '#888888',
+    metalDark: '#666666',
+    lines: {
+      primary: {
+        color: '#6b46c1',
+        opacity: 0.06
+      },
+      secondary: {
+        color: '#6b46c1',
+        opacity: 0.03
+      },
+      accent: '#6b46c1'
+    }
+  },
+  dark: {
+    primary: {
+      color: '#6b46c1',
+      opacity: 0.06
+    },
+    secondary: {
+      color: '#6b46c1',
+      opacity: 0.03
+    },
+    accent: '#6b46c1'
+  }
+}
 
 export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] as [number, number, number], fov = 20, transparent = true }) {
   return (
@@ -388,22 +425,38 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                 {/* Línea horizontal superior */}
                 <mesh>
                   <planeGeometry args={[0.2, 0.003]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.primary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.primary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.primary.opacity} 
+                  />
                 </mesh>
                 {/* Conexión vertical */}
                 <mesh position={[0.1, -0.15, 0]}>
                   <planeGeometry args={[0.003, 0.3]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.primary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.primary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.primary.opacity} 
+                  />
                 </mesh>
                 {/* Línea horizontal inferior */}
                 <mesh position={[0.15, -0.3, 0]}>
                   <planeGeometry args={[0.15, 0.003]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.primary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.primary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.primary.opacity} 
+                  />
                 </mesh>
                 {/* Punto de conexión */}
                 <mesh position={[0.1, -0.3, 0]}>
                   <circleGeometry args={[0.006]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.accent} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.accent} 
+                    transparent 
+                    opacity={0.9} 
+                  />
                 </mesh>
               </group>
 
@@ -411,20 +464,36 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               <group position={[CARD_CONFIG.width/2 - 0.15, -CARD_CONFIG.height/2 + 0.15, 0]}>
                 <mesh>
                   <planeGeometry args={[0.15, 0.003]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.secondary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.secondary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.secondary.opacity} 
+                  />
                 </mesh>
                 <mesh position={[-0.075, 0.1, 0]}>
                   <planeGeometry args={[0.003, 0.2]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.secondary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.secondary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.secondary.opacity} 
+                  />
                 </mesh>
                 <mesh position={[-0.15, 0.1, 0]}>
                   <planeGeometry args={[0.15, 0.003]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.secondary} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.secondary.color} 
+                    transparent 
+                    opacity={CARD_CONFIG.colors.lines.secondary.opacity} 
+                  />
                 </mesh>
                 {/* Punto de conexión */}
                 <mesh position={[-0.075, 0.1, 0]}>
                   <circleGeometry args={[0.006]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.accent} transparent opacity={0.9} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.accent} 
+                    transparent 
+                    opacity={0.9} 
+                  />
                 </mesh>
               </group>
 
@@ -437,7 +506,11 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
                 <group key={i} position={[config[0], config[1], -0.001]}>
                   <mesh rotation={[0, 0, config[3]]}>
                     <planeGeometry args={[config[2], 0.002]} />
-                    <meshBasicMaterial color={CARD_CONFIG.colors.lines.secondary} transparent opacity={0.4} />
+                    <meshBasicMaterial 
+                      color={CARD_CONFIG.colors.lines.secondary.color} 
+                      transparent 
+                      opacity={0.4} 
+                    />
                   </mesh>
                 </group>
               ))}
@@ -448,7 +521,11 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               ].map((pos, i) => (
                 <mesh key={i} position={[pos[0], pos[1], -0.001]}>
                   <circleGeometry args={[0.004]} />
-                  <meshBasicMaterial color={CARD_CONFIG.colors.lines.accent} transparent opacity={0.6} />
+                  <meshBasicMaterial 
+                    color={CARD_CONFIG.colors.lines.accent} 
+                    transparent 
+                    opacity={0.6} 
+                  />
                 </mesh>
               ))}
             </group>

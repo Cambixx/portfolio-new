@@ -28,145 +28,135 @@ const ExperienceSection = () => {
 
     if (!section || !timeline || !items.length) return
 
-    // Configurar animación del título
-    gsap.fromTo(
-      '.experience-title',
-      {
-        opacity: 0,
-        y: 50,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'power3.out',
+    // Crear un contexto GSAP para mejor limpieza
+    const ctx = gsap.context(() => {
+      // Batch de animaciones para mejor rendimiento
+      const tl = gsap.timeline({
+        defaults: {
+          ease: "power2.out",
+          duration: 0.8
+        },
         scrollTrigger: {
           trigger: section,
           start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    )
+          toggleActions: 'play none none reverse'
+        }
+      });
 
-    // Animación de la línea principal del timeline
-    gsap.fromTo(
-      '.timeline-line',
-      {
-        scaleY: 0,
-      },
-      {
-        scaleY: 1,
-        duration: 1.5,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: timeline,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    )
-
-    // Animación de cada elemento del timeline
-    items.forEach((item, index) => {
-      if (!item) return
-
-      const isLeft = index % 2 === 0
-      const xOffset = isLeft ? -100 : 100
-
-      // Animación de entrada
-      gsap.fromTo(
-        item,
+      // Animación del título
+      tl.fromTo(
+        '.experience-title',
         {
           opacity: 0,
-          x: xOffset,
-          y: 30,
+          y: 30
         },
         {
           opacity: 1,
-          x: 0,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
+          y: 0
+        }
+      );
+
+      // Animación de la línea principal del timeline
+      tl.fromTo(
+        '.timeline-line',
+        {
+          scaleY: 0,
+          transformOrigin: 'top'
+        },
+        {
+          scaleY: 1,
+          duration: 1
+        },
+        "-=0.4"
+      );
+
+      // Batch de animaciones para los items
+      items.forEach((item, index) => {
+        if (!item) return
+
+        const isLeft = index % 2 === 0
+        const xOffset = isLeft ? -50 : 50
+
+        const itemTl = gsap.timeline({
           scrollTrigger: {
             trigger: item,
             start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
-
-      // Animación del punto del timeline
-      const dot = item.querySelector('.timeline-dot')
-      if (dot) {
-        gsap.fromTo(
-          dot,
-          {
-            scale: 0,
-            opacity: 0,
-          },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 0.6,
-            ease: 'back.out(1.7)',
-            scrollTrigger: {
-              trigger: item,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
+            toggleActions: 'play none none reverse'
           }
-        )
-      }
+        });
 
-      // Animación de las tecnologías
-      const techs = item.querySelectorAll('.tech-tag')
-      gsap.fromTo(
-        techs,
-        {
-          opacity: 0,
-          y: 20,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 75%',
-            toggleActions: 'play none none reverse',
+        // Animación del contenido principal
+        itemTl.fromTo(
+          item,
+          {
+            opacity: 0,
+            x: xOffset,
+            y: 20
           },
-        }
-      )
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.6,
+            clearProps: "transform" // Liberar recursos después de la animación
+          }
+        );
 
-      // Animación de los logros
-      const achievements = item.querySelectorAll('.achievement-item')
-      gsap.fromTo(
-        achievements,
-        {
-          opacity: 0,
-          x: -20,
-        },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.4,
-          ease: 'power2.out',
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 70%',
-            toggleActions: 'play none none reverse',
-          },
+        // Animación del punto con will-change optimizado
+        const dot = item.querySelector('.timeline-dot')
+        if (dot) {
+          gsap.set(dot, { willChange: "transform" });
+          itemTl.fromTo(
+            dot,
+            {
+              scale: 0,
+              opacity: 0
+            },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.4,
+              ease: "back.out(1.7)",
+              onComplete: () => {
+                gsap.set(dot, { willChange: "auto" });
+              }
+            },
+            "-=0.3"
+          );
         }
-      )
-    })
+
+        // Batch de animaciones para tecnologías y logros
+        const elements = [
+          ...item.querySelectorAll('.tech-tag'),
+          ...item.querySelectorAll('.achievement-item')
+        ];
+
+        if (elements.length) {
+          itemTl.fromTo(
+            elements,
+            {
+              opacity: 0,
+              y: 10
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.3,
+              stagger: 0.05,
+              clearProps: "transform"
+            },
+            "-=0.2"
+          );
+        }
+      });
+    }, section);
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      ctx.revert(); // Limpieza más eficiente
     }
   }, [])
+
+  const experiences = experienceData as ExperienceItem[]
 
   return (
     <section ref={sectionRef} className="experience-section" id="experiencia">
@@ -176,7 +166,7 @@ const ExperienceSection = () => {
         <div ref={timelineRef} className="timeline-container">
           <div className="timeline-line"></div>
           
-          {experienceData.map((experience: ExperienceItem, index) => (
+          {experiences.map((experience, index: number) => (
             <div
               key={experience.id}
               ref={el => {
