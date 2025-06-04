@@ -110,28 +110,7 @@ label,
   }
 }
 
-// Ajustes para el tema claro
-@media (prefers-color-scheme: light) {
-  .custom-cursor {
-    .cursor-dot {
-      border-color: rgba(0, 0, 0, 0.5); // Borde oscuro para tema claro
-    }
-
-    &.pointer {
-      .cursor-dot {
-        border-color: rgba(0, 0, 0, 0.7); // Borde más oscuro en estado pointer
-      }
-    }
-
-    &.clicking {
-      .cursor-dot {
-        border-color: rgba(0, 0, 0, 1); // Borde oscuro opaco en estado clicking
-      }
-    }
-  }
-}
-
-// Restaurar cursores nativos solo en móviles (esta sección se mantiene como estaba)
+// Restaurar cursores nativos solo en móviles
 @media (max-width: 768px) {
   .custom-cursor {
     display: none;
@@ -159,5 +138,43 @@ label,
   .clickable:hover, 
   .link:hover {
     cursor: pointer !important;
+  }
+}
+
+.cursor-dot {
+  mix-blend-mode: difference;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  transition: width 0.3s, height 0.3s, background-color 0.3s;
+  z-index: 9999;
+  
+  &.cursor-hover {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    mix-blend-mode: normal;
+  }
+}
+
+.cursor-outline {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 9998;
+  mix-blend-mode: difference;
+  
+  &.cursor-hover {
+    width: 80px;
+    height: 80px;
+    border-color: var(--primary-color);
+    mix-blend-mode: normal;
   }
 } 

@@ -56,7 +56,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
+    background: var(--background-color);
     z-index: -1;
     pointer-events: none;
   }
@@ -71,21 +71,19 @@ body {
   --title-color-modern: #E8E8E8;
   --subtitle-color-modern: #D0D0D0;
   
+  // Tema oscuro fijo
   --text-color: #e0e0e0;
   --background-color: #121212;
   --text-color-rgb: 224, 224, 224;
   --background-color-rgb: 18, 18, 18;
   --transition-smooth: all 0.5s cubic-bezier(0.76, 0, 0.24, 1);
   
-  // Variables para fondos de cristal mejorados
-  --glass-bg-dark: rgba(255, 255, 255, 0.22);
-  --glass-bg-light: rgba(255, 255, 255, 0.92);
-  --glass-border-dark: rgba(255, 255, 255, 0.25);
-  --glass-border-light: rgba(0, 0, 0, 0.15);
-  --glass-shadow-dark: 0 4px 30px rgba(0, 0, 0, 0.15);
-  --glass-shadow-light: 0 4px 30px rgba(0, 0, 0, 0.08);
+  // Variables para fondos de cristal
+  --glass-bg: rgba(255, 255, 255, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   
-  // Text-shadows minimalistas pero efectivos
+  // Text-shadows
   --text-shadow-strong: 
     0 2px 8px rgba(0, 0, 0, 0.8),
     0 1px 4px rgba(0, 0, 0, 0.9);
@@ -96,7 +94,7 @@ body {
     0 1px 4px rgba(0, 0, 0, 0.6),
     0 1px 2px rgba(0, 0, 0, 0.7);
 
-  // Variables para títulos de sección (H2) minimalistas
+  // Variables para títulos de sección
   --section-title-size-desktop: clamp(3rem, 8vw, 5rem);
   --section-title-size-mobile: clamp(2.5rem, 6vw, 3.5rem);
   --section-title-weight: 600;
@@ -106,9 +104,8 @@ body {
   --section-title-margin-bottom-mobile: 3rem;
   --section-title-color: var(--title-color-modern);
   --section-title-shadow: var(--text-shadow-strong);
-  --section-title-glow: none;
 
-  // Variables para subtítulos (H3, H4) minimalistas
+  // Variables para subtítulos
   --subtitle-size-desktop: clamp(1.5rem, 3vw, 2rem);
   --subtitle-size-mobile: clamp(1.25rem, 2.5vw, 1.5rem);
   --subtitle-weight: 500;
@@ -173,100 +170,6 @@ button, .button {
   background: #FF8A8E;
 }
 
-// Media Query para Tema Claro
-@media (prefers-color-scheme: light) {
-  :root {
-    --text-color: #121212;
-    --background-color: #ffffff;
-    --text-color-rgb: 18, 18, 18;
-    --background-color-rgb: 255, 255, 255;
-    
-    // Colores minimalistas para tema claro
-    --title-color-modern: #2A2A2A;
-    --subtitle-color-modern: #404040;
-    
-    // Text-shadows sutiles para tema claro
-    --text-shadow-strong: 
-      0 1px 3px rgba(255, 255, 255, 0.8),
-      0 0 1px rgba(0, 0, 0, 0.2);
-    --text-shadow-medium: 
-      0 1px 2px rgba(255, 255, 255, 0.7),
-      0 0 1px rgba(0, 0, 0, 0.15);
-    --text-shadow-light: 
-      0 1px 1px rgba(255, 255, 255, 0.6),
-      0 0 1px rgba(0, 0, 0, 0.1);
-
-    // Variables para títulos en tema claro
-    --section-title-color: var(--title-color-modern);
-    --section-title-shadow: var(--text-shadow-strong);
-    --section-title-glow: none;
-
-    // Variables para subtítulos en tema claro
-    --subtitle-color: var(--subtitle-color-modern);
-    --subtitle-shadow: var(--text-shadow-medium);
-  }
-
-  body {
-    color: var(--text-color);
-    background-color: var(--background-color);
-    
-    &::before {
-      background: #ffffff;
-    }
-  }
-
-  // Ajustes de scrollbar para tema claro
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  // Utilidades para fondos de cristal en tema claro
-  .glass-bg {
-    background: var(--glass-bg-light);
-    border: 1px solid var(--glass-border-light);
-    box-shadow: var(--glass-shadow-light);
-  }
-
-  .glass-bg-hover {
-    &:hover {
-      background: rgba(255, 255, 255, 0.95);
-      border-color: rgba(0, 0, 0, 0.18);
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  // Títulos de sección en tema claro
-  .section-title,
-  .section-title-enhanced {
-    color: var(--section-title-color);
-    text-shadow: var(--section-title-shadow);
-    font-weight: 700; // Aumentado ligeramente para tema claro
-    
-    &::after {
-      opacity: 0; // Sin efectos adicionales en tema claro
-    }
-  }
-
-  .section-title-enhanced {
-    // Sin efectos adicionales en estilo minimalista
-  }
-
-  // Subtítulos en tema claro
-  .subtitle-enhanced {
-    color: var(--subtitle-color);
-    text-shadow: var(--subtitle-shadow);
-    font-weight: 600;
-  }
-}
-
 @keyframes moveGradient {
   0% {
     background-position: 0% 50%;
@@ -297,10 +200,10 @@ button, .button {
 
 // Utilidades para fondos de cristal
 .glass-bg {
-  background: var(--glass-bg-dark);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border-dark);
-  box-shadow: var(--glass-shadow-dark);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .glass-bg-hover {

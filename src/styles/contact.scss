@@ -66,14 +66,14 @@
 }
 
 .contact-card {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 1.5rem;
   padding: 1.5rem;
   max-width: 370px;
   width: 100%;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   margin-left: 2rem;
   
@@ -122,6 +122,8 @@
   &:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   }
   
   .icon {
@@ -144,6 +146,7 @@
     &:hover {
       background: linear-gradient(45deg, rgba(255,154,158,0.15), rgba(255,154,158,0.25));
       border-color: rgba(255,154,158,0.4);
+      box-shadow: 0 8px 30px rgba(255, 154, 158, 0.15);
     }
   }
   
@@ -154,51 +157,7 @@
     &:hover {
       background: linear-gradient(45deg, rgba(0,119,181,0.15), rgba(0,119,181,0.25));
       border-color: rgba(0,119,181,0.4);
-    }
-  }
-}
-
-// Ajustes para el tema claro
-@media (prefers-color-scheme: light) {
-  .contact-card {
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-    
-    p {
-      color: var(--text-color);
-      text-shadow: none;
-    }
-  }
-  
-  .contact-link {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.1);
-    color: var(--text-color);
-    
-    &:hover {
-      background: rgba(0, 0, 0, 0.08);
-      border-color: rgba(0, 0, 0, 0.15);
-    }
-    
-    &.email {
-      background: linear-gradient(45deg, rgba(255,154,158,0.1), rgba(255,154,158,0.15));
-      border-color: rgba(255,154,158,0.2);
-      
-      &:hover {
-        background: linear-gradient(45deg, rgba(255,154,158,0.15), rgba(255,154,158,0.2));
-        border-color: rgba(255,154,158,0.3);
-      }
-    }
-    
-    &.linkedin {
-      background: linear-gradient(45deg, rgba(0,119,181,0.1), rgba(0,119,181,0.15));
-      border-color: rgba(0,119,181,0.2);
-      
-      &:hover {
-        background: linear-gradient(45deg, rgba(0,119,181,0.15), rgba(0,119,181,0.2));
-        border-color: rgba(0,119,181,0.3);
-      }
+      box-shadow: 0 8px 30px rgba(0, 119, 181, 0.15);
     }
   }
 } 

@@ -57,23 +57,22 @@
     .project-card {
       min-width: 400px;
       height: 400px;
-      background: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 1.5rem;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
       background-size: cover;
       background-position: center;
       position: relative;
       transform-origin: center;
       transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       cursor: pointer;
-      background-image: none !important; /* Ocultar imagen en la tarjeta normal */
+      background-image: none !important;
       
-      // Optimizaciones críticas de rendimiento
       will-change: transform, box-shadow, background;
       transform: translateZ(0);
       -webkit-backface-visibility: hidden;
@@ -95,16 +94,16 @@
 
       @media (max-width: 768px) {
         min-width: 100%;
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.12);
       }
       
       &:hover {
         transform: translateY(-8px);
         background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.35);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        border-color: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         
         &::after {
           opacity: 1;
@@ -232,7 +231,6 @@
   padding: 2rem;
   pointer-events: auto;
   
-  // Optimizaciones de rendimiento
   will-change: opacity, backdrop-filter;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
@@ -254,7 +252,6 @@
               0 0 40px rgba(255, 138, 142, 0.1),
               inset 0 0 15px rgba(255, 138, 142, 0.05);
 
-  // Optimizaciones críticas de rendimiento
   will-change: transform, opacity, box-shadow;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
@@ -282,7 +279,6 @@
     line-height: 1;
     transform-origin: center center;
     
-    // Optimización para el botón
     will-change: transform;
     transform: translateZ(0);
 
@@ -319,7 +315,6 @@
     height: 100%;
     max-height: 90vh;
     
-    // Optimizaciones de rendimiento para el contenido
     will-change: opacity;
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
@@ -338,7 +333,6 @@
       background-position: center;
       border-radius: 1rem;
       
-      // Optimización para la imagen
       will-change: transform;
       transform: translateZ(0);
       -webkit-backface-visibility: hidden;
@@ -353,7 +347,6 @@
       gap: 1.5rem;
       overflow-y: auto;
       
-      // Optimización para scroll suave
       -webkit-overflow-scrolling: touch;
       contain: layout style;
 
@@ -367,7 +360,6 @@
         background-clip: text;
         text-shadow: 0 0 10px rgba(255, 154, 158, 0.4);
         
-        // Optimización para texto
         will-change: opacity;
         transform: translateZ(0);
       }
@@ -379,7 +371,6 @@
         margin: 0;
         text-shadow: 0 0 8px rgba(255, 154, 158, 0.4);
         
-        // Optimización para texto
         will-change: opacity;
         transform: translateZ(0);
       }
@@ -390,7 +381,6 @@
         gap: 0.75rem;
         margin: 0;
         
-        // Optimización para contenedor
         will-change: opacity;
         transform: translateZ(0);
         
@@ -406,7 +396,6 @@
                       background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           margin: 0;
           
-          // Optimización para tags
           will-change: transform, background-color;
           transform: translateZ(0);
           contain: layout style paint;
@@ -434,7 +423,6 @@
         text-align: center;
         width: fit-content;
         
-        // Optimización para botón
         will-change: transform, box-shadow;
         transform: translateZ(0);
         contain: layout style paint;
@@ -552,83 +540,5 @@
         }
       }
     }
-  }
-}
-
-// Ajustes para el tema claro
-@media (prefers-color-scheme: light) {
-  .projects-section {
-    .title-container {
-      .vertical-line {
-        background: linear-gradient(to bottom, rgba(var(--text-color-rgb), 0.05), rgba(var(--text-color-rgb), 0.4), rgba(var(--text-color-rgb), 0.05));
-      }
-    }
-
-    .projects-wrapper {
-      .project-card {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(0, 0, 0, 0.12);
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
-
-        @media (max-width: 768px) {
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(0, 0, 0, 0.18);
-        }
-        
-        &::after {
-          background: linear-gradient(135deg, rgba(var(--text-color-rgb), 0.05), rgba(var(--text-color-rgb), 0.1));
-        }
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.95);
-          border-color: rgba(0, 0, 0, 0.18);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .project-content {
-          h3 {
-            color: var(--text-color);
-            background: none;
-            -webkit-text-fill-color: var(--text-color);
-            font-weight: 800;
-            text-shadow: 
-              0 1px 3px rgba(255, 255, 255, 0.8),
-              0 0 1px rgba(0, 0, 0, 0.3);
-          }
-
-          p {
-            color: var(--text-color);
-            font-weight: 600;
-            text-shadow: 
-              0 1px 2px rgba(255, 255, 255, 0.8),
-              0 0 1px rgba(0, 0, 0, 0.2);
-          }
-
-          .technologies {
-            .tech-tag {
-              background: rgba(0, 0, 0, 0.08);
-              color: var(--text-color);
-              border: 1px solid rgba(0, 0, 0, 0.15);
-              font-weight: 700;
-              text-shadow: 
-                0 1px 2px rgba(255, 255, 255, 0.8),
-                0 0 1px rgba(0, 0, 0, 0.2);
-              
-              &:hover {
-                background: rgba(0, 0, 0, 0.12);
-                border-color: rgba(0, 0, 0, 0.25);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .project-modal {
-    background: var(--background-color);
-    border: 1px solid var(--text-color);
-    box-shadow: 0 0 20px rgba(var(--text-color-rgb), 0.1),
-                0 0 40px rgba(var(--text-color-rgb), 0.05);
   }
 }

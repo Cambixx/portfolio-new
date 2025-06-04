@@ -5,6 +5,11 @@ section {
   align-items: center;
   position: relative;
   color: var(--text-color);
+  
+  @media (max-width: 768px) {
+    min-height: 100dvh;
+    padding: 4rem 1rem;
+  }
 }
 
 // Hero Section
@@ -13,8 +18,16 @@ section {
   display: flex;
   align-items: center;
   
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
   .hero-content {
     max-width: 800px;
+    
+    @media (max-width: 768px) {
+      padding: 0 1rem;
+    }
   }
   
   h1 {
@@ -22,6 +35,11 @@ section {
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 1.5rem;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 1rem;
+    }
     
     .greeting {
       display: block;
@@ -32,6 +50,11 @@ section {
       opacity: 0;
       transform: translateY(20px);
       animation: fadeInUp 1s ease forwards;
+      
+      @media (max-width: 768px) {
+        font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+        margin-bottom: 0.5rem;
+      }
     }
     
     .name {
@@ -52,6 +75,11 @@ section {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 1s ease forwards 0.6s;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 0.75rem;
+    }
   }
   
   .description {
@@ -61,6 +89,11 @@ section {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 1s ease forwards 0.9s;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      margin: 0 auto;
+    }
   }
 }
 
@@ -68,9 +101,17 @@ section {
 .about {
   background-color: transparent;
   
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
   .container {
     display: flex;
     flex-direction: column;
+    
+    @media (max-width: 768px) {
+      padding: 0 1rem;
+    }
   }
   
   h2 {
@@ -82,6 +123,11 @@ section {
     -webkit-background-clip: text;
     color: transparent;
     display: inline-block;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 1.5rem;
+    }
   }
   
   p {
@@ -89,12 +135,21 @@ section {
     max-width: 600px;
     line-height: 1.8;
     color: rgba(255,255,255,0.8);
+    
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      margin: 0 auto;
+    }
   }
 }
 
 // Projects Section
 .projects {
   background-color: transparent;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
   
   h2 {
     font-size: clamp(2rem, 5vw, 4rem);
@@ -105,12 +160,23 @@ section {
     -webkit-background-clip: text;
     color: transparent;
     display: inline-block;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 2rem;
+    }
   }
   
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
   }
 }
 
@@ -118,6 +184,10 @@ section {
 .contact {
   background-color: transparent;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    padding: 4rem 1rem;
+  }
   
   h2 {
     font-size: clamp(2rem, 5vw, 4rem);
@@ -128,16 +198,25 @@ section {
     -webkit-background-clip: text;
     color: transparent;
     display: inline-block;
+    
+    @media (max-width: 768px) {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 0.75rem;
+    }
   }
   
   p {
     font-size: clamp(1rem, 1.5vw, 1.2rem);
     margin-bottom: 2rem;
     color: rgba(255,255,255,0.8);
+    
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
   }
 }
 
-// Animaciones
 @keyframes fadeInUp {
   from {
     opacity: 1;
@@ -146,39 +225,5 @@ section {
   to {
     opacity: 0;
     transform: translateY(-30px);
-  }
-}
-
-// Ajustes para el tema claro
-@media (prefers-color-scheme: light) {
-  .hero {
-    h1 {
-      .greeting {
-        color: var(--text-color);
-      }
-      .name {
-        background: linear-gradient(to right, var(--text-color), var(--primary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-    .description {
-      color: rgba(var(--text-color-rgb), 0.8);
-    }
-  }
-
-  .about,
-  .projects,
-  .contact {
-    h2 {
-      color: var(--text-color);
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    p {
-      color: rgba(var(--text-color-rgb), 0.8);
-    }
   }
 }

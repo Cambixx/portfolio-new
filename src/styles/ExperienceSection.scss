@@ -281,23 +281,109 @@
   }
 
   @media (max-width: 768px) {
-    padding: 4rem 0;
-
-    .timeline-item {
-      margin-bottom: 3rem;
+    padding: 4rem 1rem;
+    
+    .timeline-container {
+      padding-left: 1rem;
     }
-
+    
+    .timeline-line {
+      left: 1rem;
+    }
+    
+    .timeline-item {
+      width: calc(100% - 2rem);
+      margin-left: 2rem;
+      margin-bottom: 3rem;
+      
+      &.left,
+      &.right {
+        left: 0;
+        text-align: left;
+        
+        .timeline-content {
+          margin: 0;
+        }
+        
+        .timeline-dot {
+          left: -2rem;
+          transform: translateX(-50%);
+        }
+      }
+    }
+    
     .timeline-content {
       padding: 1.5rem;
-    }
-
-    .experience-header {
-      .experience-title-job {
-        font-size: clamp(1.3rem, 2.5vw, 1.5rem);
+      
+      &:hover {
+        transform: none;
       }
-
+    }
+    
+    .experience-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      
+      .experience-title-job {
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+      }
+      
       .experience-company {
-        font-size: clamp(1rem, 2vw, 1.2rem);
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .experience-period {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+      }
+    }
+    
+    .experience-description {
+      font-size: 1rem;
+      margin: 1rem 0;
+      line-height: 1.6;
+    }
+    
+    .tech-stack {
+      margin-top: 1rem;
+      
+      h5 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .tech-tags {
+        gap: 0.5rem;
+        
+        .tech-tag {
+          font-size: 0.9rem;
+          padding: 0.3rem 0.6rem;
+        }
+      }
+    }
+    
+    .achievements {
+      margin-top: 1rem;
+      
+      h5 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .achievements-list {
+        .achievement-item {
+          font-size: 0.95rem;
+          margin-bottom: 0.5rem;
+          padding-left: 1.25rem;
+          
+          &::before {
+            font-size: 0.9rem;
+            left: 0;
+          }
+        }
       }
     }
   }
@@ -326,99 +412,14 @@
   }
 }
 
-// Ajustes para el tema claro
-@media (prefers-color-scheme: light) {
-  .experience-section {
-    .timeline-line {
-      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8), rgba(0,0,0,0.1));
-    }
-
-    .timeline-dot {
-      background: var(--text-color);
-      border-color: var(--background-color);
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1),
-                  0 0 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .timeline-content {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.95);
-        border-color: rgba(0, 0, 0, 0.18);
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
-      }
-    }
-
-    .experience-header {
-      .experience-title-job {
-        color: var(--text-color);
-        font-weight: 800;
-        text-shadow: 
-          0 1px 3px rgba(255, 255, 255, 0.8),
-          0 0 1px rgba(0, 0, 0, 0.3);
-      }
-
-      .experience-company {
-        color: var(--text-color);
-        opacity: 0.85;
-        font-weight: 700;
-        text-shadow: 
-          0 1px 2px rgba(255, 255, 255, 0.8),
-          0 0 1px rgba(0, 0, 0, 0.2);
-      }
-
-      .experience-period {
-        background: var(--text-color);
-        color: var(--background-color);
-      }
-    }
-
-    .experience-description {
-      color: var(--text-color);
-      font-weight: 600;
-      text-shadow: 
-        0 1px 2px rgba(255, 255, 255, 0.8),
-        0 0 1px rgba(0, 0, 0, 0.2);
-    }
-
-    .technologies {
-      h5 {
-        // Styling now handled by global .subtitle-enhanced variables
-      }
-
-      .tech-tag {
-        background: rgba(0, 0, 0, 0.08);
-        color: var(--text-color);
-        border: 1px solid rgba(0, 0, 0, 0.15);
-        font-weight: 700;
-        text-shadow: 
-          0 1px 2px rgba(255, 255, 255, 0.8),
-          0 0 1px rgba(0, 0, 0, 0.2);
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.12);
-          border-color: rgba(0, 0, 0, 0.25);
-        }
-      }
-    }
-
-    .achievements {
-      h5 {
-        // Styling now handled by global .subtitle-enhanced variables
-      }
-
-      .achievements-list {
-        .achievement-item {
-          color: var(--text-color);
-          font-weight: 600;
-          text-shadow: 
-            0 1px 2px rgba(255, 255, 255, 0.8),
-            0 0 1px rgba(0, 0, 0, 0.2);
-        }
-      }
-    }
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
   }
 } 
