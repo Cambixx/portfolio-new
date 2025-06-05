@@ -136,7 +136,6 @@ const QuoteSection = () => {
     if (!section || !card || !text || !author) return;
 
     const isMobile = isMobileRef.current;
-    const initialScale = isMobile ? 1 : 0.95;
 
     gsap.set([card, text, author], {
       opacity: 0,

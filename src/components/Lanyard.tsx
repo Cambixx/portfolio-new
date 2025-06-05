@@ -37,11 +37,11 @@ const CARD_CONFIG = {
     lines: {
       primary: {
         color: '#6b46c1',
-        opacity: 0.06
+        opacity: 0.26
       },
       secondary: {
         color: '#6b46c1',
-        opacity: 0.03
+        opacity: 0.23
       },
       accent: '#6b46c1'
     }
