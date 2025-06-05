@@ -16,6 +16,7 @@ const QuoteSection = () => {
   const intervalRef = useRef<number | null>(null);
   const isAnimatingRef = useRef(false); // Ref to track animation state
   const scrollTriggerVisibilityInstanceRef = useRef<ScrollTrigger | null>(null); // Ref for the visibility ScrollTrigger
+  const isMobileRef = useRef(window.innerWidth <= 768);
 
   // Estado para el índice de la cita actual
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
@@ -26,39 +27,47 @@ const QuoteSection = () => {
     isAnimatingRef.current = isAnimating;
   }, [isAnimating]);
 
-  // Optimizado: animateToNextQuote es ahora estable
+  // Optimizada la función de animación para mejor rendimiento
   const animateToNextQuote = useCallback(() => {
     if (isAnimatingRef.current || !quoteTextRef.current || !quoteAuthorRef.current) return;
     
-    setIsAnimating(true); // Signal animation start
+    setIsAnimating(true);
     
     const elements = [quoteTextRef.current, quoteAuthorRef.current];
+    const isMobile = isMobileRef.current;
     
-    gsap.timeline({
+    const timeline = gsap.timeline({
+      defaults: {
+        duration: isMobile ? 0.3 : 0.4,
+        ease: "power2.inOut",
+        force3D: true,
+      },
       onComplete: () => {
         setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
         
-        // Reset for incoming animation
-        gsap.set(elements, { y: 20, opacity: 0, scale: 0.99 });
+        gsap.set(elements, {
+          opacity: 0,
+          transform: 'translate3d(0, 20px, 0)',
+        });
+        
         gsap.to(elements, {
-          y: 0,
           opacity: 1,
-          scale: 1,
-          duration: 0.5,
-          stagger: 0.08,
+          transform: 'translate3d(0, 0, 0)',
+          duration: isMobile ? 0.3 : 0.5,
+          stagger: isMobile ? 0.05 : 0.08,
           ease: "power2.out",
-          onComplete: () => setIsAnimating(false) // Signal animation end
+          force3D: true,
+          onComplete: () => setIsAnimating(false)
         });
       }
-    }).to(elements, {
-      y: -20,
-      opacity: 0,
-      scale: 0.99,
-      duration: 0.4,
-      stagger: 0.06,
-      ease: "power1.in"
     });
-  }, [setCurrentQuoteIndex, setIsAnimating]); // Depends on stable setters
+
+    timeline.to(elements, {
+      opacity: 0,
+      transform: 'translate3d(0, -20px, 0)',
+      stagger: isMobile ? 0.04 : 0.06,
+    });
+  }, []);
 
   // Optimizado: Lógica centralizada y estable para manejar el intervalo
   const manageInterval = useCallback(() => {
@@ -85,6 +94,11 @@ const QuoteSection = () => {
 
   // Optimizado: Efecto para configurar listeners (visibilidad y scroll) - se ejecuta una vez
   useEffect(() => {
+    const handleResize = () => {
+      isMobileRef.current = window.innerWidth <= 768;
+    };
+
+    window.addEventListener('resize', handleResize);
     document.addEventListener('visibilitychange', manageInterval);
 
     if (sectionRef.current) {
@@ -92,15 +106,14 @@ const QuoteSection = () => {
         trigger: sectionRef.current,
         start: "top bottom",
         end: "bottom top",
-        onToggle: (_self) => { // Cambiado de self a _self
-          manageInterval();
-        }
+        onToggle: () => manageInterval()
       });
     }
     
     manageInterval(); // Comprobación inicial
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       document.removeEventListener('visibilitychange', manageInterval);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -122,64 +135,72 @@ const QuoteSection = () => {
 
     if (!section || !card || !text || !author) return;
 
-    const isMobile = window.innerWidth <= 768;
-    const scaleFactor = isMobile ? { from: 1, to: 1 } : { from: 0.95, to: 1 };
+    const isMobile = isMobileRef.current;
+    const initialScale = isMobile ? 1 : 0.95;
 
-    gsap.set([card, text, author], { y: 40, opacity: 0 });
+    gsap.set([card, text, author], {
+      opacity: 0,
+      transform: 'translate3d(0, 40px, 0)',
+    });
     
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: section,
         start: "top bottom-=100",
         end: "bottom top",
-        scrub: false,
         once: true,
         onEnter: () => {
           gsap.to(card, {
-            y: 0,
             opacity: 1,
-            scale: scaleFactor.to,
-            duration: 0.6,
-            ease: "power2.out"
+            transform: 'translate3d(0, 0, 0) scale(1)',
+            duration: isMobile ? 0.4 : 0.6,
+            ease: "power2.out",
+            force3D: true,
           });
           
           gsap.to([text, author], {
-            y: 0,
             opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            delay: 0.2,
-            ease: "power2.out"
+            transform: 'translate3d(0, 0, 0)',
+            duration: isMobile ? 0.3 : 0.5,
+            stagger: isMobile ? 0.05 : 0.1,
+            delay: isMobile ? 0.1 : 0.2,
+            ease: "power2.out",
+            force3D: true,
           });
         }
       });
 
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: "bottom+=20% top",
-        pin: true,
-        pinSpacing: true,
-        onUpdate: (self) => {
-          if (!card) return;
+      // Optimizado el ScrollTrigger de pin para móviles
+      if (!isMobile) {
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: "bottom+=20% top",
+          pin: true,
+          pinSpacing: true,
+          onUpdate: (self) => {
+            if (!card) return;
 
-          const currentIsMobile = window.innerWidth <= 768; // Recalculate in case of resize during scroll
-          const currentScaleFactorTo = currentIsMobile ? 1 : scaleFactor.to;
+            let progress = self.progress;
+            let y = 0;
+            let opacity = 1;
+            let scale = 1;
 
-          let y = 0;
-          let opacity = 1;
-          let scale = currentScaleFactorTo;
-
-          if (self.progress > 0.3) {
-            const fadeOutProgress = Math.min(1, Math.max(0, (self.progress - 0.3) / 0.7));
-            y = fadeOutProgress * (currentIsMobile ? 20 : 40);
-            opacity = 1 - fadeOutProgress;
-            scale = currentIsMobile ? 1 : currentScaleFactorTo - (fadeOutProgress * 0.05);
+            if (progress > 0.3) {
+              const fadeOutProgress = Math.min(1, (progress - 0.3) / 0.7);
+              y = fadeOutProgress * 40;
+              opacity = 1 - fadeOutProgress;
+              scale = 1 - (fadeOutProgress * 0.05);
+            }
+            
+            gsap.set(card, {
+              transform: `translate3d(0, ${y}px, 0) scale(${scale})`,
+              opacity,
+              force3D: true,
+            });
           }
-          
-          gsap.set(card, { y, opacity, scale });
-        }
-      });
+        });
+      }
     }, section);
 
     return () => ctx.revert();

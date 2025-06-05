@@ -15,9 +15,12 @@
     transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
     filter: blur(30px);
     z-index: -1;
+    
+    @media (max-width: 768px) {
+      filter: blur(15px);
+    }
   }
   
   &::after {
@@ -28,7 +31,6 @@
     transform: translate(-50%, -50%) rotate(15deg);
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(121,40,202,0.08) 0%, rgba(121,40,202,0) 70%);
     z-index: -1;
   }
   
@@ -38,15 +40,20 @@
     margin: 0 auto;
     padding: 3rem;
     background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 1rem;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
     
     @media (max-width: 768px) {
       padding: 2rem 1.5rem;
       margin: 0 1rem;
       border-radius: 0.75rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     }
     
     &::before {
@@ -73,6 +80,8 @@
       font-weight: 500;
       text-shadow: var(--text-shadow-medium);
       position: relative;
+      will-change: transform, opacity;
+      transform: translateZ(0);
       
       @media (max-width: 768px) {
         font-size: 1.1rem;
@@ -123,6 +132,8 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
+      will-change: transform, opacity;
+      transform: translateZ(0);
       
       @media (max-width: 768px) {
         font-size: 0.95rem;
