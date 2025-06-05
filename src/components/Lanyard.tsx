@@ -30,7 +30,7 @@ const CARD_CONFIG = {
   height: 1.2,
   depth: 0.02,
   colors: {
-    primary: '#6b46c1',
+    primary: '#414142',
     secondary: '#ffffff',
     metal: '#888888',
     metalDark: '#666666',
