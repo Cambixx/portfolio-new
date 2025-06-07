@@ -18,142 +18,89 @@ interface ExperienceItem {
 
 const ExperienceSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
-  const timelineRef = useRef<HTMLDivElement>(null)
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     const section = sectionRef.current
-    const timeline = timelineRef.current
-    const items = itemsRef.current
+    if (!section) return
 
-    if (!section || !timeline || !items.length) return
-
-    // Crear un contexto GSAP para mejor limpieza
     const ctx = gsap.context(() => {
-      // Batch de animaciones para mejor rendimiento
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power2.out",
-          duration: 0.8
-        },
+      // Animación del título y la línea principal
+      const mainTl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse'
-        }
-      });
-
-      // Animación del título
-      tl.fromTo(
-        '.experience-title',
-        {
-          opacity: 0,
-          y: 30
+          start: 'top 70%',
+          toggleActions: 'play none none reverse',
         },
-        {
-          opacity: 1,
-          y: 0
-        }
-      );
-
-      // Animación de la línea principal del timeline
-      tl.fromTo(
-        '.timeline-line',
-        {
-          scaleY: 0,
-          transformOrigin: 'top'
+        defaults: {
+          ease: 'power3.out',
         },
-        {
-          scaleY: 1,
-          duration: 1
-        },
-        "-=0.4"
-      );
+      })
 
-      // Batch de animaciones para los items
-      items.forEach((item, index) => {
+      mainTl
+        .fromTo(
+          '.experience-title',
+          { opacity: 0, y: 50 },
+          { opacity: 1, y: 0, duration: 0.8 }
+        )
+        .fromTo(
+          '.timeline-line',
+          { scaleY: 0 },
+          { duration: 1.2, scaleY: 1, ease: 'power2.inOut' },
+          '-=0.6'
+        )
+
+      // Animación para cada item del timeline
+      itemsRef.current.forEach((item, index) => {
         if (!item) return
-
+        
         const isLeft = index % 2 === 0
-        const xOffset = isLeft ? -50 : 50
+        const xPercent = isLeft ? -20 : 20
 
         const itemTl = gsap.timeline({
           scrollTrigger: {
             trigger: item,
             start: 'top 85%',
-            toggleActions: 'play none none reverse'
-          }
-        });
+            toggleActions: 'play none none reverse',
+          },
+          defaults: {
+            ease: 'power3.out',
+            duration: 0.8,
+          },
+        })
 
-        // Animación del contenido principal
+        // Animación del contenedor principal
         itemTl.fromTo(
           item,
-          {
-            opacity: 0,
-            x: xOffset,
-            y: 20
-          },
-          {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            duration: 0.6,
-            clearProps: "transform" // Liberar recursos después de la animación
-          }
-        );
+          { opacity: 0, xPercent, y: 30, scale: 0.98 },
+          { opacity: 1, xPercent: 0, y: 0, scale: 1, clearProps: 'all' }
+        )
 
-        // Animación del punto con will-change optimizado
+        // Animación del punto
         const dot = item.querySelector('.timeline-dot')
         if (dot) {
-          gsap.set(dot, { willChange: "transform" });
           itemTl.fromTo(
             dot,
-            {
-              scale: 0,
-              opacity: 0
-            },
-            {
-              scale: 1,
-              opacity: 1,
-              duration: 0.4,
-              ease: "back.out(1.7)",
-              onComplete: () => {
-                gsap.set(dot, { willChange: "auto" });
-              }
-            },
-            "-=0.3"
-          );
+            { scale: 0, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)' },
+            '-=0.5'
+          )
         }
 
-        // Batch de animaciones para tecnologías y logros
-        const elements = [
-          ...item.querySelectorAll('.tech-tag'),
-          ...item.querySelectorAll('.achievement-item')
-        ];
+        // Animación del contenido interno (stagger)
+        const contentElements = item.querySelectorAll(
+          '.experience-header, .experience-description, .technologies, .achievements'
+        )
+        itemTl.fromTo(
+          contentElements,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, stagger: 0.15, duration: 0.6 },
+          '-=0.5'
+        )
+      })
+    }, section)
 
-        if (elements.length) {
-          itemTl.fromTo(
-            elements,
-            {
-              opacity: 0,
-              y: 10
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.3,
-              stagger: 0.05,
-              clearProps: "transform"
-            },
-            "-=0.2"
-          );
-        }
-      });
-    }, section);
-
-    return () => {
-      ctx.revert(); // Limpieza más eficiente
-    }
+    return () => ctx.revert()
   }, [])
 
   const experiences = experienceData as ExperienceItem[]
@@ -163,10 +110,10 @@ const ExperienceSection = () => {
       <div className="container">
         <h2 className="experience-title">Mi Experiencia</h2>
         
-        <div ref={timelineRef} className="timeline-container">
+        <div className="timeline-container">
           <div className="timeline-line"></div>
           
-          {experiences.map((experience, index: number) => (
+          {experiences.map((experience, index) => (
             <div
               key={experience.id}
               ref={el => {
@@ -183,9 +130,7 @@ const ExperienceSection = () => {
                   <span className="experience-period">{experience.period}</span>
                 </div>
                 
-                <p className="experience-description">
-                  {experience.description}
-                </p>
+                <p className="experience-description">{experience.description}</p>
                 
                 <div className="technologies">
                   <h5>Tecnologías:</h5>

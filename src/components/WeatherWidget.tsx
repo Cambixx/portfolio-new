@@ -295,15 +295,53 @@ const WEATHER_ANIMATIONS: { [key: string]: string } = {
   // Nublado
   Clouds: 'https://assets5.lottiefiles.com/packages/lf20_trr3kzyu.json',
   // Lluvia
-  Rain: 'https://assets5.lottiefiles.com/packages/lf20_bvs3lk61.json',
+  Rain: 'https://lottie.host/82b9ce35-a43b-4228-a532-1e96f1311091/rZ1yoYq3c8.json',
+  // Lluvia ligera / Llovizna
+  Drizzle: 'https://lottie.host/b04c864a-2559-4682-8b3c-633f671ef376/D5wzY1hAow.json',
   // Tormenta
   Thunderstorm: 'https://assets5.lottiefiles.com/private_files/lf30_kj1v7ucc.json',
   // Nieve
   Snow: 'https://assets5.lottiefiles.com/packages/lf20_2gjz7rtf.json',
-  // Niebla/Bruma
+  // Niebla/Bruma/Humo/Calima
   Mist: 'https://assets5.lottiefiles.com/packages/lf20_keiuqeqt.json',
+  Fog: 'https://assets5.lottiefiles.com/packages/lf20_keiuqeqt.json',
+  Haze: 'https://assets5.lottiefiles.com/packages/lf20_keiuqeqt.json',
+  Smoke: 'https://assets5.lottiefiles.com/packages/lf20_keiuqeqt.json',
+  // Polvo/Arena/Ceniza
+  Dust: 'https://assets9.lottiefiles.com/packages/lf20_8kOO9u.json',
+  Sand: 'https://assets9.lottiefiles.com/packages/lf20_8kOO9u.json',
+  Ash: 'https://assets9.lottiefiles.com/packages/lf20_8kOO9u.json',
+  // Viento/Tornado
+  Squall: 'https://assets8.lottiefiles.com/packages/lf20_s9t73t.json',
+  Tornado: 'https://assets8.lottiefiles.com/packages/lf20_s9t73t.json',
   // Valor por defecto
   default: 'https://assets5.lottiefiles.com/packages/lf20_trr3kzyu.json'
+};
+
+// Mapea el ID del clima de la API a una clave de animación para más fiabilidad
+const getAnimationKey = (weatherId: number): keyof typeof WEATHER_ANIMATIONS => {
+  if (weatherId >= 200 && weatherId <= 232) return 'Thunderstorm';
+  if (weatherId >= 300 && weatherId <= 321) return 'Drizzle';
+  if (weatherId >= 500 && weatherId <= 531) return 'Rain';
+  if (weatherId >= 600 && weatherId <= 622) return 'Snow';
+  if (weatherId >= 700 && weatherId < 800) {
+    switch (weatherId) {
+      case 701: return 'Mist';
+      case 711: return 'Smoke';
+      case 721: return 'Haze';
+      case 731: return 'Dust';
+      case 741: return 'Fog';
+      case 751: return 'Sand';
+      case 761: return 'Dust';
+      case 762: return 'Ash';
+      case 771: return 'Squall';
+      case 781: return 'Tornado';
+      default: return 'Mist';
+    }
+  }
+  if (weatherId === 800) return 'Clear';
+  if (weatherId >= 801 && weatherId <= 804) return 'Clouds';
+  return 'default';
 };
 
 const WeatherWidget = () => {
@@ -341,9 +379,10 @@ const WeatherWidget = () => {
     }
   };
 
-  const loadAnimation = async (weatherMain: string) => {
+  const loadAnimation = async (weatherId: number) => {
     try {
-      const animationUrl = WEATHER_ANIMATIONS[weatherMain] || WEATHER_ANIMATIONS.default;
+      const animationKey = getAnimationKey(weatherId);
+      const animationUrl = WEATHER_ANIMATIONS[animationKey] || WEATHER_ANIMATIONS.default;
       const response = await fetch(animationUrl);
       return await response.json();
     } catch (error) {
@@ -370,7 +409,7 @@ const WeatherWidget = () => {
         const { weather, forecast } = await fetchWeatherData(latitude, longitude, apiKey);
 
         // Cargar la animación del clima actual
-        const currentAnimation = await loadAnimation(weather.weather[0].main);
+        const currentAnimation = await loadAnimation(weather.weather[0].id);
         setAnimationData(currentAnimation);
 
         setWeather({
@@ -387,21 +426,29 @@ const WeatherWidget = () => {
         });
 
         // Procesar y cargar animaciones para el pronóstico
+        const dailyForecasts = new Map<string, any>();
+        const today = format(new Date(), 'yyyy-MM-dd');
+
+        for (const item of forecast.list) {
+          const forecastDateStr = format(fromUnixTime(item.dt), 'yyyy-MM-dd');
+          
+          // No incluir el pronóstico de hoy y solo añadir un pronóstico por día
+          if (forecastDateStr > today && !dailyForecasts.has(forecastDateStr)) {
+            dailyForecasts.set(forecastDateStr, item);
+          }
+        }
+
         const processedForecasts = await Promise.all(
-          forecast.list
-            .filter((item: any) => {
-              const itemDate = new Date(item.dt * 1000);
-              return itemDate.getHours() === 12 || itemDate.getHours() === 13;
-            })
-            .slice(0, 5)
+          Array.from(dailyForecasts.values())
+            .slice(0, 3)
             .map(async (item: any) => {
-              const animation = await loadAnimation(item.weather[0].main);
+              const animation = await loadAnimation(item.weather[0].id);
               return {
                 date: item.dt,
                 temp: Math.round(item.main.temp),
                 description: item.weather[0].description,
                 main: item.weather[0].main,
-                animationData: animation
+                animationData: animation,
               };
             })
         );
