@@ -113,11 +113,56 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] a
         <Physics gravity={gravity} timeStep={1 / 60}>
           <Band />
         </Physics>
-        <Environment blur={0.75}>
-          <Lightformer intensity={2} color="white" position={[0, -1, 5]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
-          <Lightformer intensity={3} color="white" position={[-1, -1, 1]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
-          <Lightformer intensity={3} color="white" position={[1, 1, 1]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
-          <Lightformer intensity={10} color="white" position={[-10, 0, 14]} rotation={[0, Math.PI / 2, Math.PI / 3]} scale={[100, 10, 1]} />
+        <Environment blur={0.5}>
+          {/* Luces laterales */}
+          <Lightformer 
+            intensity={2.5} 
+            color="#6b46c1" 
+            position={[-1.2, 0, 1]} 
+            rotation={[0, Math.PI / 3, -Math.PI]} 
+            scale={[2, 2, 1]} 
+          />
+          <Lightformer 
+            intensity={2.5} 
+            color="#4299e1" 
+            position={[1.2, 0, 1]} 
+            rotation={[0, -Math.PI / 3, -Math.PI / 2]} 
+            scale={[2, 2, 1]} 
+          />
+          
+          {/* Luz superior */}
+          <Lightformer 
+            intensity={3.5} 
+            color="#e2e8f0" 
+            position={[0, 1.2, 0.8]} 
+            rotation={[-Math.PI / 4, 0, -Math.PI / 2]} 
+            scale={[2.5, 2.5, 1]} 
+          />
+          
+          {/* Luz inferior para relleno */}
+          <Lightformer 
+            intensity={2} 
+            color="#805ad5" 
+            position={[0, -1.2, 1]} 
+            rotation={[Math.PI / 4, 0, 0]} 
+            scale={[2.5, 2.5, 1]} 
+          />
+          
+          {/* Luces de ambiente para los bordes */}
+          <Lightformer 
+            intensity={1.5} 
+            color="#4299e1" 
+            position={[-0.8, 0, -1]} 
+            rotation={[0, -Math.PI / 3, 0]} 
+            scale={[1.5, 1.5, 1]} 
+          />
+          <Lightformer 
+            intensity={1.5} 
+            color="#6b46c1" 
+            position={[0.8, 0, -1]} 
+            rotation={[0, Math.PI / 3, -Math.PI]} 
+            scale={[1.5, 1.5, 1]} 
+          />
         </Environment>
       </Canvas>
     </div>
@@ -361,11 +406,12 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               <meshPhysicalMaterial 
                 color={CARD_CONFIG.colors.primary}
                 clearcoat={1} 
-                clearcoatRoughness={0.1} 
-                roughness={0.3} 
+                clearcoatRoughness={0.05} 
+                roughness={0.2} 
                 metalness={0.9}
                 reflectivity={1}
-                envMapIntensity={2}
+                envMapIntensity={3}
+                ior={1.5}
               />
             </RoundedBox>
             
