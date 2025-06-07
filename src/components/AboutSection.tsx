@@ -106,16 +106,16 @@ const AboutSection = () => {
   // Bloques de texto para la sección "Sobre mí"
   const textBlocks = [
     {
-      title: "Diseño Centrado en Usuario",
-      description: "Creo experiencias digitales intuitivas y atractivas, priorizando siempre las necesidades del usuario final."
+      title: "Ingeniería Aplicada al Código",
+      description: "Mi formación como Ingeniero Industrial me aporta una visión estratégica y una capacidad analítica que integro en cada proyecto para construir soluciones web robustas y eficientes."
     },
     {
-      title: "Código Limpio y Optimizado",
-      description: "Desarrollo utilizando las últimas tecnologías y mejores prácticas, garantizando sitios rápidos, accesibles y fáciles de mantener."
+      title: "Tecnología con Propósito",
+      description: "Convierto ideas en aplicaciones web optimizadas y escalables. Mi enfoque se centra en escribir código limpio que garantiza un rendimiento excepcional y una gran experiencia de usuario."
     },
     {
-      title: "Enfoque Creativo y Analítico",
-      description: "Combino creatividad en el diseño con análisis detallado para ofrecer soluciones técnicas eficientes que destacan en el mercado digital."
+      title: "Colaboración e Innovación Continua",
+      description: "Soy un profesional proactivo, motivado por los proyectos innovadores y el trabajo en equipo. Busco constantemente aprender y aplicar nuevas tecnologías para aportar valor y superar expectativas."
     }
   ];
 
