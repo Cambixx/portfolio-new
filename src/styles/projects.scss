@@ -69,7 +69,7 @@
       background-position: center;
       position: relative;
       transform-origin: center;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      /* transition eliminada para evitar conflicto con Framer Motion y GSAP */
       cursor: pointer;
       background-image: none !important;
       
