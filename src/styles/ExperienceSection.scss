@@ -14,8 +14,26 @@
     z-index: 1;
   }
 
+  .title-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-left: 2rem;
+  }
+
+  .title-inner {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
   .experience-title {
     @include section-title-enhanced;
+    margin-left: 0;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0;
     
     & {
       text-align: center;
@@ -24,6 +42,17 @@
     @media (max-width: 768px) {
       margin-bottom: var(--section-title-margin-bottom-mobile);
     }
+  }
+
+  .vertical-line {
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 1px;
+    height: 1.2em;
+    transform: none;
+    background: linear-gradient(to bottom, rgba(255,154,158,0.1), rgba(255,154,158,0.8), rgba(255,154,158,0.1));
+    z-index: 0;
   }
 
   .timeline-container {

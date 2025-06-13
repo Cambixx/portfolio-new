@@ -108,7 +108,10 @@ const ExperienceSection = () => {
   return (
     <section ref={sectionRef} className="experience-section" id="experiencia">
       <div className="container">
-        <h2 className="experience-title">Mi Experiencia</h2>
+        <div className="title-container">
+          <h2 className="experience-title">Mi Experiencia</h2>
+          <div className="vertical-line"></div>
+        </div>
         
         <div className="timeline-container">
           <div className="timeline-line"></div>

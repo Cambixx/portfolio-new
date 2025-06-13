@@ -26,6 +26,8 @@
     
     .title {
       @include section-title-enhanced;
+      margin-left: 0;
+      position: relative;
       
       & {
         margin: 0;
