@@ -131,7 +131,6 @@
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
-    transition: background 0.4s ease-in-out, border-color 0.4s ease-in-out, transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
     will-change: transform, box-shadow;
 
     &:hover {
@@ -139,10 +138,14 @@
       border-color: rgba(255, 255, 255, 0.35);
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 12px 45px rgba(0, 0, 0, 0.28);
+      transition: background 0.4s ease-in-out, border-color 0.4s ease-in-out, transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
     }
 
     @media (max-width: 768px) {
       padding: 1.5rem;
+      &:hover {
+        transform: none;
+      }
     }
   }
 

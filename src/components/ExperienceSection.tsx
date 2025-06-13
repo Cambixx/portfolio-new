@@ -72,8 +72,8 @@ const ExperienceSection = () => {
         // Animación del contenedor principal
         itemTl.fromTo(
           item,
-          { opacity: 0, xPercent, y: 30, scale: 0.98 },
-          { opacity: 1, xPercent: 0, y: 0, scale: 1, clearProps: 'all' }
+          { xPercent, y: 30, scale: 0.98 },
+          { xPercent: 0, y: 0, scale: 1, clearProps: 'all', ease: 'power2.out', force3D: true }
         )
 
         // Animación del punto
@@ -94,7 +94,7 @@ const ExperienceSection = () => {
         itemTl.fromTo(
           contentElements,
           { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, stagger: 0.15, duration: 0.6 },
+          { opacity: 1, y: 0, stagger: 0.15, duration: 0.6, ease: 'power2.out', force3D: true, clearProps: 'all' },
           '-=0.5'
         )
       })

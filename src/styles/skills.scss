@@ -132,7 +132,6 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 0 20px rgba(255, 154, 158, 0.6);
-  transition: all 0.3s ease;
   min-height: 180px;
   
   @media (max-width: 768px) {
@@ -151,11 +150,6 @@
     font-size: 1.5rem;
     font-weight: 300;
     color: rgba(255, 255, 255, 0.7);
-    transition: all 0.3s ease;
-    
-    @media (max-width: 768px) {
-      font-size: 1.2rem;
-    }
   }
   
   .active-indicator {
@@ -206,13 +200,11 @@
   backdrop-filter: blur(15px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   transform: translate3d(0, 101%, 0);
-  transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
   
   @media (max-width: 768px) {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    transition: transform 0.5s ease;
   }
   
   &::before {
