@@ -12,6 +12,9 @@ import carlosImage from '../assets/lanyard/carlos.PNG';
 
 import './Lanyard.css';
 
+// Agrego estado para mostrar el aviso de permiso en iOS
+const isIOS = () => typeof window !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 declare module '@react-three/fiber' {
@@ -98,8 +101,28 @@ const segmentProps = {
 };
 
 export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] as [number, number, number], fov = 20, transparent = true }) {
+  // Estado para mostrar el aviso de permiso
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
   return (
     <div className="lanyard-wrapper">
+      {/* Aviso de permiso para iOS */}
+      {showPermissionPrompt && (
+        <div className="lanyard-permission-modal">
+          <div className="lanyard-permission-content">
+            <p>Para activar el movimiento del lanyard, permite el acceso al sensor de movimiento.</p>
+            <button onClick={() => {
+              // Dispara la petición de permiso manualmente
+              if (typeof (window as any).DeviceOrientationEvent?.requestPermission === 'function') {
+                (window as any).DeviceOrientationEvent.requestPermission().then((permission: string) => {
+                  if (permission === 'granted') {
+                    setShowPermissionPrompt(false);
+                  }
+                });
+              }
+            }}>Activar movimiento</button>
+          </div>
+        </div>
+      )}
       <Canvas
         camera={{ position: position as [number, number, number], fov: fov }}
         gl={{ alpha: transparent }}
@@ -111,7 +134,7 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] a
       >
         <ambientLight intensity={Math.PI} />
         <Physics gravity={gravity} timeStep={1 / 60}>
-          <Band />
+          <Band setShowPermissionPrompt={setShowPermissionPrompt} />
         </Physics>
         <Environment blur={0.5}>
           {/* Luces laterales */}
@@ -169,7 +192,7 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0] a
   );
 }
 
-function Band({ maxSpeed = 50, minSpeed = 0 }) {
+function Band({ maxSpeed = 50, minSpeed = 0, setShowPermissionPrompt }: any) {
   const band = useRef<THREE.Mesh>(null);
   const fixed = useRef<ExtendedRigidBody>(null);
   const j1 = useRef<ExtendedRigidBody>(null);
@@ -216,15 +239,19 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
           const permission = await (DeviceOrientationEvent as any).requestPermission();
           if (permission === 'granted') {
             setPermissionGranted(true);
+            setShowPermissionPrompt && setShowPermissionPrompt(false);
           } else {
+            setShowPermissionPrompt && setShowPermissionPrompt(true);
             console.log('Permiso de orientación denegado');
           }
         } catch (error) {
+          setShowPermissionPrompt && setShowPermissionPrompt(true);
           console.error('Error solicitando permisos:', error);
         }
       } else {
         // Android y otros
         setPermissionGranted(true);
+        setShowPermissionPrompt && setShowPermissionPrompt(false);
       }
     };
 
@@ -235,6 +262,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
       document.removeEventListener('touchstart', handleInteraction);
     };
 
+    if (isIOS() && !permissionGranted) {
+      setShowPermissionPrompt && setShowPermissionPrompt(true);
+    }
+
     document.addEventListener('click', handleInteraction);
     document.addEventListener('touchstart', handleInteraction);
 
@@ -242,7 +273,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
       document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
     };
-  }, [isMobile]);
+  }, [isMobile, permissionGranted, setShowPermissionPrompt]);
 
   // Manejar eventos de orientación para móvil
   useEffect(() => {
