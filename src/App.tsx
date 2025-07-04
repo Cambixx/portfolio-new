@@ -8,7 +8,6 @@ import SkillsSection from './components/SkillsSection'
 import ProjectsSection from './components/ProjectsSection'
 import ContactSection from './components/ContactSection'
 import CustomCursor from './components/CustomCursor'
-import WeatherWidget from './components/WeatherWidget'
 import './styles/global.scss'
 
 function App() {
@@ -19,7 +18,6 @@ function App() {
   return (
     <>
       <CustomCursor />
-      <WeatherWidget />
       <SmoothScroll>
         <main className="app">
           {/* Hero Section */}

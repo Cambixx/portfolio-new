@@ -59,7 +59,7 @@
     {
       "id": 8,
       "title": "Misstake",
-      "description": "Plataforma de co-creación que utiliza la creatividad y el conocimiento transversal para diseñar escenarios futuros, acompañando a empresas en la transformación y el crecimiento sostenible para aportar valor económico y social.",
+      "description": "Plataforma de co-creación que utiliza la creatividad y el conocimiento transversal para diseñar escenarios futuros y el crecimiento sostenible para aportar valor económico y social.",
       "image": "/imgs/projects/misstake.jpg",
       "technologies": ["WordPress", "PHP", "HTML", "CSS", "JavaScript", "Twig"],
       "link": "https://misstake.es/"
