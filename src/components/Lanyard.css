@@ -14,44 +14,4 @@
   .lanyard-wrapper {
     height: 100dvh;
   }
-}
-
-.lanyard-permission-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.65);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lanyard-permission-content {
-  background: #222;
-  color: #fff;
-  padding: 2rem 1.5rem;
-  border-radius: 18px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.25);
-  text-align: center;
-  max-width: 90vw;
-}
-
-.lanyard-permission-content button {
-  margin-top: 1.2rem;
-  background: #6b46c1;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.7rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.lanyard-permission-content button:hover {
-  background: #805ad5;
 } 
