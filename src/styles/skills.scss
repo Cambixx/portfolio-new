@@ -35,13 +35,10 @@
   }
   
   .title {
-    @include section-title-enhanced;
     margin-left: 0;
     position: relative;
-    
-    & {
-      margin: 0;
-    }
+    margin: 0;
+    @include section-title-enhanced;
     
     @media (max-width: 768px) {
       margin: 0;
@@ -471,15 +468,12 @@
         }
         
         .mobile-category-title {
+          font-size: clamp(1.5rem, 4vw, 2rem);
+          font-weight: 600;
+          text-transform: uppercase;
+          margin: 0 0 1.5rem 0;
+          text-align: center;
           @include subtitle-enhanced;
-          
-          & {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin: 0 0 1.5rem 0;
-            text-align: center;
-          }
         }
         
         .mobile-marquee-track {
@@ -625,15 +619,12 @@
   
   .mobile-category {
     .mobile-category-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin: 0 0 1.5rem 0;
+      text-align: center;
       @include subtitle-enhanced;
-      
-      & {
-        font-size: clamp(1.5rem, 4vw, 2rem);
-        font-weight: 600;
-        text-transform: uppercase;
-        margin: 0 0 1.5rem 0;
-        text-align: center;
-      }
     }
     
     .mobile-marquee-container {

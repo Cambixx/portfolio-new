@@ -237,12 +237,21 @@ button, .button {
 }
 
 @mixin section-title-enhanced {
-  // Heredar todas las propiedades base
-  @include section-title-base;
+  // Todas las declaraciones principales primero
+  font-size: var(--section-title-size-desktop);
+  font-weight: var(--section-title-weight);
+  text-transform: var(--section-title-transform);
+  line-height: var(--section-title-line-height);
+  margin: 0 0 var(--section-title-margin-bottom) 0;
+  color: var(--section-title-color);
+  text-shadow: var(--section-title-shadow);
+  position: relative;
+  display: inline-block;
   
-  // En estilo minimalista, no agregamos efectos adicionales
-  & {
-    // Mantener las propiedades base sin modificaciones
+  // Media queries al final
+  @media (max-width: 768px) {
+    font-size: var(--section-title-size-mobile);
+    margin-bottom: var(--section-title-margin-bottom-mobile);
   }
 }
 

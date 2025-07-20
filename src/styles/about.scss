@@ -70,13 +70,10 @@
     }
     
     .title {
-      @include section-title-enhanced;
       margin-left: 0;
       position: relative;
-      
-      & {
-        margin: 0;
-      }
+      margin: 0;
+      @include section-title-enhanced;
       
       @media (max-width: 768px) {
         margin: 0;
