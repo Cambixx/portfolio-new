@@ -8,7 +8,7 @@ import { ModelLoader } from './ModelLoader';
 import { AudioButton } from './AudioButton';
 import Ballpit from './Ballpit';
 import Lanyard from './Lanyard';
-import { useActiveSection } from '../hooks/useActiveSection';
+// import { useActiveSection } from '../hooks/useActiveSection';
 import '../styles/hero.scss';
 
 // Registramos ScrollTrigger para poder usarlo
@@ -54,12 +54,12 @@ const Hero = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   
   // Hook para detectar la sección activa
-  const { activeSection } = useActiveSection();
+  // const { activeSection } = useActiveSection();
 
   const heroRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
-  const firstNameRef = useRef<SVGTextElement>(null);
-  const lastNameRef = useRef<SVGTextElement>(null);
+  // const firstNameRef = useRef<SVGTextElement>(null);
+  // const lastNameRef = useRef<SVGTextElement>(null);
   const nameContainerRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
