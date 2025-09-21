@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import {
   Clock as ThreeClock,
   PerspectiveCamera,
@@ -118,14 +118,14 @@ const isMobile = () => window.innerWidth <= 768;
 const getDevicePerformance = () => {
   // Detectar GPU de bajo rendimiento
   const canvas = document.createElement('canvas');
-  const gl = canvas.getContext('webgl') as WebGLRenderingContext | null || 
-             canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
-  
+  const gl = canvas.getContext('webgl') as WebGLRenderingContext | null ||
+    canvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
+
   if (!gl) return 'low';
-  
+
   const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
   const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : '';
-  
+
   // Detectar GPUs integradas o de bajo rendimiento
   const lowPerformanceGPUs = [
     'Intel HD', 'Intel UHD', 'Intel Iris',
@@ -133,24 +133,24 @@ const getDevicePerformance = () => {
     'PowerVR', 'Tegra', 'Intel(R)',
     'AMD Radeon(TM)', 'AMD Radeon HD'
   ];
-  
-  const isLowPerformanceGPU = lowPerformanceGPUs.some(gpu => 
+
+  const isLowPerformanceGPU = lowPerformanceGPUs.some(gpu =>
     renderer.toLowerCase().includes(gpu.toLowerCase())
   );
-  
+
   // Factores adicionales
   const cores = navigator.hardwareConcurrency || 4;
   const memory = (navigator as any).deviceMemory || 4;
   const isMobileDevice = isMobile();
   const fps = getFPSMeasurement();
-  
+
   // Lógica de clasificación más estricta
   if (isLowPerformanceGPU || memory < 4 || cores < 4 || isMobileDevice || fps < 30) {
     return 'low';
   } else if (memory < 8 || cores < 8 || fps < 50) {
     return 'medium';
   }
-  
+
   return 'high';
 };
 
@@ -164,9 +164,9 @@ const getFPSMeasurement = () => {
 const getOptimizedConfig = (baseConfig: any) => {
   const performance = getDevicePerformance();
   const mobile = isMobile();
-  
+
   let optimizedConfig = { ...baseConfig };
-  
+
   switch (performance) {
     case 'low':
       optimizedConfig.count = mobile ? Math.floor(BALLS_CONFIG.MOBILE_COUNT * 0.5) : BALLS_CONFIG.LOW_PERFORMANCE_COUNT;
@@ -194,12 +194,12 @@ const getOptimizedConfig = (baseConfig: any) => {
       optimizedConfig.enableBloom = true;
       break;
   }
-  
+
   if (mobile) {
     optimizedConfig.minSize *= SIZE_CONFIG.MOBILE_SCALE;
     optimizedConfig.maxSize *= SIZE_CONFIG.MOBILE_SCALE;
   }
-  
+
   return optimizedConfig;
 };
 
@@ -373,7 +373,7 @@ class BallPhysics {
 
   update(e: { delta: number }) {
     const { config, center, positionData, sizeData, velocityData } = this;
-    
+
     let r = 0;
     if (config.controlSphere0) {
       r = 1;
@@ -520,24 +520,24 @@ class BallpitMesh extends InstancedMesh {
     const pmrem = new PMREMGenerator(renderer);
     pmrem.compileEquirectangularShader();
     const envMap = pmrem.fromScene(env).texture;
-    
+
     // Usar configuración de geometría optimizada
     const geometryConfig = mergedConfig.geometryQuality || GEOMETRY_CONFIG.HIGH_QUALITY;
     const geometry = new SphereGeometry(1, geometryConfig.widthSegments, geometryConfig.heightSegments);
-    
-    const material = new BallMaterial({ 
+
+    const material = new BallMaterial({
       envMap,
       ...mergedConfig.materialParams,
       flatShading: false,
       dithering: true,
     });
-    
+
     super(geometry, material, mergedConfig.count);
     this.config = mergedConfig;
     this.physics = new BallPhysics(mergedConfig);
     this.setupLights();
     this.setColors(mergedConfig.colors);
-    
+
     this.frustumCulled = true;
     this.matrixAutoUpdate = true;
   }
@@ -547,12 +547,12 @@ class BallpitMesh extends InstancedMesh {
       LIGHT_CONFIG.AMBIENT.INTENSITY
     );
     this.add(this.ambientLight);
-    
+
     this.light = new PointLight(this.config.colors[0], LIGHT_CONFIG.POINT_LIGHT.INTENSITY);
     this.light.distance = LIGHT_CONFIG.POINT_LIGHT.DISTANCE;
     this.light.decay = LIGHT_CONFIG.POINT_LIGHT.DECAY;
     this.add(this.light);
-    
+
     this.cursorLight = new PointLight(
       LIGHT_CONFIG.CURSOR_LIGHT.COLOR,
       LIGHT_CONFIG.CURSOR_LIGHT.INTENSITY
@@ -582,18 +582,18 @@ class BallpitMesh extends InstancedMesh {
             if (idx >= arrColors.length - 1) return start.clone();
             const alpha = scaled - idx;
             const end = arrColors[idx + 1];
-            
+
             // Añadimos una pequeña variación aleatoria al color
             const variation = 0.1; // 10% de variación
             out.r = start.r + alpha * (end.r - start.r) + (Math.random() - 0.5) * variation;
             out.g = start.g + alpha * (end.g - start.g) + (Math.random() - 0.5) * variation;
             out.b = start.b + alpha * (end.b - start.b) + (Math.random() - 0.5) * variation;
-            
+
             // Aseguramos que los valores estén en el rango correcto
             out.r = Math.max(0, Math.min(1, out.r));
             out.g = Math.max(0, Math.min(1, out.g));
             out.b = Math.max(0, Math.min(1, out.b));
-            
+
             return out;
           },
         };
@@ -643,9 +643,9 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
     renderer: WebGLRenderer;
     size = { width: 0, height: 0, wWidth: 0, wHeight: 0, ratio: 0, pixelRatio: 0 };
     render = this.#render;
-    onBeforeRender = (_delta?: number) => {};
-    onAfterRender = () => {};
-    onAfterResize = () => {};
+    onBeforeRender = (_delta?: number) => { };
+    onAfterRender = () => { };
+    onAfterResize = () => { };
     #raf: any;
     #clock = new ThreeClock();
     #running = false;
@@ -657,11 +657,11 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
       this.camera = new PerspectiveCamera();
       this.cameraFov = this.camera.fov;
       this.scene = new Scene();
-      this.renderer = new WebGLRenderer({ 
-        canvas: this.canvas, 
-        powerPreference: 'high-performance', 
-        antialias: true, 
-        alpha: true 
+      this.renderer = new WebGLRenderer({
+        canvas: this.canvas,
+        powerPreference: 'high-performance',
+        antialias: true,
+        alpha: true
       });
       this.renderer.outputColorSpace = SRGBColorSpace;
       this.renderer.toneMapping = ACESFilmicToneMapping;
@@ -701,12 +701,12 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
     resize() {
       let width = this.canvas.parentNode ? (this.canvas.parentNode as HTMLElement).offsetWidth : window.innerWidth;
       let height = this.canvas.parentNode ? (this.canvas.parentNode as HTMLElement).offsetHeight : window.innerHeight;
-      
+
       this.size.width = width;
       this.size.height = height;
       this.size.ratio = width / height;
       this.camera.aspect = this.size.width / this.size.height;
-      
+
       if (this.camera.isPerspectiveCamera && this.cameraFov) {
         if (this.cameraMinAspect && this.camera.aspect < this.cameraMinAspect) {
           this._adjustFov(this.cameraMinAspect);
@@ -716,7 +716,7 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
           this.camera.fov = this.cameraFov;
         }
       }
-      
+
       this.camera.updateProjectionMatrix();
       this.updateWorldSize();
       this.renderer.setSize(this.size.width, this.size.height);
@@ -789,13 +789,13 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   const raycaster = new Raycaster();
   const plane = new Plane(new Vector3(0, 0, 1), 0);
   const intersection = new Vector3();
-  
+
   pointerHandler = setupPointer(canvas, {
     onMove(state: any) {
       raycaster.setFromCamera(state.nPosition, three.camera);
       three.camera.getWorldDirection(plane.normal);
       raycaster.ray.intersectPlane(plane, intersection);
-      
+
       const t = performance.now() * 0.001;
       const zOsc = Math.sin(t * EFFECTS_CONFIG.CURSOR_Z_FREQUENCY) * EFFECTS_CONFIG.CURSOR_Z_OSCILLATION;
       const cursorPos = new Vector3(
@@ -805,7 +805,7 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
       );
       mesh.physics.center.copy(cursorPos);
       mesh.config.controlSphere0 = true;
-      
+
       mesh.setCursorLightPosition(cursorPos);
     },
     onLeave() {
@@ -844,7 +844,17 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}) {
   };
 }
 
-const Ballpit = ({ className = '', followCursor = true, ...props }: any) => {
+interface BallpitProps {
+  className?: string;
+  followCursor?: boolean;
+  [key: string]: any;
+}
+
+const Ballpit = ({
+  className = '',
+  followCursor = true,
+  ...props
+}: BallpitProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const spheresInstanceRef = useRef<any>(null);
   const originalGravity = useRef<number | null>(null);

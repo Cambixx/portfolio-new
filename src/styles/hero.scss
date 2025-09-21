@@ -2,18 +2,36 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--background-color);
+  //background: linear-gradient(135deg, var(--background-color) 0%, rgba(18, 18, 18, 0.95) 100%);
   color: var(--text-color);
   display: flex;
   align-items: center;
   justify-content: flex-start;
   overflow: visible;
   opacity: 1;
+  
+  // Mejora visual con overlay sutil
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    //background: radial-gradient(ellipse at center, rgba(255, 154, 158, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
 
   @media (max-width: 768px) {
     min-height: 100dvh;
     overflow: hidden;
     padding: 1rem;
+    background: var(--background-color);
+    
+    &::before {
+      background: radial-gradient(ellipse at center, rgba(255, 154, 158, 0.05) 0%, transparent 60%);
+    }
   }
 
   .hero-right {
@@ -99,41 +117,78 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+      
+      &:hover {
+        transform: translateY(-5px);
+        
+        span {
+          color: rgba(255, 255, 255, 1);
+          text-shadow: 
+            var(--text-shadow-medium),
+            0 0 10px rgba(255, 154, 158, 0.4);
+        }
+        
+        .arrow {
+          border-color: rgba(255, 154, 158, 0.8);
+          box-shadow: 
+            0 4px 12px rgba(0, 0, 0, 0.2),
+            0 2px 6px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(255, 154, 158, 0.3);
+          animation-duration: 1.5s;
+          
+          &::after {
+            border-color: rgba(255, 154, 158, 0.9);
+          }
+        }
+      }
       
       @media (max-width: 768px) {
         bottom: 1.5rem;
         transform: scale(0.9);
         width: 100%;
+        
+        &:hover {
+          transform: scale(0.95) translateY(-3px);
+        }
       }
       
       span {
         color: rgba(255, 255, 255, 0.85);
         font-size: 0.9rem;
         font-weight: 500;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.15em;
         text-shadow: var(--text-shadow-medium);
+        transition: all 0.3s ease;
         
         @media (max-width: 768px) {
           font-size: 0.8rem;
+          margin-bottom: 0.6rem;
         }
       }
       
       .arrow {
-        width: 30px;
-        height: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        width: 32px;
+        height: 32px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
         border-radius: 50%;
         position: relative;
-        animation: bounce 2s infinite;
+        animation: smoothBounce 2.5s ease-in-out infinite;
         box-shadow: 
-          0 2px 6px rgba(0, 0, 0, 0.15),
-          0 1px 3px rgba(0, 0, 0, 0.2);
+          0 2px 8px rgba(0, 0, 0, 0.15),
+          0 1px 4px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         
         @media (max-width: 768px) {
-          width: 25px;
-          height: 25px;
+          width: 28px;
+          height: 28px;
         }
         
         &::after {
@@ -144,14 +199,30 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%) rotate(45deg);
-          border-right: 2px solid #ffffff;
-          border-bottom: 2px solid #ffffff;
+          border-right: 2px solid rgba(255, 255, 255, 0.8);
+          border-bottom: 2px solid rgba(255, 255, 255, 0.8);
           margin-top: -2px;
+          transition: all 0.3s ease;
           
           @media (max-width: 768px) {
             width: 6px;
             height: 6px;
+            border-width: 1.5px;
           }
+        }
+        
+        // Efecto de pulso sutil
+        &::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          border: 1px solid rgba(255, 154, 158, 0.3);
+          border-radius: 50%;
+          animation: pulse 3s ease-in-out infinite;
+          opacity: 0;
         }
       }
     }
@@ -167,5 +238,85 @@
   }
   60% {
     transform: translateY(-5px);
+  }
+}
+
+@keyframes smoothBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+// Barra de progreso sutil
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, 
+      rgba(255, 154, 158, 0.8) 0%, 
+      rgba(255, 154, 158, 1) 50%, 
+      rgba(121, 40, 202, 0.8) 100%
+    );
+    transition: transform 0.1s ease-out;
+    box-shadow: 
+      0 0 10px rgba(255, 154, 158, 0.5),
+      0 0 20px rgba(255, 154, 158, 0.3);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 100%
+      );
+      animation: shimmer 2s ease-in-out infinite;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    height: 2px;
+    
+    .progress-bar {
+      box-shadow: 
+        0 0 8px rgba(255, 154, 158, 0.4),
+        0 0 15px rgba(255, 154, 158, 0.2);
+    }
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

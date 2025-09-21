@@ -8,6 +8,7 @@ import { ModelLoader } from './ModelLoader';
 import { AudioButton } from './AudioButton';
 import Ballpit from './Ballpit';
 import Lanyard from './Lanyard';
+import { useActiveSection } from '../hooks/useActiveSection';
 import '../styles/hero.scss';
 
 // Registramos ScrollTrigger para poder usarlo
@@ -50,6 +51,10 @@ const Hero = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
   const [isAudioActuallyPlaying, setIsAudioActuallyPlaying] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
+  // Hook para detectar la sección activa
+  const { activeSection } = useActiveSection();
 
   const heroRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLDivElement>(null);
@@ -57,6 +62,7 @@ const Hero = () => {
   const lastNameRef = useRef<SVGTextElement>(null);
   const nameContainerRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
   const animationContextRef = useRef<gsap.Context | null>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
@@ -97,14 +103,13 @@ const Hero = () => {
     };
   }, [isMobile, cleanupAnimations]);
 
-  // Animación inicial optimizada
+  // Animación inicial mejorada
   useEffect(() => {
     const hero = heroRef.current;
-    const firstNameLine = firstNameRef.current;
-    const lastNameLine = lastNameRef.current;
+    const nameContainer = nameContainerRef.current;
     const scrollIndicator = scrollIndicatorRef.current;
 
-    if (!hero || !firstNameLine || !lastNameLine || !scrollIndicator) return;
+    if (!hero || !nameContainer || !scrollIndicator) return;
 
     const config = isMobile ? 
       NAME_ANIMATION_CONFIG.MOBILE : 
@@ -116,36 +121,44 @@ const Hero = () => {
 
     // Crear contexto de animación
     animationContextRef.current = gsap.context(() => {
-      gsap.set([firstNameLine, lastNameLine], {
+      // Estados iniciales
+      gsap.set(nameContainer, {
         y: config.INITIAL_Y,
-        opacity: 0
+        opacity: 0,
+        scale: 0.9
+      });
+
+      gsap.set(scrollIndicator, {
+        opacity: 0,
+        y: 30
       });
 
       const tl = gsap.timeline({
         defaults: {
           duration: defaults.duration,
           ease: defaults.ease
-        }
+        },
+        delay: showLoader ? 0.5 : 0
       });
 
-      // Animación optimizada de entrada
-      tl.to(firstNameLine, {
+      // Animación de entrada más elegante
+      tl.to(nameContainer, {
         y: 0,
-        opacity: 1
+        opacity: 1,
+        scale: 1,
+        duration: defaults.duration * 1.2,
+        ease: "back.out(1.7)"
       })
-      .to(lastNameLine, {
-        y: 0,
-        opacity: 1
-      }, "-=0.3")
       .to(scrollIndicator, {
         opacity: 1,
         y: 0,
-        duration: defaults.duration * 0.75
-      }, "-=0.2");
+        duration: defaults.duration * 0.8,
+        ease: "power2.out"
+      }, "-=0.4");
     }, hero);
 
     return () => cleanupAnimations();
-  }, [isMobile, cleanupAnimations]);
+  }, [isMobile, cleanupAnimations, showLoader]);
 
   // Efecto de scroll optimizado
   useEffect(() => {
@@ -192,6 +205,9 @@ const Hero = () => {
           opacity: gsap.utils.clamp(0, 1, 1 - progress * 3),
           y: progress * 20
         });
+
+        // Actualizar progreso para la barra
+        setScrollProgress(progress);
       }
     });
 
@@ -201,6 +217,25 @@ const Hero = () => {
   const handleAnalyserStateChange = useCallback((analyser: AnalyserNode | null, playing: boolean) => {
     setAnalyserNode(analyser);
     setIsAudioActuallyPlaying(playing);
+  }, []);
+
+  // Función para scroll suave a la siguiente sección
+  const handleScrollToNext = useCallback(() => {
+    const nextSection = document.querySelector('.about-section') || 
+                       document.querySelector('section:nth-of-type(2)');
+    
+    if (nextSection) {
+      nextSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // Fallback: scroll por viewport height
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
   return (
@@ -264,10 +299,32 @@ const Hero = () => {
         <div 
           className="scroll-indicator" 
           ref={scrollIndicatorRef}
+          onClick={handleScrollToNext}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleScrollToNext();
+            }
+          }}
+          aria-label="Scroll to next section"
         >
           <span>Scroll</span>
           <div className="arrow"></div>
         </div>
+      </div>
+      
+      {/* Barra de progreso sutil */}
+      <div className="progress-container">
+        <div 
+          className="progress-bar" 
+          ref={progressBarRef}
+          style={{
+            transform: `scaleX(${scrollProgress})`,
+            transformOrigin: 'left center'
+          }}
+        />
       </div>
       
       <AudioButton onToggle={setAudioEnabled} onAnalyserStateChange={handleAnalyserStateChange} />
