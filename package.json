@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build --mode analyze",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "optimize": "node scripts/optimize-assets.js",
+    "build:prod": "npm run optimize && npm run build"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.17.3",
@@ -43,6 +46,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "gltf-pipeline": "^4.3.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5"

@@ -62,37 +62,55 @@ const AboutSection = () => {
   }, []);
 
   useEffect(() => {
-    setupScrollTrigger();
-    // Animaciones de bloques de texto
-    const textBlocks = textBlocksRef.current.filter(Boolean);
-    // Limpiar animaciones previas si existen
-    textAnimationsRef.current.forEach(anim => {
-      if (anim.scrollTrigger) anim.scrollTrigger.kill();
-      anim.kill();
-    });
-    textAnimationsRef.current = [];
-    textBlocks.forEach((block) => {
-      const tween = gsap.fromTo(
-        block,
-        {
-          y: window.innerWidth <= 768 ? 20 : 30,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          ease: 'power2.out',
-          force3D: true,
-          scrollTrigger: {
-            trigger: block,
-            start: 'top 80%',
-            end: 'top center',
-            scrub: 1.2,
+    // Función para inicializar GSAP con retry
+    const initGSAP = () => {
+      if (!titleContainerRef.current || !titleRef.current || !lastBlockTitleRef.current) {
+        console.log('GSAP AboutSection: Elementos no encontrados, reintentando...');
+        setTimeout(initGSAP, 100);
+        return;
+      }
+
+      setupScrollTrigger();
+      
+      // Animaciones de bloques de texto
+      const textBlocks = textBlocksRef.current.filter(Boolean);
+      
+      // Limpiar animaciones previas si existen
+      textAnimationsRef.current.forEach(anim => {
+        if (anim.scrollTrigger) anim.scrollTrigger.kill();
+        anim.kill();
+      });
+      textAnimationsRef.current = [];
+      
+      textBlocks.forEach((block) => {
+        const tween = gsap.fromTo(
+          block,
+          {
+            y: window.innerWidth <= 768 ? 20 : 30,
+            opacity: 0,
           },
-        }
-      );
-      textAnimationsRef.current.push(tween);
-    });
+          {
+            y: 0,
+            opacity: 1,
+            ease: 'power2.out',
+            force3D: true,
+            scrollTrigger: {
+              trigger: block,
+              start: 'top 80%',
+              end: 'top center',
+              scrub: 1.2,
+            },
+          }
+        );
+        textAnimationsRef.current.push(tween);
+      });
+
+      console.log('GSAP AboutSection initialized successfully');
+    };
+
+    // Delay inicial para asegurar que el DOM esté listo
+    setTimeout(initGSAP, 200);
+
     // Resize handler
     const handleResize = () => {
       setupScrollTrigger();

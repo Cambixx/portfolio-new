@@ -16,38 +16,73 @@ const ProjectsSection = () => {
 
   useEffect(() => {
     if (window.innerWidth < 768) return; // Solo aplica GSAP en desktop
-    if (!sectionRef.current || !containerRef.current || !projectsRef.current || !lastCardRef.current) return;
-
-    const container = containerRef.current;
-    const projectsWrapper = projectsRef.current;
-    const lastCard = lastCardRef.current;
-
-    // Calculamos el ancho total del contenedor de proyectos
-    const totalWidth = projectsWrapper.scrollWidth;
-    const viewportWidth = window.innerWidth;
-    const scrollDistance = totalWidth - viewportWidth + (viewportWidth * 0.5);
-
-    // Creamos la animación de scroll horizontal
-    gsap.to(projectsWrapper, {
-      x: -scrollDistance,
-      ease: "power1.inOut",
-      scrollTrigger: {
-        trigger: container,
-        endTrigger: lastCard,
-        pin: true,
-        start: "top top",
-        end: "bottom top",
-        scrub: 0.3,
-        anticipatePin: 1,
-        pinSpacing: true,
-        fastScrollEnd: true,
-        preventOverlaps: true,
-        invalidateOnRefresh: true
+    
+    // Función para inicializar GSAP con retry
+    const initGSAP = () => {
+      if (!sectionRef.current || !containerRef.current || !projectsRef.current || !lastCardRef.current) {
+        console.log('GSAP: Elementos no encontrados, reintentando...');
+        setTimeout(initGSAP, 100);
+        return;
       }
-    });
+
+      const container = containerRef.current;
+      const projectsWrapper = projectsRef.current;
+      const lastCard = lastCardRef.current;
+
+      // Asegurar que los elementos tengan dimensiones
+      if (projectsWrapper.scrollWidth === 0) {
+        console.log('GSAP: ScrollWidth es 0, reintentando...');
+        setTimeout(initGSAP, 100);
+        return;
+      }
+
+      // Calculamos el ancho total del contenedor de proyectos
+      const totalWidth = projectsWrapper.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const scrollDistance = totalWidth - viewportWidth + (viewportWidth * 0.5);
+
+      // Limpiar triggers existentes
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === container) {
+          trigger.kill();
+        }
+      });
+
+      // Creamos la animación de scroll horizontal
+      gsap.to(projectsWrapper, {
+        x: -scrollDistance,
+        ease: "power1.inOut",
+        scrollTrigger: {
+          trigger: container,
+          endTrigger: lastCard,
+          pin: true,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.3,
+          anticipatePin: 1,
+          pinSpacing: true,
+          fastScrollEnd: true,
+          preventOverlaps: true,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            console.log('GSAP ScrollTrigger refreshed');
+          }
+        }
+      });
+
+      console.log('GSAP ProjectsSection initialized successfully');
+    };
+
+    // Delay inicial para asegurar que el DOM esté listo
+    const timer = setTimeout(initGSAP, 200);
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      clearTimeout(timer);
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger === containerRef.current) {
+          trigger.kill();
+        }
+      });
     };
   }, []);
 

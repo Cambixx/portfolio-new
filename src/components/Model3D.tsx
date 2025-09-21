@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, Suspense } from 'react';
 import React from 'react';
 import { useGLTF, useAnimations, Float, Environment, Lightformer } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
@@ -9,6 +9,9 @@ import { CSSPlugin } from 'gsap/CSSPlugin';
 
 gsap.registerPlugin(ScrollTrigger, CSSPlugin);
 import { AudioController } from './AudioController';
+
+// Lazy load del modelo 3D - implementación futura
+// const Model3DContent = React.lazy(() => import('./Model3DContent'));
 
 // Constante para configurar el número de rotaciones completas durante el scroll
 const TOTAL_ROTATIONS = 0.9; // Número de vueltas completas durante todo el scroll
@@ -25,7 +28,7 @@ export const Model3D = React.memo(function Model3D({
   isAudioPlaying = false 
 }: Model3DProps) {
   const modelRef = useRef<THREE.Group>(null);
-  const { nodes, animations } = useGLTF('/models/carlos-3.glb');
+  const { nodes, animations } = useGLTF('/models/carlos-3-ultra-optimized.glb');
   const { actions } = useAnimations(animations, modelRef);
 
   const targetRotation = useRef(0);
@@ -157,7 +160,7 @@ export const Model3D = React.memo(function Model3D({
   });
 
   return (
-    <>
+    <Suspense fallback={<div className="model-loading">Cargando modelo 3D...</div>}>
       {audioEnabled && <AudioController />}
       <fog attach="fog" args={['#161616', 30, 40]} />
       
@@ -197,8 +200,8 @@ export const Model3D = React.memo(function Model3D({
           <primitive object={nodes.Scene} />
         </group>
       </Float>
-    </>
+    </Suspense>
   );
 });
 
-useGLTF.preload('/models/carlos-3.glb');
+useGLTF.preload('/models/carlos-3-ultra-optimized.glb');
